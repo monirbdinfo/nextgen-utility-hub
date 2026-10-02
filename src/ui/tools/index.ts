@@ -6,6 +6,7 @@ import { emiCalculator } from './emiCalculator';
 import type { ToolView } from './kit';
 import { numberToWordsTool } from './numberToWords';
 import { takaInWords } from './takaInWords';
+import { unicodeCleaner } from './unicodeCleaner';
 
 /** View for every `available` tool, keyed by registry id (checked in tests/registry.test.ts). */
 export const toolViews: Readonly<Record<string, ToolView>> = {
@@ -16,6 +17,7 @@ export const toolViews: Readonly<Record<string, ToolView>> = {
   'number-to-words-bn': numberToWordsTool,
   'taka-in-words': takaInWords,
   'date-formatter': dateFormatter,
+  'unicode-cleaner': unicodeCleaner,
 };
 
 export type { ToolContext, ToolView } from './kit';

@@ -311,3 +311,157 @@ describe('date formatter', () => {
     expect(resultText(root)).not.toContain('বৈশাখ');
   });
 });
+
+describe('Unicode text cleaner', () => {
+  const u = (...cps: number[]): string => String.fromCodePoint(...cps);
+  const ZWSP = u(0x200b);
+  const ZWJ = u(0x200d);
+  const NBSP = u(0x00a0);
+  // কোড (KA + O-kar), ক্ষ (KA + hasanta + SSA), দাঁড়ি
+  const BN = u(0x0995, 0x09cb, 0x09a1) + ' ' + u(0x0995, 0x09cd, 0x09b7) + u(0x0964);
+  // jsdom's textarea.value setter turns CRLF into LF (as browsers do for script-set values),
+  // so these tests use U+2028; e2e/unicode.spec.ts covers typed CRLF in a real browser.
+  const LS = u(0x2028);
+  const messy = `  Hello${ZWSP}   world${NBSP}${LS}${LS}${LS}${BN}  ${u(0x09b0)}${ZWJ}${u(0x09cd, 0x09af)}\n`;
+  const out = (root: ParentNode): string => $<HTMLTextAreaElement>(root, '#clean-output').value;
+  const notesText = (root: ParentNode): string =>
+    $<HTMLElement>(root, '.result-notes').textContent ?? '';
+
+  it('opens directly with defaults and an empty output', () => {
+    const root = open('#/tool/unicode-cleaner');
+    expect($(root, 'h1').textContent).toBe('Unicode Text Cleaner');
+    expect($(root, '#clean-trimEnds').checked).toBe(true);
+    expect($(root, '#clean-removeJoiners').checked).toBe(false);
+    expect($(root, '#clean-removeBidi').checked).toBe(false);
+    expect($(root, '#clean-norm-none').checked).toBe(true);
+    expect($(root, '#clean-removeJoiners').getAttribute('aria-describedby')).toBe(
+      'clean-removeJoiners-hint',
+    );
+    expect($(root, '#clean-output').closest('.field')?.hasAttribute('hidden')).toBe(true);
+  });
+
+  it('requires some text', () => {
+    const root = open('#/tool/unicode-cleaner');
+    submit(root);
+    expect($(root, '#clean-input-error').textContent).toBe('Enter or paste some text to clean.');
+    expect(document.activeElement?.id).toBe('clean-input');
+  });
+
+  it('counts input characters live', () => {
+    const root = open('#/tool/unicode-cleaner');
+    set(root, '#clean-input', `ab\n${u(0x1f44d)}`);
+    expect($(root, '#clean-input-count').textContent).toBe('4 characters · 2 lines');
+  });
+
+  it('cleans mixed Bangla and English and reports found vs removed vs kept', () => {
+    const root = open('#/tool/unicode-cleaner');
+    set(root, '#clean-input', messy);
+    submit(root);
+    expect(out(root)).toBe(`Hello world\n\n${BN} ${u(0x09b0)}${ZWJ}${u(0x09cd, 0x09af)}`);
+    const n = notesText(root);
+    expect(n).toContain(
+      'Zero-width characters (U+200B, U+2060, U+FEFF, U+00AD): 1 found, 1 removed',
+    );
+    expect(n).toContain('Zero-width joiners (U+200C ZWNJ, U+200D ZWJ): 1 found, kept');
+    expect(n).toContain('Unusual spaces (such as non-breaking U+00A0): 1 found, 1 converted');
+    expect(n).toContain('3 found, 3 converted'); // U+2028 line separators
+    expect(rowValue(root, 'Characters')).toBe(`${[...messy].length} → ${[...out(root)].length}`);
+  });
+
+  it('applies only the selected options', () => {
+    const root = open('#/tool/unicode-cleaner');
+    set(root, '#clean-input', messy);
+    for (const id of [
+      'trimEnds',
+      'trimLineEnds',
+      'collapseSpaces',
+      'convertUnusualSpaces',
+      'normalizeLineEndings',
+      'removeZeroWidth',
+      'removeControl',
+    ]) {
+      $(root, `#clean-${id}`).click();
+    }
+    set(root, '#clean-blankLines', 'keep');
+    submit(root);
+    expect(out(root)).toBe(messy);
+    expect(notesText(root)).toContain('No changes were needed');
+    $(root, '#clean-removeJoiners').click();
+    submit(root);
+    expect(out(root)).toBe(messy.replace(ZWJ, ''));
+  });
+
+  it('can join lines and normalize with NFKC', () => {
+    const root = open('#/tool/unicode-cleaner');
+    set(root, '#clean-input', `${u(0xfb01)}rst line\nsecond ${u(0x2460)}`);
+    $(root, '#clean-keepLineBreaks').click();
+    $(root, '#clean-norm-NFKC').click();
+    submit(root);
+    expect(out(root)).toBe('first line second 1');
+    expect(notesText(root)).toContain('Normalization (NFKC) changed');
+  });
+
+  it('explains whitespace-only input', () => {
+    const root = open('#/tool/unicode-cleaner');
+    set(root, '#clean-input', ` \n\t${NBSP} `);
+    submit(root);
+    expect(out(root)).toBe('');
+    expect(notesText(root)).toContain('only whitespace');
+  });
+
+  it('keeps input, options and result across a language switch', async () => {
+    const root = open('#/tool/unicode-cleaner');
+    set(root, '#clean-input', messy);
+    $(root, '#clean-removeJoiners').click();
+    $(root, '#clean-norm-NFC').click();
+    submit(root);
+    const cleaned = out(root);
+    $<HTMLButtonElement>(root, '#lang-btn').click();
+    await Promise.resolve();
+    expect($(root, 'h1').textContent).toBe('ইউনিকোড টেক্সট ক্লিনার');
+    expect($<HTMLTextAreaElement>(root, '#clean-input').value).toBe(messy);
+    expect($(root, '#clean-removeJoiners').checked).toBe(true);
+    expect($(root, '#clean-norm-NFC').checked).toBe(true);
+    expect(out(root)).toBe(cleaned);
+    expect(notesText(root)).toContain('পাওয়া গেছে');
+  });
+
+  it('copies the cleaned text, not the summary', async () => {
+    const writeText = vi.fn().mockResolvedValue(undefined);
+    Object.defineProperty(navigator, 'clipboard', { value: { writeText }, configurable: true });
+    const root = open('#/tool/unicode-cleaner');
+    const copyBtn = (): HTMLButtonElement =>
+      [...root.querySelectorAll<HTMLButtonElement>('.form-actions button')].find(
+        (b) => b.textContent === 'Copy cleaned text',
+      )!;
+    copyBtn().click();
+    await vi.waitFor(() =>
+      expect($(root, '.copy-status').textContent).toBe('Clean some text first.'),
+    );
+    expect(writeText).not.toHaveBeenCalled();
+    set(root, '#clean-input', `a${ZWSP}  b`);
+    submit(root);
+    copyBtn().click();
+    await vi.waitFor(() => expect(writeText).toHaveBeenCalledWith('a b'));
+  });
+
+  it('resets text, options and result to defaults', () => {
+    const root = open('#/tool/unicode-cleaner');
+    set(root, '#clean-input', messy);
+    $(root, '#clean-removeBidi').click();
+    $(root, '#clean-trimEnds').click();
+    $(root, '#clean-norm-NFKC').click();
+    set(root, '#clean-blankLines', 'remove');
+    submit(root);
+    [...root.querySelectorAll<HTMLButtonElement>('.form-actions button')]
+      .find((b) => b.textContent === 'Reset')!
+      .click();
+    expect($<HTMLTextAreaElement>(root, '#clean-input').value).toBe('');
+    expect($(root, '#clean-removeBidi').checked).toBe(false);
+    expect($(root, '#clean-trimEnds').checked).toBe(true);
+    expect($(root, '#clean-norm-none').checked).toBe(true);
+    expect($<HTMLSelectElement>(root, '#clean-blankLines').value).toBe('collapse');
+    expect(root.querySelector('.result-list')).toBeNull();
+    expect(document.activeElement?.id).toBe('clean-input');
+  });
+});

@@ -173,7 +173,11 @@ export interface ResultPanel {
 }
 
 /** Result area announced politely to screen readers when it changes. */
-export function resultPanel(ctx: ToolContext, actionLabel: string): ResultPanel {
+export function resultPanel(
+  ctx: ToolContext,
+  actionLabel: string,
+  opts: { prepend?: HTMLElement } = {},
+): ResultPanel {
   let current: ResultRow[] = [];
   let currentNotes: string[] = [];
   const body = h('div', { class: 'result-body', 'aria-live': 'polite' });
@@ -182,6 +186,7 @@ export function resultPanel(ctx: ToolContext, actionLabel: string): ResultPanel 
     'section',
     { class: 'result', 'aria-label': ctx.t('result') },
     h('h2', { class: 'result-title' }, ctx.t('result')),
+    opts.prepend ?? null,
     body,
     status,
   );
@@ -248,18 +253,32 @@ export function resultPanel(ctx: ToolContext, actionLabel: string): ResultPanel 
 /** Calculate / Reset / Copy result buttons. */
 export function formActions(
   ctx: ToolContext,
-  opts: { submitLabel: string; onReset(): void; panel?: ResultPanel },
+  opts: {
+    submitLabel: string;
+    onReset(): void;
+    panel?: ResultPanel;
+    /** Copy this instead of the result summary (e.g. a tool's output text). */
+    copy?: { label: string; text(): string; emptyMessage: string };
+  },
 ): HTMLElement {
   const reset = h('button', { type: 'button', class: 'btn' }, icon('reset', 18), ctx.t('reset'));
   reset.addEventListener('click', opts.onReset);
   const copy = opts.panel
-    ? h('button', { type: 'button', class: 'btn' }, icon('copy', 18), ctx.t('copyResult'))
+    ? h(
+        'button',
+        { type: 'button', class: 'btn' },
+        icon('copy', 18),
+        opts.copy?.label ?? ctx.t('copyResult'),
+      )
     : null;
   copy?.addEventListener('click', async () => {
-    const text = opts.panel?.text() ?? '';
-    if (!text) return;
-    const okCopy = await copyText(text);
     const status = opts.panel?.el.querySelector('.copy-status');
+    const text = opts.copy ? opts.copy.text() : (opts.panel?.text() ?? '');
+    if (!text) {
+      if (status && opts.copy) status.textContent = opts.copy.emptyMessage;
+      return;
+    }
+    const okCopy = await copyText(text);
     if (status) status.textContent = ctx.t(okCopy ? 'copied' : 'copyFailed');
   });
   return h(
@@ -302,9 +321,17 @@ export function wireForm(
       return;
     }
     memo.__done = '1';
-    // On small screens the result sits below the form: bring it into view.
+    // On small screens the result sits below the form: if it is cut off at the bottom and does
+    // not already start near the top of the screen, scroll it into view.
     const result = form.parentElement?.querySelector<HTMLElement>('.result');
-    if (byUser && result && result.getBoundingClientRect().top > window.innerHeight * 0.75) {
+    const rect = result?.getBoundingClientRect();
+    if (
+      byUser &&
+      result &&
+      rect &&
+      rect.bottom > window.innerHeight &&
+      rect.top > window.innerHeight * 0.25
+    ) {
       result.scrollIntoView?.({
         behavior: prefersReducedMotion() ? 'auto' : 'smooth',
         block: 'start',

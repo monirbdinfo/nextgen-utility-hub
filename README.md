@@ -9,27 +9,28 @@ Website (GitHub Pages): <https://monirbdinfo.github.io/nextgen-utility-hub/>, de
 `main` by GitHub Actions (first successful deployment: 2 October 2026). Changes on other
 branches appear there only after they are merged into `main`. See [Deployment](#deployment).
 
-## Status: Milestone 3 (first tools)
+## Status: Milestone 4 (Unicode text cleaning)
 
-7 of 26 registry tools are **Available**; the other 19 are **Planned** (roadmap only, shown
+8 of 26 registry tools are **Available**; the other 18 are **Planned** (roadmap only, shown
 with a badge and not linked). See [docs/PROJECT_ROADMAP.md](docs/PROJECT_ROADMAP.md).
 
-| Available now (run entirely in your browser)                               | Toolkit              |
-| -------------------------------------------------------------------------- | -------------------- |
-| Age Calculator — age in years/months/days, next birthday                   | General Utilities    |
-| Date Difference — Y/M/D, total days, inclusive option                      | General Utilities    |
-| Loan EMI Calculator — installment, total repayment and interest (estimate) | General Utilities    |
-| Bangla ⇄ English Digits — digits only, all other text preserved            | Bangla Number & Text |
-| Number to Words — Bangla and English, lakh/crore or million                | Bangla Number & Text |
-| Taka in Words — Taka and poisha, cheque style, never rounds                | Bangla Number & Text |
-| Date Text Formatter — numeric, Bangla/English text, date in words          | Bangla Number & Text |
+| Available now (run entirely in your browser)                                                  | Toolkit              |
+| --------------------------------------------------------------------------------------------- | -------------------- |
+| Age Calculator — age in years/months/days, next birthday                                      | General Utilities    |
+| Date Difference — Y/M/D, total days, inclusive option                                         | General Utilities    |
+| Loan EMI Calculator — installment, total repayment and interest (estimate)                    | General Utilities    |
+| Bangla ⇄ English Digits — digits only, all other text preserved                               | Bangla Number & Text |
+| Number to Words — Bangla and English, lakh/crore or million                                   | Bangla Number & Text |
+| Taka in Words — Taka and poisha, cheque style, never rounds                                   | Bangla Number & Text |
+| Date Text Formatter — numeric, Bangla/English text, date in words                             | Bangla Number & Text |
+| Unicode Text Cleaner — spaces, blank lines, hidden characters, optional NFC/NFKC; Bangla-safe | Bangla Number & Text |
 
 Platform features: responsive homepage, Bangla/English toggle (persisted, sets
 `<html lang>`), light/dark theme, keyboard-accessible search, hash routing with deep links,
 typed central registry. Calculation conventions, rounding rules and limitations are in
 [docs/TOOLS.md](docs/TOOLS.md).
 
-Not available yet: Unicode cleaning, image and PDF tools (`pdf-lib` not added), CV/cover
+Not available yet: image and PDF tools (`pdf-lib` not added), CV/cover
 letter templates, network tools, bandwidth calculator.
 
 ## Toolkits

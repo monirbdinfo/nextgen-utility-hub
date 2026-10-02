@@ -86,3 +86,55 @@ by unit tests in `tests/calc/`.
 - Forms submit with Enter; Reset returns focus to the first field; on narrow screens the
   result is scrolled into view after calculating.
 - Tool pages update the document title and move focus to the tool heading on navigation.
+
+## Unicode Text Cleaner
+
+Route `#/tool/unicode-cleaner`. Code: `src/calc/textClean.ts` (logic) and
+`src/ui/tools/unicodeCleaner.ts` (view). The text is processed only in the browser tab; it
+is not uploaded, stored or logged, and the page makes no network requests.
+
+**Nothing changes until "Clean text" is pressed, and only the ticked operations run.**
+Defaults: trim the start/end, remove spaces at line ends, collapse repeated spaces, convert
+unusual spaces, convert line endings to LF, keep paragraph breaks (at most one blank line),
+keep tabs and line breaks, remove zero-width characters and control characters. Joiners,
+bidi marks and Unicode normalization are **off** by default.
+
+| Option                      | Exactly what it changes                                                                                                                                                                               |
+| --------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Trim start and end          | Whitespace and blank lines before the first and after the last visible character. A leading BOM (U+FEFF) is not treated as whitespace; it is a zero-width character.                                  |
+| Spaces at line ends         | Spaces and tabs before each line break. Indentation is untouched.                                                                                                                                     |
+| Repeated spaces             | Two or more U+0020 spaces become one (anywhere, including indentation). Tabs are separate.                                                                                                            |
+| Unusual spaces              | U+00A0, U+1680, U+2000–U+200A, U+202F, U+205F, U+3000 → U+0020.                                                                                                                                       |
+| Line endings                | CRLF, CR, NEL (U+0085), LS (U+2028), PS (U+2029) → LF.                                                                                                                                                |
+| Blank lines                 | Keep all; keep paragraph breaks (runs of blank lines → one); or remove all. A blank line contains only spaces/tabs.                                                                                   |
+| Keep tabs (off)             | Each tab → one space.                                                                                                                                                                                 |
+| Keep line breaks (off)      | Every line break, with the spaces/tabs around it, → one space (paragraphs merge).                                                                                                                     |
+| Zero-width characters       | U+200B, U+2060, U+FEFF, U+00AD.                                                                                                                                                                       |
+| Control characters          | U+0000–U+0008, U+000B, U+000C, U+000E–U+001F, U+007F–U+0084, U+0086–U+009F. Tab, LF, CR and NEL are never removed by this option.                                                                     |
+| Joiners (opt-in, warned)    | ZWNJ U+200C and ZWJ U+200D. Needed for some Bangla conjunct forms (e.g. র + ZWJ + ্ + য) and for emoji sequences.                                                                                     |
+| Bidi marks (opt-in, warned) | U+200E, U+200F, U+061C, U+202A–U+202E, U+2066–U+2069. Needed in right-to-left text; stray overrides can make text display in a misleading order.                                                      |
+| NFC                         | Canonical composition. Text looks the same. Bangla: decomposed ো/ৌ are composed; precomposed য়/ড়/ঢ় (U+09DF, U+09DC, U+09DD) become letter + nukta, because Unicode excludes them from composition. |
+| NFKC                        | NFC plus compatibility mappings, which can change appearance or meaning: ﬁ → fi, ① → 1, Ａ → A, x² → x2, 𝐀 → A, NBSP → space.                                                                         |
+
+**Never removed:** Bangla letters, vowel signs (কার), ফলা, যুক্তাক্ষর, hasanta (U+09CD), nukta
+(U+09BC), chandrabindu, anusvara, visarga, khanda ta, dari (।), any combining mark, emoji
+skin-tone modifiers and variation selectors. A unit test checks that no code point in the
+Bengali block (U+0980–U+09FF) is in any removal set. U+034F (combining grapheme joiner) and
+U+180E (Mongolian vowel separator) are deliberately not in the zero-width set.
+
+**Order of operations** (fixed): normalize → line endings → control/zero-width/joiner/bidi
+removal → unusual spaces and tabs → join lines → line-end spaces and repeated spaces → blank
+lines → trim ends → normalize again (removing a character between a letter and its combining
+mark can expose a sequence the chosen form composes). Running the same options twice gives
+the same text (tested).
+
+**Report:** "found" counts come from the original text; "removed"/"converted" counts are what
+the selected options actually changed. Groups whose option is off are reported as "kept".
+The tool also says when the input is not in NFC, when normalization changed the text, when no
+change was needed, and when whitespace-only input became empty.
+
+**Counting and limits:** characters are Unicode code points (ক্ষ = 3, 👍🏽 = 2), not user-visible
+letters. Input is limited to 1,000,000 UTF-16 units.
+
+**Browser note:** setting a text box's value from a script turns CR/CRLF into LF, but text
+typed or pasted into it keeps CR in Chromium. The line-ending option handles both.
