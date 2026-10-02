@@ -6,17 +6,17 @@ This roadmap follows the real implementation. A tool is only marked **Available*
 
 ## Status overview
 
-| Milestone | Scope                                                                  | Status                                                           |
-| --------- | ---------------------------------------------------------------------- | ---------------------------------------------------------------- |
-| 1         | Vite + TypeScript foundation, homepage, registry, i18n, CI             | Done (PR #1)                                                     |
-| 2         | GitHub Pages deployment workflow                                       | Done (PR #2), site deployed                                      |
-| 3         | Date/age, date difference, EMI, digits, number/Taka words, date text   | **Done on branch `claude/happy-clarke-w53sgx`, awaiting review** |
-| 4         | Unicode text cleaning and normalization                                | **Done on branch `claude/happy-clarke-w53sgx`, awaiting review** |
-| 5         | Image resize, crop, compression, conversion, photo/signature presets   | Planned                                                          |
-| 6         | PDF creation, merge, split, page tools, size reduction                 | Planned                                                          |
-| 7         | CV and cover-letter templates with print/PDF export                    | Planned                                                          |
-| 8         | Subnet/CIDR/IP-range calculators, IP/DNS lookup, latency check         | Planned                                                          |
-| 9         | Bandwidth/data usage, integration, accessibility and regression review | Planned                                                          |
+| Milestone | Scope                                                                  | Status                                        |
+| --------- | ---------------------------------------------------------------------- | --------------------------------------------- |
+| 1         | Vite + TypeScript foundation, homepage, registry, i18n, CI             | Done (PR #1)                                  |
+| 2         | GitHub Pages deployment workflow                                       | Done (PR #2), site deployed                   |
+| 3         | Date/age, date difference, EMI, digits, number/Taka words, date text   | Done (PR #3, merged `9d0ed68`), site deployed |
+| 4         | Unicode text cleaning and normalization                                | Done (PR #3, merged `9d0ed68`), site deployed |
+| 5         | Image resize, crop, compression, conversion, photo/signature presets   | Planned                                       |
+| 6         | PDF creation, merge, split, page tools, size reduction                 | Planned                                       |
+| 7         | CV and cover-letter templates with print/PDF export                    | Planned                                       |
+| 8         | Subnet/CIDR/IP-range calculators, IP/DNS lookup, latency check         | Planned                                       |
+| 9         | Bandwidth/data usage, integration, accessibility and regression review | Planned                                       |
 
 ## Tool catalog by milestone
 
@@ -134,6 +134,26 @@ Findings during implementation:
 - **Mobile result visibility:** the scroll-into-view rule in the shared kit now triggers when
   the result is cut off at the bottom (it previously missed long results such as this tool's
   output box). It applies to every tool.
+
+Milestones 3 and 4 were merged into `main` together in PR #3 (merge commit `9d0ed68`,
+2 October 2026). CI passed on the pull request and on `main`, and the "Deploy to GitHub
+Pages" workflow (run #2) published them.
+
+## Follow-up — Text Cleaner performance fix
+
+A post-merge review found that three whitespace regexes in `src/calc/textClean.ts` (joining
+lines, trimming line ends, trimming the whole text) backtracked quadratically on very long
+runs of spaces or tabs: 10,000 / 20,000 / 40,000 spaces took about 0.26 / 1.0 / 3.8 s, so an
+input at the 1,000,000-character limit could freeze the tab for tens of minutes. Normal text
+was not affected.
+
+They were replaced by linear-time loops with identical behaviour. Regex lookbehind was not
+used because it needs Safari/iOS 16.4+, while the ES2022 build otherwise supports Safari
+15.4+; on older Safari it would have stopped the whole site from loading. Behaviour is pinned
+by `tests/calc/textCleanLinear.test.ts`: explicit cases checked against the original regexes,
+a fixed-seed differential test (100,000 random inputs per operation) and 1,000,000-character
+inputs (correctness only, no timing assertion). Measured timings are in
+[TOOLS.md](TOOLS.md#unicode-text-cleaner).
 
 ## Notes for later milestones
 

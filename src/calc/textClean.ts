@@ -128,10 +128,70 @@ const RE_LONE_CR = /\r(?!\n)/g;
 const RE_UNICODE_LINE_SEP = new RegExp(`[${UNICODE_LINE_SEPS}]`, 'g');
 const LINE_BREAK = `(?:\\r\\n|[\\n\\r${UNICODE_LINE_SEPS}])`;
 const RE_LINE_BREAK = new RegExp(LINE_BREAK, 'g');
-/** Whitespace trimmed at the ends of the whole text. Excludes U+FEFF (handled as zero-width). */
-const WS = `[ \\t\\n\\r${esc(0x0b)}${esc(0x0c)}${UNICODE_LINE_SEPS}${classOf(UNUSUAL_SPACES)}]`;
 
 const count = (text: string, re: RegExp): number => text.match(re)?.length ?? 0;
+
+// Whitespace handling below uses plain loops instead of regexes such as /[ \t]+$/, which
+// backtrack quadratically on very long runs of spaces (a 1,000,000-space input could freeze
+// the tab). Regex lookbehind would also fix that but needs Safari 16.4+.
+const RE_SPLIT_LINES = new RegExp(`(${LINE_BREAK})`);
+const isHSpace = (c: string | undefined): boolean => c === ' ' || c === '\t';
+const WS_CHARS = new Set([
+  ' ',
+  '\t',
+  '\n',
+  '\r',
+  ...chars(0x0b, 0x0c, 0x85, 0x2028, 0x2029),
+  ...UNUSUAL_SPACES,
+]);
+
+function trimEndHSpace(s: string): string {
+  let end = s.length;
+  while (end > 0 && isHSpace(s[end - 1])) end--;
+  return s.slice(0, end);
+}
+
+function trimStartHSpace(s: string): string {
+  let start = 0;
+  while (start < s.length && isHSpace(s[start])) start++;
+  return s.slice(start);
+}
+
+/** Lines and the exact separators between them (split keeps captured separators). */
+function splitLines(text: string): { lines: string[]; seps: string[] } {
+  const parts = text.split(RE_SPLIT_LINES);
+  return { lines: parts.filter((_, i) => i % 2 === 0), seps: parts.filter((_, i) => i % 2 === 1) };
+}
+
+/** Remove spaces and tabs at the end of every line, keeping each original line break. */
+export function trimLineEndsLinear(text: string): string {
+  const { lines, seps } = splitLines(text);
+  return lines.map((line, i) => trimEndHSpace(line) + (seps[i] ?? '')).join('');
+}
+
+/** Join all lines: each break, with the spaces/tabs and blank lines around it, becomes one space. */
+export function joinLinesLinear(text: string): string {
+  const { lines } = splitLines(text);
+  if (lines.length === 1) return text;
+  const last = lines.length - 1;
+  let out = trimEndHSpace(lines[0] ?? '');
+  for (let i = 1; i <= last; i++) {
+    const line =
+      i === last ? trimStartHSpace(lines[i] ?? '') : trimEndHSpace(trimStartHSpace(lines[i] ?? ''));
+    if (line === '' && i < last) continue; // a blank line is absorbed into the single joining space
+    out += ` ${line}`;
+  }
+  return out;
+}
+
+/** Trim whitespace (including line breaks and unusual spaces, but not U+FEFF) at both ends. */
+export function trimEndsLinear(text: string): string {
+  let start = 0;
+  let end = text.length;
+  while (start < end && WS_CHARS.has(text[start] ?? '')) start++;
+  while (end > start && WS_CHARS.has(text[end - 1] ?? '')) end--;
+  return text.slice(start, end);
+}
 
 // ---------- Report ----------
 
@@ -253,11 +313,11 @@ export function cleanText(
 
   // 5. Joining lines: each break, with spaces/tabs around it, becomes one space.
   if (!o.keepLineBreaks) {
-    t = t.replace(new RegExp(`[ \\t]*(?:${LINE_BREAK}[ \\t]*)+`, 'g'), ' ');
+    t = joinLinesLinear(t);
   }
 
   // 6. Per-line whitespace.
-  if (o.trimLineEnds) t = t.replace(new RegExp(`[ \\t]+(?=${LINE_BREAK}|$)`, 'g'), '');
+  if (o.trimLineEnds) t = trimLineEndsLinear(t);
   if (o.collapseSpaces) t = t.replace(/ {2,}/g, ' ');
 
   // 7. Blank lines. A blank line holds nothing but spaces or tabs.
@@ -270,7 +330,7 @@ export function cleanText(
   }
 
   // 8. Ends of the whole text.
-  if (o.trimEnds) t = t.replace(new RegExp(`^${WS}+|${WS}+$`, 'g'), '');
+  if (o.trimEnds) t = trimEndsLinear(t);
 
   // 9. Normalize again: removing a character between a letter and a combining mark can
   //    leave a sequence that the selected form would compose.

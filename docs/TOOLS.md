@@ -136,5 +136,12 @@ change was needed, and when whitespace-only input became empty.
 **Counting and limits:** characters are Unicode code points (ক্ষ = 3, 👍🏽 = 2), not user-visible
 letters. Input is limited to 1,000,000 UTF-16 units.
 
+**Performance:** every operation runs in linear time, including on long runs of spaces or
+tabs. Measured on the development machine (median of 5 runs; device speed varies): the
+cleaning engine handles 1,000,000 spaces in about 25 ms and 1,000,000 tabs in about 85 ms
+on Node 22, and a full "Clean text" at the 1,000,000-character limit takes about 22–45 ms in
+Chromium on the production build. The whitespace steps use plain loops rather than regex
+lookbehind so the tool keeps working on Safari/iOS 15.4–16.3.
+
 **Browser note:** setting a text box's value from a script turns CR/CRLF into LF, but text
 typed or pasted into it keeps CR in Chromium. The line-ending option handles both.
