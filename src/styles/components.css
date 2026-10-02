@@ -1273,3 +1273,187 @@
 .result > .field {
   margin-top: var(--space-4);
 }
+
+/* ---------- Image tools ---------- */
+.dropzone {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-8) var(--space-4);
+  text-align: center;
+  border: 2px dashed var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-bg);
+  transition:
+    border-color 0.15s var(--ease),
+    background-color 0.15s var(--ease);
+}
+
+.dropzone-active {
+  border-color: var(--color-primary);
+  background: color-mix(in srgb, var(--color-primary) 8%, var(--color-bg));
+}
+
+.dropzone-icon {
+  display: grid;
+  place-items: center;
+  width: 56px;
+  height: 56px;
+  color: var(--color-link);
+  background: color-mix(in srgb, var(--color-primary) 12%, var(--color-surface));
+  border-radius: var(--radius-pill);
+}
+
+.drop-text {
+  color: var(--color-muted);
+}
+
+/* Visually hidden but focusable: the visible label acts as the button. */
+.file-input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  overflow: hidden;
+}
+
+.file-input:focus-visible + label {
+  outline: 3px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+.image-status:empty,
+.image-alert[hidden] {
+  display: none;
+}
+
+.image-status {
+  margin-top: var(--space-4);
+  font-weight: 600;
+  color: var(--color-success-text);
+}
+
+.image-alert {
+  margin-top: var(--space-4);
+  padding: var(--space-3) var(--space-4);
+  font-weight: 600;
+  color: var(--color-danger);
+  border: 1px solid var(--color-danger);
+  border-radius: var(--radius-md);
+}
+
+.image-card + .image-card,
+.image-input .image-card {
+  margin-top: var(--space-5);
+}
+
+.image-frame {
+  display: grid;
+  place-items: center;
+  margin-top: var(--space-4);
+  padding: var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  /* Checkerboard so transparent areas are visible. */
+  background-color: var(--color-surface);
+  background-image:
+    linear-gradient(45deg, var(--color-surface-2) 25%, transparent 25%),
+    linear-gradient(-45deg, var(--color-surface-2) 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, var(--color-surface-2) 75%),
+    linear-gradient(-45deg, transparent 75%, var(--color-surface-2) 75%);
+  background-size: 20px 20px;
+  background-position:
+    0 0,
+    0 10px,
+    10px -10px,
+    -10px 0;
+}
+
+.image-preview {
+  display: block;
+  max-width: 100%;
+  max-height: 360px;
+  height: auto;
+  object-fit: contain;
+}
+
+.image-meta {
+  margin-top: var(--space-4);
+}
+
+@media (min-width: 640px) {
+  .image-meta {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+.preset-group {
+  margin: var(--space-5) 0 0;
+  padding: 0;
+  border: 0;
+}
+
+.preset-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin-top: var(--space-2);
+}
+
+.preset-buttons .btn {
+  min-width: 64px;
+  min-height: var(--touch);
+}
+
+.image-controls .field-grid + .field-grid {
+  margin-top: var(--space-5);
+}
+
+.image-warnings {
+  display: grid;
+  gap: var(--space-2);
+  margin: var(--space-4) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.image-warnings:empty {
+  display: none;
+}
+
+.image-warnings li {
+  display: flex;
+  gap: var(--space-2);
+  align-items: flex-start;
+  padding: var(--space-3);
+  font-size: 0.92rem;
+  background: var(--color-surface-2);
+  border-radius: var(--radius-sm);
+}
+
+.image-warnings .icon {
+  margin-top: 3px;
+  color: var(--color-link);
+}
+
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.image-output .form-actions {
+  margin-top: var(--space-4);
+}
+
+.image-controls > .result-title {
+  margin-bottom: var(--space-4);
+}
+
+.image-controls .preset-group + .field-grid {
+  margin-top: var(--space-5);
+}
+
+a.btn {
+  text-decoration: none;
+}

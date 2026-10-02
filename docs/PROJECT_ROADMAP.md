@@ -12,7 +12,7 @@ This roadmap follows the real implementation. A tool is only marked **Available*
 | 2         | GitHub Pages deployment workflow                                       | Done (PR #2), site deployed                   |
 | 3         | Date/age, date difference, EMI, digits, number/Taka words, date text   | Done (PR #3, merged `9d0ed68`), site deployed |
 | 4         | Unicode text cleaning and normalization                                | Done (PR #3, merged `9d0ed68`), site deployed |
-| 5         | Image resize, crop, compression, conversion, photo/signature presets   | Planned                                       |
+| 5         | Image resize, crop, compression, conversion, photo/signature presets   | In progress: Image Resizer done (this branch) |
 | 6         | PDF creation, merge, split, page tools, size reduction                 | Planned                                       |
 | 7         | CV and cover-letter templates with print/PDF export                    | Planned                                       |
 | 8         | Subnet/CIDR/IP-range calculators, IP/DNS lookup, latency check         | Planned                                       |
@@ -20,7 +20,7 @@ This roadmap follows the real implementation. A tool is only marked **Available*
 
 ## Tool catalog by milestone
 
-26 registry entries; 8 available after Milestone 4.
+27 registry entries; 9 available after the Milestone 5 Image Resizer.
 
 | Milestone | Category | Registry ID              | Tool                                   | Status    |
 | --------- | -------- | ------------------------ | -------------------------------------- | --------- |
@@ -33,7 +33,8 @@ This roadmap follows the real implementation. A tool is only marked **Available*
 | 3         | Bangla   | `date-formatter`         | Date Text Formatter                    | Available |
 | 4         | Bangla   | `unicode-cleaner`        | Unicode Text Cleaner                   | Available |
 | 5         | Files    | `image-compressor`       | Image Compressor & Converter (JPG/PNG) | Planned   |
-| 5         | Files    | `image-resize-crop`      | Image Resize & Crop                    | Planned   |
+| 5         | Files    | `image-resizer`          | Image Resizer                          | Available |
+| 5         | Files    | `image-cropper`          | Image Cropper                          | Planned   |
 | 5         | Files    | `job-photo-resizer`      | Photo & Signature Resizer              | Planned   |
 | 6         | Files    | `pdf-create`             | Create PDF                             | Planned   |
 | 6         | Files    | `pdf-merge`              | PDF Merge & Split                      | Planned   |
@@ -54,7 +55,9 @@ This roadmap follows the real implementation. A tool is only marked **Available*
 ### How overlapping requirements were merged
 
 - "Image resize and compression" and "JPG/PNG compression and conversion" share
-  `image-compressor`; resizing to exact dimensions and cropping is `image-resize-crop`.
+  `image-compressor`. Resizing and cropping were planned together as `image-resize-crop`;
+  in Milestone 5 that entry was split into `image-resizer` and `image-cropper` so each can
+  ship on its own (see below).
 - "Printable and PDF-exportable application documents" and "configurable layouts" are
   features of `cv-templates` and `cover-letter-templates`, not separate tools.
 - "Subnet calculator" and "CIDR and IP-range calculator" are separate entries but will
@@ -155,6 +158,46 @@ a fixed-seed differential test (100,000 random inputs per operation) and 1,000,0
 inputs (correctness only, no timing assertion). Measured timings are in
 [TOOLS.md](TOOLS.md#unicode-text-cleaner).
 
+## Milestone 5 — Image Resizer delivered (other image tools planned)
+
+Tool: **Image Resizer** (`image-resizer`, Privacy-First File Tools, route
+`#/tool/image-resizer`). Conventions, limits and browser notes are in
+[TOOLS.md](TOOLS.md#image-resizer).
+
+Registry change: the planned `image-resize-crop` entry was replaced by `image-resizer`
+(available) and `image-cropper` (planned). Planned tools never had a route, so no published
+link changes. `image-compressor` and `job-photo-resizer` are unchanged and still planned.
+
+Added:
+
+- `src/calc/image.ts` — pure logic: file-type sniffing from the first bytes, size limits,
+  aspect-ratio and percentage maths, dimension validation, output format choice,
+  transparency checks, safe download filenames.
+- `src/lib/imageCanvas.ts` — browser decode (`<img>` + `decode()`), canvas resize and encode,
+  with typed errors for decode, canvas and encode failures.
+- `src/ui/tools/imageResizer.ts` — the view. The shared tool context gained an in-memory
+  per-tool session (survives a language switch, cleared when leaving the tool) and cleanup
+  hooks, which the image tool uses to revoke object URLs.
+- No new dependencies. Tests: `tests/calc/image.test.ts` (19), `tests/imageResizer.test.ts`
+  (18, canvas mocked), `e2e/image.spec.ts` (15) with deterministic fixtures in
+  `e2e/fixtures/`, plus the tool in the desktop/mobile load checks.
+
+Validation (run locally on 2 October 2026 after a clean `npm ci`, Node 22, Chromium):
+
+| Command                                                     | Result                                                                                            |
+| ----------------------------------------------------------- | ------------------------------------------------------------------------------------------------- |
+| `npm run format:check`, `npm run lint`, `npm run typecheck` | passed                                                                                            |
+| `npm test`                                                  | 275 tests passed in 15 files                                                                      |
+| `npm run build`                                             | succeeded (JS 132.7 kB / 42.0 kB gzip, CSS 24.8 kB)                                               |
+| `npm run test:e2e`                                          | 58 tests passed, including 15 image tests at 360/768/1280 px and the `/nextgen-utility-hub/` path |
+
+An axe-core scan (WCAG 2.1 A/AA and best practices, run ad hoc; axe is not a project
+dependency) found no violations on the empty and result states, in light and dark themes,
+English and Bangla, at 360 and 1280 px.
+
+Still planned in Milestone 5, each as a separate step: Image Cropper, Image Compressor,
+Image Converter (format conversion), and the photo/signature presets.
+
 ## Notes for later milestones
 
 - **Milestone 6 (PDF)** will need `pdf-lib`; add it to `docs/LICENSES.md` with verified
@@ -165,10 +208,9 @@ inputs (correctness only, no timing assertion). Measured timings are in
   Browsers cannot send ICMP, so "ping" will be an HTTPS round-trip measurement and must be
   labelled as such. No port or network scanning will be implemented.
 
-## Recommended next milestone
+## Recommended next step
 
-**Milestone 5 — image resize, crop, compression and conversion, with photo/signature presets.**
-It can use the browser's built-in canvas APIs without new dependencies or network access,
-and the photo/signature presets are directly useful for Bangladeshi job applications.
-Exact preset dimensions and file-size limits for specific recruiters should be confirmed
-from their official notices before they are hard-coded.
+Continue Milestone 5 one tool at a time, reusing `src/calc/image.ts` and
+`src/lib/imageCanvas.ts`: Image Cropper, then Image Compressor, then Image Converter, then
+the photo/signature presets. Exact preset dimensions and file-size limits for specific
+recruiters should be confirmed from their official notices before they are hard-coded.

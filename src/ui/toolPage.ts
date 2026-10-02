@@ -6,11 +6,13 @@ import { icon } from './icons';
 import { toolViews } from './tools';
 
 /** Dedicated page for one available tool: breadcrumb, heading, the tool itself and related tools. */
-export function createToolPage(
-  ctx: AppContext,
-  tool: Tool,
-  memo: Record<string, string>,
-): HTMLElement {
+export interface ToolStore {
+  memo: Record<string, string>;
+  session: Map<string, unknown>;
+  onCleanup(fn: () => void): void;
+}
+
+export function createToolPage(ctx: AppContext, tool: Tool, store: ToolStore): HTMLElement {
   const { t, state } = ctx;
   const lang = state.lang;
   const cat = getCategory(tool.category);
@@ -54,7 +56,7 @@ export function createToolPage(
         ),
       ),
     ),
-    view ? view({ lang, t: ctx.t, memo }) : null,
+    view ? view({ lang, t: ctx.t, ...store }) : null,
     h('p', { class: 'tool-privacy' }, icon('shield', 18), t('toolPrivacy')),
     related.length
       ? h(

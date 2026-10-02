@@ -38,6 +38,22 @@ export function mountApp(root: HTMLElement): () => void {
   let main: HTMLElement | null = null;
   /** Per-tool form values, kept in memory only (survives language switches, not reloads). */
   const toolMemo = new Map<string, Record<string, string>>();
+  /** Per-tool in-memory objects (e.g. picked files); dropped when the user leaves the tool. */
+  const toolSession = new Map<string, Map<string, unknown>>();
+  /** Cleanups registered by the tool view currently on screen. */
+  let cleanups: Array<() => void> = [];
+
+  function runCleanups(): void {
+    const pending = cleanups;
+    cleanups = [];
+    for (const fn of pending) {
+      try {
+        fn();
+      } catch {
+        /* a failing cleanup must not break navigation */
+      }
+    }
+  }
 
   const ctx: AppContext = {
     state,
@@ -117,6 +133,7 @@ export function mountApp(root: HTMLElement): () => void {
   /** Fill <main> for the current route: a tool page, or the home view (hero, toolkits, about). */
   function renderMain(): void {
     if (!main) return;
+    runCleanups();
     const route = state.route;
     const tool = route.name === 'tool' ? getTool(route.id) : undefined;
     if (tool) {
@@ -124,7 +141,10 @@ export function mountApp(root: HTMLElement): () => void {
       toolkits = null;
       let memo = toolMemo.get(tool.id);
       if (!memo) toolMemo.set(tool.id, (memo = {}));
-      main.replaceChildren(createToolPage(ctx, tool, memo));
+      let session = toolSession.get(tool.id);
+      if (!session) toolSession.set(tool.id, (session = new Map()));
+      const onCleanup = (fn: () => void): void => void cleanups.push(fn);
+      main.replaceChildren(createToolPage(ctx, tool, { memo, session, onCleanup }));
       return;
     }
     search = createSearch(ctx);
@@ -162,6 +182,8 @@ export function mountApp(root: HTMLElement): () => void {
     const prev: Route = state.route;
     const changed = toHash(next) !== toHash(prev);
     state.route = next;
+    // Leaving a tool drops its in-memory objects (picked files, results).
+    if (prev.name === 'tool' && changed) toolSession.delete(prev.id);
     applyDocumentState();
     // Tool pages replace the home view; home ↔ category only updates it in place.
     if (next.name === 'tool' || prev.name === 'tool') {
@@ -239,6 +261,8 @@ export function mountApp(root: HTMLElement): () => void {
   document.addEventListener('keydown', onKeydown);
 
   return () => {
+    runCleanups();
+    toolSession.clear();
     header?.destroy();
     window.removeEventListener('hashchange', onHashChange);
     root.removeEventListener('click', onClick);
