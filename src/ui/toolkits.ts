@@ -1,5 +1,12 @@
 import { h } from '../lib/dom';
-import { categories, getCategory, toolsByCategory, type Category, type Tool } from '../registry';
+import {
+  categories,
+  getCategory,
+  sortByAvailability,
+  toolsByCategory,
+  type Category,
+  type Tool,
+} from '../registry';
 import type { Route } from '../router/router';
 import { toHash } from '../router/router';
 import { icon } from './icons';
@@ -48,7 +55,6 @@ export function createToolkits(ctx: AppContext): ToolkitsHandle {
   );
 
   function card(cat: Category): HTMLElement {
-    const count = toolsByCategory(cat.id).length;
     return h(
       'li',
       { class: `card card-${cat.id}` },
@@ -66,7 +72,7 @@ export function createToolkits(ctx: AppContext): ToolkitsHandle {
       h(
         'p',
         { class: 'card-foot' },
-        h('span', { class: 'card-count' }, t('toolCount', { n: count })),
+        h('span', { class: 'card-count' }, countLabel(cat)),
         h(
           'span',
           { class: 'card-cta', 'aria-hidden': 'true' },
@@ -77,18 +83,42 @@ export function createToolkits(ctx: AppContext): ToolkitsHandle {
     );
   }
 
+  function countLabel(cat: Category): string {
+    const list = toolsByCategory(cat.id);
+    const available = list.filter((x) => x.status === 'available').length;
+    const planned = list.length - available;
+    if (!available) return t('toolCount', { n: planned });
+    if (!planned) return t('toolCountAvailable', { n: available });
+    return t('toolCountMixed', { available, planned });
+  }
+
   function toolItem(tool: Tool): HTMLElement {
+    const available = tool.status === 'available';
+    const name = available
+      ? h(
+          'a',
+          { href: toHash({ name: 'tool', id: tool.id }), class: 'tool-link' },
+          tool.name[state.lang],
+        )
+      : tool.name[state.lang];
     return h(
       'li',
-      { id: `tool-${tool.id}`, class: 'tool', tabindex: '-1' },
+      { id: `tool-${tool.id}`, class: `tool${available ? ' tool-available' : ''}`, tabindex: '-1' },
       h(
         'div',
         { class: 'tool-head' },
-        h('h5', { class: 'tool-name' }, tool.name[state.lang]),
+        h('h5', { class: 'tool-name' }, name),
         h('span', { class: `pill pill-${tool.status}` }, t(statusKey[tool.status])),
       ),
       h('p', { class: 'tool-desc' }, tool.description[state.lang]),
-      tool.status === 'available' ? null : h('p', { class: 'tool-note' }, t('plannedNote')),
+      available
+        ? h(
+            'p',
+            { class: 'tool-cta', 'aria-hidden': 'true' },
+            t('openTool'),
+            icon('arrow-right', 16),
+          )
+        : h('p', { class: 'tool-note' }, t('plannedNote')),
     );
   }
 
@@ -104,6 +134,7 @@ export function createToolkits(ctx: AppContext): ToolkitsHandle {
       return;
     }
 
+    if (route.name !== 'category') return; // tool pages do not show this section
     const cat = getCategory(route.id);
     if (!cat) return;
     body.replaceChildren(
@@ -126,7 +157,11 @@ export function createToolkits(ctx: AppContext): ToolkitsHandle {
           ),
         ),
         h('h4', { class: 'panel-subtitle' }, t('toolsInCategory')),
-        h('ul', { class: 'tool-grid', role: 'list' }, ...toolsByCategory(cat.id).map(toolItem)),
+        h(
+          'ul',
+          { class: 'tool-grid', role: 'list' },
+          ...sortByAvailability(toolsByCategory(cat.id)).map(toolItem),
+        ),
         h(
           'a',
           { href: toHash({ name: 'home' }), class: 'back-link' },

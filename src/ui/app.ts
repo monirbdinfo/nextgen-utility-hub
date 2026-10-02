@@ -1,13 +1,14 @@
 import { detectLang, t as translate } from '../i18n';
 import { focusAndReveal, h } from '../lib/dom';
 import { readPref, writePref } from '../lib/storage';
-import { getCategory, type Lang } from '../registry';
-import { parseHash, toHash } from '../router/router';
+import { getCategory, getTool, type Lang } from '../registry';
+import { parseHash, toHash, type Route } from '../router/router';
 import type { AppContext, AppState, Theme } from './context';
 import { createHeader, type HeaderHandle } from './header';
 import { icon } from './icons';
 import { createSearch, type SearchHandle } from './search';
 import { createToolkits, type ToolkitsHandle } from './toolkits';
+import { createToolPage } from './toolPage';
 
 export const LANG_KEY = 'nguh.lang';
 export const THEME_KEY = 'nguh.theme';
@@ -34,6 +35,9 @@ export function mountApp(root: HTMLElement): () => void {
   let search: SearchHandle | null = null;
   let toolkits: ToolkitsHandle | null = null;
   let pendingFocus: string | null = null;
+  let main: HTMLElement | null = null;
+  /** Per-tool form values, kept in memory only (survives language switches, not reloads). */
+  const toolMemo = new Map<string, Record<string, string>>();
 
   const ctx: AppContext = {
     state,
@@ -63,8 +67,14 @@ export function mountApp(root: HTMLElement): () => void {
     const doc = document.documentElement;
     doc.lang = state.lang;
     doc.dataset.theme = state.theme;
-    const cat = state.route.name === 'category' ? getCategory(state.route.id) : undefined;
-    document.title = cat ? `${cat.name[state.lang]} · ${t('siteName')}` : t('siteName');
+    const route = state.route;
+    const page =
+      route.name === 'category'
+        ? getCategory(route.id)?.name[state.lang]
+        : route.name === 'tool'
+          ? getTool(route.id)?.name[state.lang]
+          : undefined;
+    document.title = page ? `${page} · ${t('siteName')}` : t('siteName');
   }
 
   function hero(searchEl: HTMLElement): HTMLElement {
@@ -104,17 +114,35 @@ export function mountApp(root: HTMLElement): () => void {
     );
   }
 
+  /** Fill <main> for the current route: a tool page, or the home view (hero, toolkits, about). */
+  function renderMain(): void {
+    if (!main) return;
+    const route = state.route;
+    const tool = route.name === 'tool' ? getTool(route.id) : undefined;
+    if (tool) {
+      search = null;
+      toolkits = null;
+      let memo = toolMemo.get(tool.id);
+      if (!memo) toolMemo.set(tool.id, (memo = {}));
+      main.replaceChildren(createToolPage(ctx, tool, memo));
+      return;
+    }
+    search = createSearch(ctx);
+    toolkits = createToolkits(ctx);
+    main.replaceChildren(hero(search.el), toolkits.el, about());
+  }
+
   function renderShell(): void {
     header?.destroy();
     header = createHeader(ctx);
-    search = createSearch(ctx);
-    toolkits = createToolkits(ctx);
     applyDocumentState();
+    main = h('main', { id: 'main', tabindex: '-1' });
+    renderMain();
 
     root.replaceChildren(
       h('a', { class: 'skip-link', href: '#main' }, t('skipLink')),
       header.el,
-      h('main', { id: 'main', tabindex: '-1' }, hero(search.el), toolkits.el, about()),
+      main,
       h(
         'footer',
         { class: 'footer' },
@@ -131,16 +159,28 @@ export function mountApp(root: HTMLElement): () => void {
   function onRouteChange(initial = false): void {
     const next = parseHash(location.hash);
     if (!next) return; // plain in-page anchor, not a route
-    const changed = toHash(next) !== toHash(state.route);
+    const prev: Route = state.route;
+    const changed = toHash(next) !== toHash(prev);
     state.route = next;
     applyDocumentState();
-    toolkits?.update();
-    search?.refresh();
+    // Tool pages replace the home view; home ↔ category only updates it in place.
+    if (next.name === 'tool' || prev.name === 'tool') {
+      if (changed || !main?.hasChildNodes()) renderMain();
+    } else {
+      toolkits?.update();
+      search?.refresh();
+    }
 
-    const focusTarget = pendingFocus ? document.getElementById(pendingFocus) : null;
+    const focusTarget = pendingFocus ? focusableFor(pendingFocus) : null;
     pendingFocus = null;
     if (focusTarget) {
       focusAndReveal(focusTarget);
+    } else if (next.name === 'tool') {
+      const title = document.getElementById('tool-title');
+      if (initial || !title) window.scrollTo?.(0, 0);
+      else if (changed) focusAndReveal(title);
+    } else if (prev.name === 'tool' && next.name === 'home' && main) {
+      focusAndReveal(main); // leaving a tool for home: start at the top
     } else if (initial) {
       if (next.name === 'category' && toolkits) focusAndReveal(toolkits.el, { focus: false });
     } else if (changed && toolkits) {
@@ -165,13 +205,21 @@ export function mountApp(root: HTMLElement): () => void {
       return;
     }
     if (href.startsWith('#/')) return; // real route: let the hash change
-    const target = document.getElementById(href.slice(1));
-    if (target) {
-      e.preventDefault();
-      const heading = target.matches('section') ? target.querySelector<HTMLElement>('h2') : null;
-      focusAndReveal(heading ?? target);
-    }
+    const id = href.slice(1);
+    const target = focusableFor(id);
+    e.preventDefault();
+    if (target) focusAndReveal(target);
+    // The section lives on the home view (e.g. "About" clicked on a tool page): go home first.
+    else if (id === 'toolkits' || id === 'about') ctx.navigate({ name: 'home' }, id);
   };
+
+  /** Element to focus for an id: a section's heading, or the element itself. */
+  function focusableFor(id: string): HTMLElement | null {
+    const target = document.getElementById(id);
+    if (!target) return null;
+    const heading = target.matches('section') ? target.querySelector<HTMLElement>('h2') : null;
+    return heading ?? target;
+  }
 
   const onKeydown = (e: KeyboardEvent): void => {
     if (e.key !== '/' || e.ctrlKey || e.metaKey || e.altKey) return;

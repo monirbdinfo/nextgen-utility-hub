@@ -40,6 +40,9 @@ const pairs: Array<[string, string, number]> = [
   ['--hero-text', '--hero-bg', 4.5],
   ['--hero-muted', '--hero-bg', 4.5],
   ['--hero-accent', '--hero-bg', 4.5],
+  ['--color-danger', '--color-surface', 4.5],
+  ['--color-danger', '--color-bg', 4.5],
+  ['--color-success-text', '--color-success-bg', 4.5],
   ['--color-focus', '--color-surface', 3],
   ['--color-focus', '--color-bg', 3],
 ];

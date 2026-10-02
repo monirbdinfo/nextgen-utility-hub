@@ -9,12 +9,23 @@ export function isCategoryId(value: string): value is CategoryId {
   return categories.some((c) => c.id === value);
 }
 
+export function getTool(id: string): Tool | undefined {
+  return tools.find((t) => t.id === id);
+}
+
 export function getCategory(id: CategoryId): Category | undefined {
   return categories.find((c) => c.id === id);
 }
 
 export function toolsByCategory(id: CategoryId, source: readonly Tool[] = tools): Tool[] {
   return source.filter((t) => t.category === id);
+}
+
+/** Available tools first, otherwise registry order. */
+export function sortByAvailability(list: readonly Tool[]): Tool[] {
+  return [...list].sort(
+    (a, b) => Number(b.status === 'available') - Number(a.status === 'available'),
+  );
 }
 
 /** Case-insensitive search across names, descriptions and keywords in both languages. */

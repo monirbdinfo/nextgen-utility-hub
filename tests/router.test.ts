@@ -15,8 +15,15 @@ describe('router', () => {
 
   it('falls back to home for unknown routes', () => {
     expect(parseHash('#/category/nope')).toEqual({ name: 'home' });
-    expect(parseHash('#/tool/pdf-merge')).toEqual({ name: 'home' });
+    expect(parseHash('#/tool/pdf-merge')).toEqual({ name: 'home' }); // planned tool
+    expect(parseHash('#/tool/does-not-exist')).toEqual({ name: 'home' });
+    expect(parseHash('#/tool/age-calculator/extra')).toEqual({ name: 'home' });
     expect(parseHash('#/category/files/extra')).toEqual({ name: 'home' });
+  });
+
+  it('parses routes for available tools', () => {
+    expect(parseHash('#/tool/age-calculator')).toEqual({ name: 'tool', id: 'age-calculator' });
+    expect(toHash({ name: 'tool', id: 'taka-in-words' })).toBe('#/tool/taka-in-words');
   });
 
   it('ignores plain in-page anchors', () => {

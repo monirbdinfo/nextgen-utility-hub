@@ -11,7 +11,10 @@ type UiIcon =
   | 'arrow-right'
   | 'arrow-left'
   | 'check'
-  | 'code';
+  | 'code'
+  | 'copy'
+  | 'reset'
+  | 'calculator';
 
 // 24×24 stroke icons drawn for this project (no icon library dependency).
 const paths: Record<UiIcon, string> = {
@@ -32,6 +35,10 @@ const paths: Record<UiIcon, string> = {
   'arrow-left': 'M19 12H5 M11 6l-6 6 6 6',
   check: 'M5 12.5l4.5 4.5L19 7.5',
   code: 'M8.5 7 3.5 12l5 5 M15.5 7l5 5-5 5',
+  copy: 'M9 9h10v11H9z M5 15H4.5A.5.5 0 0 1 4 14.5V4.5a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 .5.5V5',
+  reset: 'M4 12a8 8 0 1 0 2.3-5.6 M4 4v4.5h4.5',
+  calculator:
+    'M6 3h12v18H6z M9 6.5h6 M9 11h.01 M12 11h.01 M15 11h.01 M9 14.5h.01 M12 14.5h.01 M15 14.5h.01 M9 18h.01 M12 18h.01 M15 18h.01',
 };
 
 const SVG_NS = 'http://www.w3.org/2000/svg';

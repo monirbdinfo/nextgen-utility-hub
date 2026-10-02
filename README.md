@@ -5,23 +5,33 @@ your browser: no backend, no analytics, no uploads.
 
 Repository: <https://github.com/monirbdinfo/nextgen-utility-hub>
 
-Website (GitHub Pages): <https://monirbdinfo.github.io/nextgen-utility-hub/>. **Not live yet**:
-the site will only be available after the first successful run of the deployment workflow.
-See [Deployment](#deployment).
+Website (GitHub Pages): <https://monirbdinfo.github.io/nextgen-utility-hub/>, deployed from
+`main` by GitHub Actions (first successful deployment: 2 October 2026). Changes on other
+branches appear there only after they are merged into `main`. See [Deployment](#deployment).
 
-## Status: Milestone 1 (foundation)
+## Status: Milestone 4 (Unicode text cleaning)
 
-| Working now                                                   | Placeholder / planned                      |
-| ------------------------------------------------------------- | ------------------------------------------ |
-| Responsive homepage (mobile, tablet, desktop)                 | Every individual tool (10 listed, 0 built) |
-| Bangla/English toggle, persisted, sets `<html lang>`          | Tool pages and `#/tool/<id>` routes        |
-| Light/dark theme toggle, persisted                            | PDF/image processing (`pdf-lib` not added) |
-| Keyboard-accessible search over the tool registry             | Live site (deploy workflow added, not run) |
-| Hash routing with category views, deep links and back/forward |                                            |
-| Typed central tool registry                                   |                                            |
+8 of 26 registry tools are **Available**; the other 18 are **Planned** (roadmap only, shown
+with a badge and not linked). See [docs/PROJECT_ROADMAP.md](docs/PROJECT_ROADMAP.md).
 
-Tools are shown with a **Planned** badge and are not links. A tool may only be marked
-`available` once it is implemented and has a route; unit tests enforce this.
+| Available now (run entirely in your browser)                                                  | Toolkit              |
+| --------------------------------------------------------------------------------------------- | -------------------- |
+| Age Calculator — age in years/months/days, next birthday                                      | General Utilities    |
+| Date Difference — Y/M/D, total days, inclusive option                                         | General Utilities    |
+| Loan EMI Calculator — installment, total repayment and interest (estimate)                    | General Utilities    |
+| Bangla ⇄ English Digits — digits only, all other text preserved                               | Bangla Number & Text |
+| Number to Words — Bangla and English, lakh/crore or million                                   | Bangla Number & Text |
+| Taka in Words — Taka and poisha, cheque style, never rounds                                   | Bangla Number & Text |
+| Date Text Formatter — numeric, Bangla/English text, date in words                             | Bangla Number & Text |
+| Unicode Text Cleaner — spaces, blank lines, hidden characters, optional NFC/NFKC; Bangla-safe | Bangla Number & Text |
+
+Platform features: responsive homepage, Bangla/English toggle (persisted, sets
+`<html lang>`), light/dark theme, keyboard-accessible search, hash routing with deep links,
+typed central registry. Calculation conventions, rounding rules and limitations are in
+[docs/TOOLS.md](docs/TOOLS.md).
+
+Not available yet: image and PDF tools (`pdf-lib` not added), CV/cover
+letter templates, network tools, bandwidth calculator.
 
 ## Toolkits
 
@@ -60,8 +70,8 @@ once. CI (`.github/workflows/ci.yml`) runs all checks on pushes to `main` and on
 The site is a static build published to GitHub Pages by
 [`.github/workflows/deploy.yml`](.github/workflows/deploy.yml).
 
-- **Expected URL:** <https://monirbdinfo.github.io/nextgen-utility-hub/>. It is **not live**
-  until the first deployment succeeds.
+- **URL:** <https://monirbdinfo.github.io/nextgen-utility-hub/>. The first deployment
+  (workflow run #1, 2 October 2026) succeeded; each later push to `main` redeploys.
 - **When it runs:** on every push to `main`, or manually via _Actions → Deploy to GitHub Pages →
   Run workflow_. Both jobs are guarded with `if: github.ref == 'refs/heads/main'`, so a manual
   run started from any other branch is skipped and deploys nothing.
@@ -94,13 +104,15 @@ The site is a static build published to GitHub Pages by
 
 Hash-based, so it works on static hosting without server rewrites:
 
-| URL               | View                                |
-| ----------------- | ----------------------------------- |
-| `#/`              | Home with all toolkits              |
-| `#/category/<id>` | One toolkit and its (planned) tools |
-| anything else     | Falls back to home                  |
+| URL               | View                               |
+| ----------------- | ---------------------------------- |
+| `#/`              | Home with all toolkits             |
+| `#/category/<id>` | One toolkit and its tools          |
+| `#/tool/<id>`     | A tool page (available tools only) |
+| anything else     | Falls back to home                 |
 
-Category ids: `general`, `jobs`, `bangla`, `files`, `network`. Plain fragments such as
+Category ids: `general`, `jobs`, `bangla`, `files`, `network`. A `#/tool/<id>` URL for a
+planned or unknown tool falls back to home. Plain fragments such as
 `#about` are treated as in-page anchors, not routes.
 
 ## Accessibility
@@ -118,21 +130,27 @@ Category ids: `general`, `jobs`, `bangla`, `files`, `network`. Plain fragments s
 
 ```
 src/
+  calc/       Pure calculation modules (dates, EMI, digits, number/Taka words, date text)
   registry/   Typed categories, tools, lookup and search
   router/     Hash route parsing
   i18n/       English/Bangla messages and helpers
-  ui/         App shell, header, search combobox, toolkits view, icons
+  ui/         App shell, header, search combobox, toolkits view, tool page, icons
+  ui/tools/   One view per available tool + shared form/result kit
   lib/        DOM and storage helpers
   styles/     Design tokens (navy + teal), base and component CSS
-tests/        Vitest unit tests
-e2e/          Playwright smoke tests
-docs/         Licensing documentation
+tests/        Vitest unit tests (tests/calc/ for calculations)
+e2e/          Playwright tests (desktop, mobile, GitHub Pages sub-path)
+docs/         Roadmap, tool conventions, licensing
 ```
 
 ## Adding a tool
 
-Add an entry to `src/registry/tools.ts` with both `en` and `bn` text and
-`status: 'planned'`. Change it to `available` (and add a `route`) only when the tool works.
+1. Add an entry to `src/registry/tools.ts` with English and Bangla text, English and Bangla
+   search keywords and `status: 'planned'`.
+2. Put the calculation in `src/calc/` as pure functions with unit tests.
+3. Add a view in `src/ui/tools/` (use `kit.ts`) and register it in `src/ui/tools/index.ts`.
+4. Only then set `status: 'available'` and `route: '#/tool/<id>'`. Tests fail if an
+   available tool lacks a route or view, or if a planned tool has one.
 
 ## Privacy, security and limitations
 
