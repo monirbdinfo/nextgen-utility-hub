@@ -128,13 +128,25 @@ describe('fixed-seed differential test against the original regexes', () => {
   const randomText = (): string =>
     Array.from({ length: rand(40) }, () => ALPHABET[rand(ALPHABET.length)]).join('');
 
-  it('matches on 100,000 random inputs for each operation', () => {
+  // Compares directly and records mismatches instead of calling expect() 300,000 times, and
+  // has a generous timeout: a slow CI runner once exceeded Vitest's 5 s default here.
+  it('matches on 100,000 random inputs for each operation', { timeout: 60_000 }, () => {
+    const mismatches: Array<{ op: string; input: string; got: string; want: string }> = [];
+    let compared = 0;
     for (let i = 0; i < 100_000; i++) {
       const t = randomText();
-      expect(trimLineEndsLinear(t), JSON.stringify(t)).toBe(ref.trimLineEnds(t));
-      expect(joinLinesLinear(t), JSON.stringify(t)).toBe(ref.join(t));
-      expect(trimEndsLinear(t), JSON.stringify(t)).toBe(ref.trimEnds(t));
+      const checks: Array<[string, string, string]> = [
+        ['trimLineEnds', trimLineEndsLinear(t), ref.trimLineEnds(t)],
+        ['join', joinLinesLinear(t), ref.join(t)],
+        ['trimEnds', trimEndsLinear(t), ref.trimEnds(t)],
+      ];
+      for (const [op, got, want] of checks) {
+        compared++;
+        if (got !== want && mismatches.length < 5) mismatches.push({ op, input: t, got, want });
+      }
     }
+    expect(mismatches).toEqual([]);
+    expect(compared).toBe(300_000);
   });
 });
 
