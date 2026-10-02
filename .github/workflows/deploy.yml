@@ -1,0 +1,67 @@
+name: Deploy to GitHub Pages
+
+# Publishes https://monirbdinfo.github.io/nextgen-utility-hub/ from `main` only.
+# Requires Settings → Pages → Source: "GitHub Actions" (see README → Deployment).
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+# Nothing by default; each job requests only what it needs.
+permissions: {}
+
+# One deployment at a time; never cancel a deployment that is already running.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    name: Verify and build
+    # Guard manual runs too: workflow_dispatch can be started from any branch.
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pages: read # configure-pages reads the repository's Pages settings
+    steps:
+      # Third-party actions are pinned to full commit SHAs; the tag is noted alongside.
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run format:check
+      - run: npm run lint
+      - run: npm run typecheck
+      - run: npm test
+      - run: npm run build
+      - run: npx playwright install --with-deps chromium
+      # Playwright serves the production build (its webServer runs `npm run build`
+      # again, which produces identical output) and must pass before anything ships.
+      - run: npm run test:e2e
+        env:
+          CI: true
+      - uses: actions/configure-pages@45bfe0192ca1faeb007ade9deae92b16b8254a0d # v6.0.0
+      - uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
+        with:
+          path: dist
+
+  deploy:
+    name: Deploy
+    needs: build
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write # publish the Pages deployment
+      id-token: write # OIDC token that deploy-pages uses to verify the source
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@368f82528645a54fb793d4d04e342629a3f51346 # v5.0.1
