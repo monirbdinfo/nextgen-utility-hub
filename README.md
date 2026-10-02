@@ -5,6 +5,10 @@ your browser: no backend, no analytics, no uploads.
 
 Repository: <https://github.com/monirbdinfo/nextgen-utility-hub>
 
+Website (GitHub Pages): <https://monirbdinfo.github.io/nextgen-utility-hub/>. **Not live yet**:
+the site will only be available after the first successful run of the deployment workflow.
+See [Deployment](#deployment).
+
 ## Status: Milestone 1 (foundation)
 
 | Working now                                                   | Placeholder / planned                      |
@@ -12,7 +16,7 @@ Repository: <https://github.com/monirbdinfo/nextgen-utility-hub>
 | Responsive homepage (mobile, tablet, desktop)                 | Every individual tool (10 listed, 0 built) |
 | Bangla/English toggle, persisted, sets `<html lang>`          | Tool pages and `#/tool/<id>` routes        |
 | Light/dark theme toggle, persisted                            | PDF/image processing (`pdf-lib` not added) |
-| Keyboard-accessible search over the tool registry             | GitHub Pages deployment                    |
+| Keyboard-accessible search over the tool registry             | Live site (deploy workflow added, not run) |
 | Hash routing with category views, deep links and back/forward |                                            |
 | Typed central tool registry                                   |                                            |
 
@@ -50,6 +54,41 @@ npm run test:e2e     # Playwright smoke tests in Chromium against the production
 
 Playwright needs a Chromium build. On a fresh machine run `npx playwright install chromium`
 once. CI (`.github/workflows/ci.yml`) runs all checks on pushes to `main` and on pull requests.
+
+## Deployment
+
+The site is a static build published to GitHub Pages by
+[`.github/workflows/deploy.yml`](.github/workflows/deploy.yml).
+
+- **Expected URL:** <https://monirbdinfo.github.io/nextgen-utility-hub/>. It is **not live**
+  until the first deployment succeeds.
+- **When it runs:** on every push to `main`, or manually via _Actions → Deploy to GitHub Pages →
+  Run workflow_. Both jobs are guarded with `if: github.ref == 'refs/heads/main'`, so a manual
+  run started from any other branch is skipped and deploys nothing.
+- **Gate:** the build job runs `format:check`, `lint`, `typecheck`, unit tests, the production
+  build and the Playwright E2E tests. If any step fails, the deploy job does not run and the
+  live site is left unchanged.
+- **Output:** `dist/` is uploaded with `actions/upload-pages-artifact` and published with
+  `actions/deploy-pages`. Source maps are published deliberately (open-source project).
+- **Security:** official GitHub actions only, each pinned to a full commit SHA with its version
+  noted in a comment. The workflow has no permissions by default; the build job gets
+  `contents: read` and `pages: read`, and only the deploy job gets `pages: write` and
+  `id-token: write`. No secrets are used. A deployment that is already running is never cancelled;
+  a newer run waits for it (GitHub keeps only the latest waiting run).
+- **Base path:** `vite.config.ts` uses `base: './'`, so asset URLs are relative and work under
+  the `/nextgen-utility-hub/` sub-path. Routing is hash-based (`#/category/<id>`), so no
+  `404.html` fallback is needed for deep links.
+
+### One-time repository settings (manual)
+
+1. **Settings → Pages → Build and deployment → Source:** select **GitHub Actions**. While Pages
+   is not enabled, the `configure-pages` step fails and nothing is deployed. If Pages is already
+   enabled with "Deploy from a branch", switch it to **GitHub Actions** so this workflow is the
+   site's source.
+2. **Settings → Actions → General:** allow GitHub-owned actions (the default for public
+   repositories).
+3. **Settings → Environments → `github-pages`** (created by the first run): keep the deployment
+   branch rule limited to `main`, so GitHub also enforces "deploy from `main` only".
 
 ## Routing
 
