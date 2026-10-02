@@ -1,0 +1,90 @@
+/*
+ * Design tokens: navy + teal. Text/background pairs are checked for WCAG AA
+ * contrast in tests/contrast.test.ts, so keep values as 6-digit hex.
+ */
+:root {
+  color-scheme: light;
+  --font-sans:
+    system-ui, -apple-system, 'Segoe UI', Roboto, 'Noto Sans', 'Noto Sans Bengali', 'Hind Siliguri',
+    'Nirmala UI', sans-serif;
+
+  --navy-950: #061024;
+  --navy-900: #0b1b3a;
+  --navy-800: #12305e;
+  --teal-300: #5eead4;
+  --teal-400: #2dd4bf;
+  --teal-700: #0f766e;
+
+  --color-bg: #f4f7fb;
+  --color-surface: #ffffff;
+  --color-surface-2: #eaf0f7;
+  --color-text: #0b1b3a;
+  --color-muted: #4a5a78;
+  --color-border: #d6deeb;
+  --color-primary: #0f766e;
+  --color-on-primary: #ffffff;
+  --color-link: #0f766e;
+  --color-focus: #0d9488;
+  --color-pill-bg: #eaf0f7;
+  --color-pill-text: #3d4d6b;
+
+  /* Hero band is navy in both themes. */
+  --hero-bg: #0b1b3a;
+  --hero-text: #ffffff;
+  --hero-muted: #b9c7e1;
+  --hero-accent: #5eead4;
+  --hero-glow:
+    radial-gradient(50% 70% at 85% 0%, rgba(45, 212, 191, 0.28), transparent 70%),
+    radial-gradient(40% 60% at 10% 100%, rgba(18, 48, 94, 0.9), transparent 70%);
+
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 18px;
+  --radius-pill: 999px;
+  --shadow-sm: 0 1px 2px rgba(11, 27, 58, 0.06);
+  --shadow-md: 0 10px 30px -12px rgba(11, 27, 58, 0.22);
+  --shadow-lg: 0 24px 60px -24px rgba(6, 16, 36, 0.55);
+
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+  --space-20: 80px;
+
+  --container: 1160px;
+  --gutter: 16px;
+  --header-h: 64px;
+  --touch: 44px;
+  --ease: cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+:root[data-theme='dark'] {
+  color-scheme: dark;
+  --color-bg: #07122a;
+  --color-surface: #0d1d3d;
+  --color-surface-2: #13284f;
+  --color-text: #e8eefc;
+  --color-muted: #a9b7d3;
+  --color-border: #22396a;
+  --color-primary: #2dd4bf;
+  --color-on-primary: #04211f;
+  --color-link: #5eead4;
+  --color-focus: #5eead4;
+  --color-pill-bg: #13284f;
+  --color-pill-text: #c3cfe6;
+  --hero-bg: #061024;
+  --shadow-sm: none;
+  --shadow-md: 0 10px 30px -12px rgba(0, 0, 0, 0.6);
+}
+
+@media (min-width: 640px) {
+  :root {
+    --gutter: 24px;
+  }
+}

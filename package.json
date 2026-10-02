@@ -1,0 +1,35 @@
+{
+  "name": "nextgen-utility-hub",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Static-first, privacy-friendly utility platform with Bangla and English support.",
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:e2e": "playwright test"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.0.0",
+    "@playwright/test": "1.56.1",
+    "eslint": "^9.0.0",
+    "eslint-config-prettier": "^10.0.0",
+    "jsdom": "^26.0.0",
+    "prettier": "^3.3.0",
+    "typescript": "^5.6.0",
+    "typescript-eslint": "^8.0.0",
+    "vite": "^6.0.0",
+    "vitest": "^3.0.0"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
