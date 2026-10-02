@@ -44,7 +44,7 @@ test('search is keyboard operable end to end', async ({ page }) => {
   await page.keyboard.press('/');
   const search = page.getByRole('combobox', { name: 'Search tools' });
   await expect(search).toBeFocused();
-  await search.fill('pdf');
+  await search.fill('merge');
   await expect(page.getByRole('option')).toHaveCount(1);
   await page.keyboard.press('ArrowDown');
   await expect(page.getByRole('option').first()).toHaveAttribute('aria-selected', 'true');

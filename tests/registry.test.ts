@@ -1,5 +1,13 @@
 import { describe, expect, it } from 'vitest';
-import { categories, searchTools, tools, toolsByCategory } from '../src/registry';
+import {
+  categories,
+  searchTools,
+  sortByAvailability,
+  tools,
+  toolsByCategory,
+} from '../src/registry';
+import { parseHash } from '../src/router/router';
+import { toolViews } from '../src/ui/tools';
 
 describe('registry integrity', () => {
   it('defines exactly five categories', () => {
@@ -18,12 +26,68 @@ describe('registry integrity', () => {
     }
   });
 
-  it('requires a route for every available tool', () => {
-    for (const t of tools) if (t.status === 'available') expect(t.route).toBeTruthy();
+  it('gives every available tool a working route and view', () => {
+    for (const t of tools.filter((x) => x.status === 'available')) {
+      expect(t.route, t.id).toBe(`#/tool/${t.id}`);
+      expect(parseHash(t.route!), t.id).toEqual({ name: 'tool', id: t.id });
+      expect(toolViews[t.id], `view for ${t.id}`).toBeTypeOf('function');
+    }
   });
 
-  it('does not mark any tool implemented in the foundation milestone', () => {
-    expect(tools.every((t) => t.status === 'planned')).toBe(true);
+  it('never routes or renders planned tools', () => {
+    for (const t of tools.filter((x) => x.status !== 'available')) {
+      expect(t.route, t.id).toBeUndefined();
+      expect(parseHash(`#/tool/${t.id}`), t.id).toEqual({ name: 'home' });
+      expect(toolViews[t.id], t.id).toBeUndefined();
+    }
+  });
+
+  it('marks exactly the Milestone 3 tools as available', () => {
+    expect(tools.filter((t) => t.status === 'available').map((t) => t.id)).toEqual([
+      'age-calculator',
+      'date-difference',
+      'emi-calculator',
+      'digit-converter',
+      'number-to-words-bn',
+      'taka-in-words',
+      'date-formatter',
+    ]);
+  });
+
+  it('keeps every tool id from Milestone 1', () => {
+    const ids = new Set(tools.map((t) => t.id));
+    for (const id of [
+      'unit-converter',
+      'text-counter',
+      'job-photo-resizer',
+      'cv-checklist',
+      'number-to-words-bn',
+      'digit-converter',
+      'image-compressor',
+      'pdf-merge',
+      'my-ip-info',
+      'dns-lookup',
+    ]) {
+      expect(ids.has(id), id).toBe(true);
+    }
+  });
+
+  it('has Bangla and English search keywords for every tool', () => {
+    for (const t of tools) {
+      expect(
+        t.keywords.some((k) => /[\u0980-\u09FF]/.test(k)),
+        `${t.id} bn keyword`,
+      ).toBe(true);
+      expect(
+        t.keywords.some((k) => /[a-z]/i.test(k)),
+        `${t.id} en keyword`,
+      ).toBe(true);
+    }
+  });
+
+  it('sorts available tools first without reordering otherwise', () => {
+    const sorted = sortByAvailability(toolsByCategory('general')).map((t) => t.status);
+    expect(sorted.indexOf('planned')).toBeGreaterThan(sorted.lastIndexOf('available'));
   });
 
   it('gives every category at least one tool', () => {

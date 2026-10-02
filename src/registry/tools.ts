@@ -1,10 +1,70 @@
 import type { Tool } from './types';
 
+const route = (id: string): string => `#/tool/${id}`;
+
 /**
- * Central tool registry. Every entry is currently `planned`: no tool is
- * implemented yet. Flip `status` (and add `route`) only when a tool ships.
+ * Central tool registry. A tool may be `available` only when its calculation
+ * logic, view, route and tests exist (enforced in tests/registry.test.ts).
+ * Planned tools are roadmap items; see docs/PROJECT_ROADMAP.md.
  */
 export const tools: readonly Tool[] = [
+  // ---------- General Utilities ----------
+  {
+    id: 'age-calculator',
+    category: 'general',
+    name: { en: 'Age Calculator', bn: 'বয়স ক্যালকুলেটর' },
+    description: {
+      en: 'Exact age in years, months and days on any date, plus your next birthday.',
+      bn: 'যেকোনো তারিখে বছর, মাস ও দিনে সঠিক বয়স এবং পরের জন্মদিন।',
+    },
+    keywords: ['age', 'birthday', 'date of birth', 'dob', 'বয়স', 'জন্মদিন', 'জন্ম তারিখ'],
+    status: 'available',
+    route: route('age-calculator'),
+  },
+  {
+    id: 'date-difference',
+    category: 'general',
+    name: { en: 'Date Difference', bn: 'দুই তারিখের ব্যবধান' },
+    description: {
+      en: 'Years, months, days and total days between two dates.',
+      bn: 'দুই তারিখের মধ্যে বছর, মাস, দিন ও মোট দিন।',
+    },
+    keywords: ['date', 'days between', 'duration', 'difference', 'তারিখ', 'ব্যবধান', 'দিন'],
+    status: 'available',
+    route: route('date-difference'),
+  },
+  {
+    id: 'emi-calculator',
+    category: 'general',
+    name: { en: 'Loan EMI Calculator', bn: 'ঋণের কিস্তি (ইএমআই) ক্যালকুলেটর' },
+    description: {
+      en: 'Estimate the fixed installment, total repayment and total interest of a loan.',
+      bn: 'ঋণের নির্দিষ্ট কিস্তি, মোট পরিশোধ ও মোট সুদের আনুমানিক হিসাব।',
+    },
+    keywords: ['emi', 'loan', 'installment', 'interest', 'kisti', 'কিস্তি', 'ঋণ', 'সুদ', 'লোন'],
+    status: 'available',
+    route: route('emi-calculator'),
+  },
+  {
+    id: 'bandwidth-calculator',
+    category: 'general',
+    name: { en: 'Bandwidth & Data Usage', bn: 'ব্যান্ডউইথ ও ডেটা ব্যবহার' },
+    description: {
+      en: 'Download time, data usage and speed unit conversions (Mbps, MB/s, GB).',
+      bn: 'ডাউনলোডের সময়, ডেটা ব্যবহার ও গতির একক রূপান্তর (Mbps, MB/s, GB)।',
+    },
+    keywords: [
+      'bandwidth',
+      'mbps',
+      'data',
+      'download time',
+      'internet',
+      'ব্যান্ডউইথ',
+      'ডেটা',
+      'ইন্টারনেট',
+    ],
+    status: 'planned',
+  },
   {
     id: 'unit-converter',
     category: 'general',
@@ -24,15 +84,45 @@ export const tools: readonly Tool[] = [
     keywords: ['count', 'words', 'characters', 'গণনা'],
     status: 'planned',
   },
+
+  // ---------- Job Application Toolkit ----------
   {
-    id: 'job-photo-resizer',
+    id: 'cv-templates',
     category: 'jobs',
-    name: { en: 'Job Photo & Signature Resizer', bn: 'চাকরির ছবি ও স্বাক্ষর রিসাইজার' },
+    name: { en: 'CV / Resume Templates', bn: 'সিভি / রিজিউমে টেমপ্লেট' },
     description: {
-      en: 'Resize photos and signatures to application size limits.',
-      bn: 'আবেদনের সাইজ সীমা অনুযায়ী ছবি ও স্বাক্ষর রিসাইজ।',
+      en: 'Fill in a configurable CV layout and print it or save it as PDF.',
+      bn: 'কনফিগারযোগ্য সিভি লেআউট পূরণ করে প্রিন্ট বা পিডিএফ হিসেবে সংরক্ষণ।',
     },
-    keywords: ['photo', 'signature', 'resize', 'bpsc', 'ছবি', 'স্বাক্ষর'],
+    keywords: [
+      'cv',
+      'resume',
+      'biodata',
+      'template',
+      'pdf',
+      'print',
+      'সিভি',
+      'জীবনবৃত্তান্ত',
+      'বায়োডাটা',
+    ],
+    status: 'planned',
+  },
+  {
+    id: 'cover-letter-templates',
+    category: 'jobs',
+    name: { en: 'Cover Letter Templates', bn: 'কভার লেটার টেমপ্লেট' },
+    description: {
+      en: 'Job application and cover letter templates, printable or saved as PDF.',
+      bn: 'চাকরির আবেদন ও কভার লেটার টেমপ্লেট, প্রিন্ট বা পিডিএফ হিসেবে সংরক্ষণযোগ্য।',
+    },
+    keywords: [
+      'cover letter',
+      'application letter',
+      'job application',
+      'কভার লেটার',
+      'আবেদনপত্র',
+      'দরখাস্ত',
+    ],
     status: 'planned',
   },
   {
@@ -46,37 +136,132 @@ export const tools: readonly Tool[] = [
     keywords: ['checklist', 'documents', 'cv', 'সিভি'],
     status: 'planned',
   },
-  {
-    id: 'number-to-words-bn',
-    category: 'bangla',
-    name: { en: 'Number to Bangla Words', bn: 'সংখ্যা থেকে বাংলা কথায়' },
-    description: {
-      en: 'Write numbers and amounts in Bangla words.',
-      bn: 'সংখ্যা ও টাকার অঙ্ক বাংলায় কথায় লিখুন।',
-    },
-    keywords: ['number', 'words', 'taka', 'টাকা', 'কথায়'],
-    status: 'planned',
-  },
+
+  // ---------- Bangla Number & Text Toolkit ----------
   {
     id: 'digit-converter',
     category: 'bangla',
     name: { en: 'Bangla ⇄ English Digits', bn: 'বাংলা ⇄ ইংরেজি অঙ্ক' },
     description: {
-      en: 'Convert between Bangla and Latin digits.',
-      bn: 'বাংলা ও ইংরেজি অঙ্কের মধ্যে রূপান্তর।',
+      en: 'Convert between Bangla and English digits; all other text stays as it is.',
+      bn: 'বাংলা ও ইংরেজি অঙ্কের মধ্যে রূপান্তর; বাকি লেখা অপরিবর্তিত থাকে।',
     },
-    keywords: ['digits', 'numerals', 'অঙ্ক'],
+    keywords: ['digits', 'numerals', 'convert', 'অঙ্ক', 'সংখ্যা', 'রূপান্তর'],
+    status: 'available',
+    route: route('digit-converter'),
+  },
+  {
+    id: 'number-to-words-bn',
+    category: 'bangla',
+    name: { en: 'Number to Words', bn: 'সংখ্যা থেকে কথায়' },
+    description: {
+      en: 'Write any number in Bangla or English words, with lakh/crore or million.',
+      bn: 'যেকোনো সংখ্যা বাংলা বা ইংরেজি কথায় লিখুন; লক্ষ/কোটি বা মিলিয়ন।',
+    },
+    keywords: ['number', 'words', 'spell', 'lakh', 'crore', 'কথায়', 'সংখ্যা', 'লক্ষ', 'কোটি'],
+    status: 'available',
+    route: route('number-to-words-bn'),
+  },
+  {
+    id: 'taka-in-words',
+    category: 'bangla',
+    name: { en: 'Taka in Words', bn: 'টাকার অঙ্ক কথায়' },
+    description: {
+      en: 'Write a Taka amount with poisha in words, ready for cheques and receipts.',
+      bn: 'টাকা ও পয়সার অঙ্ক কথায় লিখুন; চেক ও রসিদের জন্য।',
+    },
+    keywords: [
+      'taka',
+      'bdt',
+      'amount',
+      'cheque',
+      'poisha',
+      'money',
+      'টাকা',
+      'পয়সা',
+      'চেক',
+      'কথায়',
+    ],
+    status: 'available',
+    route: route('taka-in-words'),
+  },
+  {
+    id: 'date-formatter',
+    category: 'bangla',
+    name: { en: 'Date Text Formatter', bn: 'তারিখ লেখার ফরম্যাট' },
+    description: {
+      en: 'Write a date in numeric, Bangla and English text formats, including in words.',
+      bn: 'তারিখ সংখ্যায়, বাংলা ও ইংরেজি লেখায় এবং কথায় লিখুন।',
+    },
+    keywords: ['date', 'format', 'date in words', 'তারিখ', 'কথায় তারিখ', 'ফরম্যাট'],
+    status: 'available',
+    route: route('date-formatter'),
+  },
+  {
+    id: 'unicode-cleaner',
+    category: 'bangla',
+    name: { en: 'Unicode Text Cleaner', bn: 'ইউনিকোড টেক্সট ক্লিনার' },
+    description: {
+      en: 'Clean and normalize Bangla/English Unicode text (spaces, hidden characters, normalization).',
+      bn: 'বাংলা/ইংরেজি ইউনিকোড লেখা পরিষ্কার ও নরমালাইজ করুন (স্পেস, লুকানো অক্ষর)।',
+    },
+    keywords: ['unicode', 'clean', 'normalize', 'text', 'ইউনিকোড', 'লেখা', 'পরিষ্কার'],
     status: 'planned',
   },
+
+  // ---------- Privacy-First File Tools ----------
   {
     id: 'image-compressor',
     category: 'files',
-    name: { en: 'Image Compressor', bn: 'ছবি কম্প্রেসার' },
+    name: { en: 'Image Compressor & Converter', bn: 'ছবি কম্প্রেসার ও কনভার্টার' },
     description: {
-      en: 'Compress images locally in your browser.',
-      bn: 'ব্রাউজারে ছবি কম্প্রেস করুন।',
+      en: 'Compress and convert JPG/PNG images in your browser.',
+      bn: 'ব্রাউজারেই JPG/PNG ছবি কম্প্রেস ও রূপান্তর করুন।',
     },
-    keywords: ['image', 'compress', 'jpg', 'png', 'ছবি'],
+    keywords: [
+      'image',
+      'compress',
+      'convert',
+      'jpg',
+      'jpeg',
+      'png',
+      'reduce size',
+      'ছবি',
+      'কম্প্রেস',
+    ],
+    status: 'planned',
+  },
+  {
+    id: 'image-resize-crop',
+    category: 'files',
+    name: { en: 'Image Resize & Crop', bn: 'ছবি রিসাইজ ও ক্রপ' },
+    description: {
+      en: 'Resize images to exact dimensions and crop them in your browser.',
+      bn: 'ব্রাউজারেই ছবি নির্দিষ্ট মাপে রিসাইজ ও ক্রপ করুন।',
+    },
+    keywords: ['resize', 'crop', 'dimensions', 'pixels', 'image', 'রিসাইজ', 'ক্রপ', 'ছবি'],
+    status: 'planned',
+  },
+  {
+    id: 'job-photo-resizer',
+    category: 'files',
+    name: { en: 'Photo & Signature Resizer', bn: 'ছবি ও স্বাক্ষর রিসাইজার' },
+    description: {
+      en: 'Prepare photos and signatures at the dimensions and file sizes job applications require.',
+      bn: 'চাকরির আবেদনের নির্ধারিত মাপ ও ফাইল সাইজে ছবি ও স্বাক্ষর তৈরি।',
+    },
+    keywords: ['photo', 'signature', 'resize', 'job', 'bpsc', 'teletalk', 'ছবি', 'স্বাক্ষর'],
+    status: 'planned',
+  },
+  {
+    id: 'pdf-create',
+    category: 'files',
+    name: { en: 'Create PDF', bn: 'পিডিএফ তৈরি' },
+    description: {
+      en: 'Create a PDF from images and other supported files, in your browser.',
+      bn: 'ছবি ও অন্যান্য সমর্থিত ফাইল থেকে ব্রাউজারেই পিডিএফ তৈরি।',
+    },
+    keywords: ['pdf', 'create', 'images to pdf', 'jpg to pdf', 'পিডিএফ', 'তৈরি'],
     status: 'planned',
   },
   {
@@ -87,18 +272,64 @@ export const tools: readonly Tool[] = [
       en: 'Merge or split PDFs without uploading them.',
       bn: 'আপলোড ছাড়াই পিডিএফ মার্জ বা স্প্লিট।',
     },
-    keywords: ['pdf', 'merge', 'split', 'পিডিএফ'],
+    keywords: ['pdf', 'merge', 'split', 'combine', 'পিডিএফ'],
+    status: 'planned',
+  },
+  {
+    id: 'pdf-tools',
+    category: 'files',
+    name: { en: 'PDF Page Tools', bn: 'পিডিএফ পেজ টুল' },
+    description: {
+      en: 'Common PDF utilities: rotate, reorder and delete pages.',
+      bn: 'সাধারণ পিডিএফ টুল: পেজ ঘোরানো, সাজানো ও মুছে ফেলা।',
+    },
+    keywords: ['pdf', 'rotate', 'reorder', 'delete pages', 'পিডিএফ', 'পেজ'],
+    status: 'planned',
+  },
+  {
+    id: 'pdf-compress',
+    category: 'files',
+    name: { en: 'Reduce PDF Size', bn: 'পিডিএফ সাইজ কমানো' },
+    description: {
+      en: 'Reduce PDF file size where technically feasible in the browser.',
+      bn: 'ব্রাউজারে যতটা সম্ভব পিডিএফ ফাইলের সাইজ কমানো।',
+    },
+    keywords: ['pdf', 'compress', 'reduce size', 'file size', 'পিডিএফ', 'সাইজ'],
+    status: 'planned',
+  },
+
+  // ---------- Network & IT Diagnostic Toolkit ----------
+  {
+    id: 'subnet-calculator',
+    category: 'network',
+    name: { en: 'Subnet Calculator', bn: 'সাবনেট ক্যালকুলেটর' },
+    description: {
+      en: 'Network, broadcast, mask and usable hosts for an IPv4 subnet.',
+      bn: 'IPv4 সাবনেটের নেটওয়ার্ক, ব্রডকাস্ট, মাস্ক ও ব্যবহারযোগ্য হোস্ট।',
+    },
+    keywords: ['subnet', 'ipv4', 'mask', 'network', 'সাবনেট'],
+    status: 'planned',
+  },
+  {
+    id: 'cidr-calculator',
+    category: 'network',
+    name: { en: 'CIDR & IP Range Calculator', bn: 'CIDR ও আইপি রেঞ্জ ক্যালকুলেটর' },
+    description: {
+      en: 'Convert between CIDR blocks and IP address ranges.',
+      bn: 'CIDR ব্লক ও আইপি অ্যাড্রেস রেঞ্জের মধ্যে রূপান্তর।',
+    },
+    keywords: ['cidr', 'ip range', 'ipv4', 'block', 'আইপি'],
     status: 'planned',
   },
   {
     id: 'my-ip-info',
     category: 'network',
-    name: { en: 'Browser & Connection Info', bn: 'ব্রাউজার ও সংযোগ তথ্য' },
+    name: { en: 'IP Lookup', bn: 'আইপি লুকআপ' },
     description: {
-      en: 'Show what your browser exposes about your device and connection.',
-      bn: 'আপনার ব্রাউজার ডিভাইস ও সংযোগ সম্পর্কে কী জানায় তা দেখুন।',
+      en: 'Look up your public IP address. Requires an external lookup service.',
+      bn: 'আপনার পাবলিক আইপি অ্যাড্রেস দেখুন। বাইরের লুকআপ সার্ভিস প্রয়োজন।',
     },
-    keywords: ['browser', 'connection', 'user agent', 'network'],
+    keywords: ['ip', 'my ip', 'public ip', 'lookup', 'network', 'আইপি'],
     status: 'planned',
   },
   {
@@ -106,10 +337,21 @@ export const tools: readonly Tool[] = [
     category: 'network',
     name: { en: 'DNS Lookup', bn: 'ডিএনএস লুকআপ' },
     description: {
-      en: 'Look up public DNS records for a domain.',
-      bn: 'ডোমেইনের পাবলিক ডিএনএস রেকর্ড দেখুন।',
+      en: 'Look up public DNS records for a domain. Requires a DNS-over-HTTPS service.',
+      bn: 'ডোমেইনের পাবলিক ডিএনএস রেকর্ড দেখুন। DNS-over-HTTPS সার্ভিস প্রয়োজন।',
     },
-    keywords: ['dns', 'domain', 'records'],
+    keywords: ['dns', 'domain', 'records', 'nslookup', 'ডিএনএস'],
+    status: 'planned',
+  },
+  {
+    id: 'latency-test',
+    category: 'network',
+    name: { en: 'Latency & Packet-Loss Check', bn: 'লেটেন্সি ও প্যাকেট লস পরীক্ষা' },
+    description: {
+      en: 'Approximate latency and failed requests using HTTPS (browsers cannot send ICMP ping).',
+      bn: 'HTTPS দিয়ে আনুমানিক লেটেন্সি ও ব্যর্থ রিকোয়েস্ট (ব্রাউজার ICMP পিং পাঠাতে পারে না)।',
+    },
+    keywords: ['ping', 'latency', 'packet loss', 'speed', 'পিং', 'লেটেন্সি'],
     status: 'planned',
   },
 ];

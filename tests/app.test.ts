@@ -1,4 +1,4 @@
-import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { LANG_KEY, mountApp } from '../src/ui/app';
 
 let dispose: (() => void) | null = null;
@@ -25,6 +25,7 @@ function type(root: HTMLElement, value: string): HTMLInputElement {
 
 beforeEach(() => {
   localStorage.clear();
+  window.scrollTo = vi.fn() as unknown as typeof window.scrollTo; // not implemented in jsdom
   window.matchMedia = ((q: string) => ({
     matches: false,
     media: q,
@@ -72,10 +73,28 @@ describe('search combobox', () => {
     const root = setup();
     const input = type(root, 'pdf');
     const options = root.querySelectorAll('[role="option"]');
-    expect(options).toHaveLength(1);
-    expect(options[0]?.querySelector('.pill')?.textContent).toBe('Planned');
+    expect(options).toHaveLength(6);
+    for (const o of options) expect(o.querySelector('.pill')?.textContent).toBe('Planned');
     expect(input.getAttribute('aria-expanded')).toBe('true');
-    expect(root.querySelector('[role="status"]')?.textContent).toBe('1 matching tools');
+    expect(root.querySelector('[role="status"]')?.textContent).toBe('6 matching tools');
+  });
+
+  it('labels available tools in results', () => {
+    const root = setup();
+    type(root, 'taka');
+    const pills = [...root.querySelectorAll('[role="option"] .pill')].map((p) => p.textContent);
+    expect(pills).toContain('Available');
+  });
+
+  it('Enter on an available tool opens its page', () => {
+    const root = setup();
+    const input = type(root, 'cheque');
+    key(input, 'ArrowDown');
+    key(input, 'Enter');
+    window.dispatchEvent(new HashChangeEvent('hashchange'));
+    expect(location.hash).toBe('#/tool/taka-in-words');
+    expect(root.querySelector('h1')?.textContent).toBe('Taka in Words');
+    expect(document.activeElement?.id).toBe('tool-title');
   });
 
   it('moves the active option with arrow keys and wraps', () => {
@@ -93,9 +112,9 @@ describe('search combobox', () => {
     expect(input.getAttribute('aria-activedescendant')).toBe(last.id);
   });
 
-  it('Enter navigates to the tool’s category', () => {
+  it('Enter on a planned tool navigates to its category', () => {
     const root = setup();
-    const input = type(root, 'pdf');
+    const input = type(root, 'merge');
     key(input, 'ArrowDown');
     key(input, 'Enter');
     window.dispatchEvent(new HashChangeEvent('hashchange'));

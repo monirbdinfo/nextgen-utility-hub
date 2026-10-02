@@ -52,7 +52,8 @@ export function createSearch(ctx: AppContext): SearchHandle {
     state.query = '';
     input.value = '';
     refresh();
-    ctx.navigate({ name: 'category', id: tool.category }, `tool-${tool.id}`);
+    if (tool.status === 'available') ctx.navigate({ name: 'tool', id: tool.id }, 'tool-title');
+    else ctx.navigate({ name: 'category', id: tool.category }, `tool-${tool.id}`);
   }
 
   function setActive(index: number): void {
