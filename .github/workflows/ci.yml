@@ -49,3 +49,25 @@ jobs:
           name: playwright-report
           path: playwright-report
           retention-days: 7
+
+  e2e-cross-browser:
+    name: Cross-browser image tests (Firefox, WebKit)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      # Only the two extra engines; the Chromium job above covers Chromium.
+      - run: npx playwright install --with-deps firefox webkit
+      - run: npm run test:e2e:cross
+        env:
+          CI: true
+      - if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report-cross-browser
+          path: playwright-report
+          retention-days: 7
