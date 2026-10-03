@@ -242,7 +242,9 @@ without replacing an image that is already open.
   size and position.
 - Typed values apply when the field is left or Enter is pressed. Values that do not fit are
   **reported, never clamped**: "X + width can be at most N pixels", or, with a fixed ratio,
-  that the size does not fit from the current position.
+  that the size does not fit from the current position. With a fixed ratio, typing a width
+  sets the height (and vice versa); typing X or Y only moves the selection and never changes
+  its size.
 - Only the box and its handles use `touch-action: none`; touching elsewhere on the image or
   page scrolls normally.
 

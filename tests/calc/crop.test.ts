@@ -221,6 +221,36 @@ describe('numeric fields', () => {
   });
 });
 
+describe('numeric fields with a fixed ratio', () => {
+  const P = 35 / 45;
+  // Typing a height of 299 at 35:45 gives a 233 × 299 selection (233 ÷ 0.7778 = 299.6).
+  const typed = rectFromFields(fields('0', '0', '1', '299'), 'height', B, P);
+
+  it('derives the other side only when width or height is edited', () => {
+    expect(typed).toEqual({ ok: true, value: R(0, 0, 233, 299) });
+    // Moving with X or Y keeps the size exactly; it is not re-derived from the width.
+    expect(rectFromFields(fields('10', '0', '233', '299'), 'x', B, P)).toEqual({
+      ok: true,
+      value: R(10, 0, 233, 299),
+    });
+    expect(rectFromFields(fields('10', '1', '233', '299'), 'y', B, P)).toEqual({
+      ok: true,
+      value: R(10, 1, 233, 299),
+    });
+  });
+
+  it('reports a position that does not fit against the edited position field', () => {
+    expect(rectFromFields(fields('200', '0', '233', '299'), 'x', B, P)).toEqual({
+      ok: false,
+      error: { field: 'x', error: 'past-right' },
+    });
+    expect(rectFromFields(fields('0', '2', '233', '299'), 'y', B, P)).toEqual({
+      ok: false,
+      error: { field: 'y', error: 'past-bottom' },
+    });
+  });
+});
+
 describe('keyboard helpers', () => {
   it('maps arrow keys and step sizes', () => {
     expect(arrowDelta('ArrowLeft')).toEqual({ x: -1, y: 0 });

@@ -325,6 +325,25 @@ describe('Image Cropper view', () => {
     );
   });
 
+  it('moves with X and Y at a fixed ratio without changing the size', async () => {
+    const root = open();
+    await load(root);
+    const aspect = $<HTMLSelectElement>(root, '#crop-aspect');
+    aspect.value = 'passport';
+    aspect.dispatchEvent(new Event('change'));
+    setField(root, 'y', '0');
+    setField(root, 'height', '299'); // 35:45 → 233 × 299
+    expect(values(root).slice(2)).toEqual(['233', '299']);
+    setField(root, 'x', '10');
+    setField(root, 'y', '1');
+    expect(values(root)).toEqual(['10', '1', '233', '299']);
+    setField(root, 'y', '2');
+    expect($(root, '#crop-y-error').textContent).toBe(
+      'The crop goes past the bottom edge. Y + height can be at most 300 pixels.',
+    );
+    expect(values(root).slice(2)).toEqual(['233', '299']);
+  });
+
   it('applies a typed value when Enter submits before the field changes', async () => {
     const root = open();
     await load(root);

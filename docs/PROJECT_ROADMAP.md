@@ -236,6 +236,17 @@ layouts and the `/nextgen-utility-hub/` path. An ad hoc axe-core scan found no v
 the empty, editing and result states, in light and dark themes, English and Bangla, at 360
 and 1280 px.
 
+The Image Cropper was merged into `main` in PR #7 (merge commit `b67abea`).
+
+**Follow-up fix (post-merge review):** with a fixed ratio, typing X or Y re-derived the height
+from the width. Whole-pixel rounding can differ by 1 pixel (for example 233 × 299 at 35:45
+became 233 × 300), so moving the crop could silently resize it or report "does not fit"
+against the height. Now only an edited width or height derives the other side; X and Y only
+move the selection. Covered by 2 new tests in `tests/calc/crop.test.ts` and 1 in
+`tests/imageCropper.test.ts` (both failed before the fix). Full validation after a clean
+`npm ci`: 318 unit tests in 17 files and 77 Playwright tests passed; format, lint,
+typecheck and build passed.
+
 Still planned in Milestone 5, each as a separate step: Image Compressor, Image Converter
 (format conversion), and the photo/signature presets.
 
