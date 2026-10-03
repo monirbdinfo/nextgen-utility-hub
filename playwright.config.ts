@@ -6,6 +6,7 @@ declare const process: { env: Record<string, string | undefined> };
 const PORT = 4173;
 export const SUBPATH_PORT = 4174;
 export const SUBPATH = '/nextgen-utility-hub/';
+const CROSS_BROWSER_SPECS = ['cross-browser.spec.ts', 'exif.spec.ts'];
 
 export default defineConfig({
   testDir: 'e2e',
@@ -17,7 +18,22 @@ export default defineConfig({
     baseURL: `http://127.0.0.1:${PORT}/`,
     trace: 'retain-on-failure',
   },
-  projects: [{ name: 'chromium', use: { ...devices['Desktop Chrome'] } }],
+  // Chromium runs every spec. Firefox and WebKit run the image-tool specs written to be
+  // engine-neutral (cross-browser and EXIF orientation); `npm run test:e2e` stays
+  // Chromium-only and `npm run test:e2e:cross` runs the other two engines.
+  projects: [
+    { name: 'chromium', use: { ...devices['Desktop Chrome'] } },
+    {
+      name: 'firefox',
+      use: { ...devices['Desktop Firefox'] },
+      testMatch: CROSS_BROWSER_SPECS,
+    },
+    {
+      name: 'webkit',
+      use: { ...devices['Desktop Safari'] },
+      testMatch: CROSS_BROWSER_SPECS,
+    },
+  ],
   // Test the production build, served exactly as GitHub Pages would serve static files.
   // The second server mounts the same build under the GitHub Pages project sub-path.
   // Playwright starts web servers one after another, so the build finishes first.

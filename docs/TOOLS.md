@@ -185,7 +185,8 @@ filled with white, and the result says when that actually happened.
 
 **Metadata and orientation.** The output contains no EXIF/XMP metadata from the original
 (camera, GPS, date). Photos are decoded with their orientation tag applied, so they are
-resized the right way up.
+resized the right way up (tested in Chromium, Firefox and WebKit; see
+[Image tools: browsers and EXIF orientation](#image-tools-browsers-and-exif-orientation)).
 
 **Browser support and limits.**
 
@@ -267,13 +268,15 @@ refused with an explanation (a warning appears as soon as the selection is that 
 
 **Browser support and limits.**
 
-- Tested only in Chromium (Playwright, desktop pointer and keyboard). Pointer Events, pointer
-  capture and the `<img>`/canvas APIs used are supported in current Firefox and Safari,
-  but those browsers were not tested. Real touch dragging was not tested; touch support relies
-  on Pointer Events and `touch-action`.
-- Orientation: browsers that apply EXIF orientation when drawing an image to a canvas
-  (current Chromium, Firefox and Safari) crop the image as it is displayed. This was not
-  tested with rotated photos.
+- Tested in Chromium, Firefox and WebKit with a desktop mouse and keyboard (see
+  [Image tools: browsers and EXIF orientation](#image-tools-browsers-and-exif-orientation)).
+  Real touch dragging was not tested; touch support relies on Pointer Events and
+  `touch-action`.
+- Orientation: crop coordinates refer to the upright (displayed) image, and the output
+  matches what the selection showed, including for EXIF-rotated photos. The crop copies the
+  whole oriented image at an offset onto a crop-sized canvas, because WebKit's
+  source-rectangle `drawImage` did not use the upright coordinates (found by the
+  cross-browser tests and fixed).
 - If the selection covers the whole preview on a phone, scroll by touching outside the image
   or the box.
 
@@ -325,8 +328,10 @@ the status suggests keeping the original. Savings are never claimed when there a
 
 **Browser support and limits.**
 
-- Tested only in Chromium. Output sizes for the same settings differ between browsers and
-  browser versions, because each uses its own encoder.
+- Tested in Chromium, Firefox and WebKit (see
+  [Image tools: browsers and EXIF orientation](#image-tools-browsers-and-exif-orientation)).
+  Output sizes for the same settings differ between browsers and browser versions, because
+  each uses its own encoder.
 - WebP encoding is not available in Safari, so WebP is disabled there; a WebP file with "Same
   as original" then shows an error asking for another format (tested with a mocked encoder,
   not real Safari).
@@ -369,8 +374,50 @@ frame.
 difference (smaller / "No change in size" / larger, in bytes and percent) and the quality
 used. A larger output is explained (normal for PNG), never presented as a saving.
 
-**Browser support and limits.** Tested only in Chromium. Output sizes differ between browsers
-and versions. WebP encoding is unavailable in Safari, so WebP is disabled there (simulated in
-Chromium by patching `toDataURL`, not tested in real Safari). Metadata (camera, GPS) is not
-carried over, colour profiles are handled by the browser, and photos are turned upright using
-their orientation tag (not yet covered by a test; see the category audit).
+**Browser support and limits.** Tested in Chromium, Firefox and WebKit (see
+[Image tools: browsers and EXIF orientation](#image-tools-browsers-and-exif-orientation)).
+Output sizes differ between browsers and versions. Where the canvas cannot encode WebP, the
+option is disabled and explained. Metadata (camera, GPS) is not carried over, colour profiles
+are handled by the browser, and photos are turned upright using their orientation tag (tested
+for orientations 1, 3, 6 and 8).
+
+## Image tools: browsers and EXIF orientation
+
+**Browsers actually tested.** The four image tools are tested with Playwright in three
+engines (`playwright.config.ts`, CI job "Cross-browser image tests" plus the Chromium job):
+
+| Engine                   | Version tested (CI)        | Specs                                                  |
+| ------------------------ | -------------------------- | ------------------------------------------------------ |
+| Chromium                 | 141.0 (Playwright 1.56.1)  | every spec, including the cross-browser and EXIF specs |
+| Firefox                  | 142.0.1 (Playwright v1495) | `e2e/cross-browser.spec.ts`, `e2e/exif.spec.ts`        |
+| WebKit (Safari's engine) | 26.0 (Playwright v2215)    | `e2e/cross-browser.spec.ts`, `e2e/exif.spec.ts`        |
+
+WebKit here is Playwright's Linux build of the engine Safari uses, **not Safari itself**;
+real Safari on macOS or iOS and physical touch devices have not been tested. Firefox and
+WebKit run only in GitHub Actions (they could not be installed in the development
+environment), so their results come from CI logs.
+
+Canvas encoding support detected in CI (the same check the tools use, printed to the test
+log): JPEG, PNG and WebP in all three engines, including Playwright's Linux WebKit build.
+Real Safari is documented not to encode WebP, so the "no WebP encoder" path (WebP option
+disabled and labelled) is covered only by tests that simulate it by patching
+`toDataURL`, not by a real engine. The WebP test asserts whichever applies.
+
+**EXIF orientation.** The tools never read EXIF themselves; they rely on the browser, which
+applies the orientation tag when decoding (`naturalWidth`/`naturalHeight`, previews and
+`drawImage`). Outputs are drawn from the upright image and carry **no** EXIF, so viewers
+cannot rotate them a second time. Verified cases (fixtures `e2e/fixtures/exif-orientation-*.jpg`,
+generated locally: 80 × 60 stored pixels with red, green, blue and yellow quadrants, only the
+Orientation tag differing):
+
+| Orientation | Displayed size | Verified in all three engines                                                                                               |
+| ----------- | -------------- | --------------------------------------------------------------------------------------------------------------------------- |
+| 1           | 80 × 60        | Converter: preview and output pixels                                                                                        |
+| 3 (180°)    | 80 × 60        | Converter: preview and output pixels                                                                                        |
+| 6 (90° CW)  | 60 × 80        | Converter; Resizer (50 % → 30 × 40, no EXIF in output); Cropper (coordinates and a crop of the displayed top-left quadrant) |
+| 8 (90° CCW) | 60 × 80        | Converter; Compressor (60 × 80, no EXIF in output)                                                                          |
+
+Mirrored orientations (2, 4, 5, 7) are not covered by a fixture. The cross-browser tests
+found one engine difference: WebKit's source-rectangle `drawImage` did not use the upright
+coordinates of an EXIF-rotated image, which made the Cropper return the wrong region; the
+Cropper now draws the whole image at an offset instead (see the Cropper notes).

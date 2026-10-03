@@ -335,6 +335,30 @@ breaking Vitest upgrade, which is out of scope here.
 Still planned in Milestone 5: the photo/signature presets (`job-photo-resizer`), which need
 verified official specifications first.
 
+## Follow-up — image tools reliability (cross-browser and EXIF)
+
+Addresses the two P1 items in [FILE_TOOLS_AUDIT.md](FILE_TOOLS_AUDIT.md):
+
+- **Cross-browser tests.** Playwright gained Firefox and WebKit projects that run
+  `e2e/cross-browser.spec.ts` and `e2e/exif.spec.ts` (Chromium still runs every spec).
+  `npm run test:e2e` stays Chromium-only and is still the deploy gate; the new
+  `npm run test:e2e:cross` runs Firefox and WebKit in a separate CI job, which installs only
+  those two browsers. WebKit is not Safari itself; real Safari is untested.
+- **EXIF orientation.** Four generated fixtures (Orientation 1, 3, 6, 8) are checked in all
+  four tools; outputs are upright and carry no EXIF.
+- **Bug found and fixed:** in WebKit, a source-rectangle `drawImage` of an EXIF-rotated photo did
+  not use the upright coordinates, so the Cropper returned the wrong area for rotated photos. The
+  crop now draws the whole oriented image at an offset (`src/lib/imageCanvas.ts`).
+- No dependencies were added; `package.json` gained one script and `ci.yml` one job.
+
+Validation (3 October 2026). Locally, after a clean `npm ci` (Node 22): format, lint and
+typecheck passed; 364 unit tests in 21 files passed; the build succeeded; `npm run test:e2e`
+passed 137 tests in Chromium. `npm run test:e2e:cross` cannot run locally (the development
+environment's network policy blocks the Playwright browser download), so Firefox and WebKit
+were run only in GitHub Actions on the pull request: Firefox 19/19 and WebKit 19/19 passed
+after the Cropper fix (before it, WebKit failed 1 of 19: the EXIF Cropper test). No
+accessibility scan was re-run: this change does not alter any page.
+
 ## Notes for later milestones
 
 - **Milestone 6 (PDF)** will need `pdf-lib`; add it to `docs/LICENSES.md` with verified
@@ -347,7 +371,7 @@ verified official specifications first.
 
 ## Recommended next step
 
-Work through the P1 items in [FILE_TOOLS_AUDIT.md](FILE_TOOLS_AUDIT.md) (cross-browser
-Playwright projects, an EXIF-orientation fixture) as separate pull requests, then the
+The P1 items in [FILE_TOOLS_AUDIT.md](FILE_TOOLS_AUDIT.md) are done. Next: the P2 items
+(align the Resizer's encoder-fallback policy, touch tests for the Cropper), then the
 photo/signature presets. Exact preset dimensions and file-size limits for specific
 recruiters should be confirmed from their official notices before they are hard-coded.

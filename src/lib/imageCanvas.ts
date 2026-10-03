@@ -148,6 +148,17 @@ async function render(
   }
 }
 
+/** Displayed size of a drawable source (for an <img>, after EXIF orientation). */
+function sourceSize(source: CanvasImageSource): Size {
+  if (source instanceof HTMLImageElement) {
+    return { width: source.naturalWidth, height: source.naturalHeight };
+  }
+  const s = source as { width: number | SVGAnimatedLength; height: number | SVGAnimatedLength };
+  const n = (v: number | SVGAnimatedLength): number =>
+    typeof v === 'number' ? v : v.baseVal.value;
+  return { width: n(s.width), height: n(s.height) };
+}
+
 export interface EncodedImage {
   blob: Blob;
   /** The format the browser actually produced (it may differ from the request). */
@@ -193,8 +204,13 @@ export function openEncoder(
     }
     if (from) {
       // 1:1 copy at whole-pixel offsets: no smoothing, so pixels are copied exactly.
+      // The whole image is drawn at a negative offset instead of passing a source
+      // rectangle: with EXIF-rotated photos, WebKit's source-rectangle drawImage does not
+      // use the upright (displayed) coordinates, while a whole-image draw does in every
+      // engine we test. Only the crop area lands on the crop-sized canvas.
       ctx.imageSmoothingEnabled = false;
-      ctx.drawImage(source, from.x, from.y, from.width, from.height, 0, 0, size.width, size.height);
+      const full = sourceSize(source);
+      ctx.drawImage(source, -from.x, -from.y, full.width, full.height);
     } else {
       ctx.imageSmoothingEnabled = true;
       ctx.imageSmoothingQuality = 'high';
