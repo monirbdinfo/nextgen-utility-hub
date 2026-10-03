@@ -63,11 +63,15 @@ npm run format:check # Prettier
 npm run lint         # ESLint
 npm run typecheck    # tsc --noEmit
 npm test             # Vitest unit tests (jsdom), incl. WCAG contrast checks on tokens
-npm run test:e2e     # Playwright smoke tests in Chromium against the production build
+npm run test:e2e     # Playwright tests in Chromium against the production build (all specs)
+npm run test:e2e:cross # Image-tool and EXIF specs in Firefox and WebKit
 ```
 
-Playwright needs a Chromium build. On a fresh machine run `npx playwright install chromium`
-once. CI (`.github/workflows/ci.yml`) runs all checks on pushes to `main` and on pull requests.
+Playwright needs browser builds. On a fresh machine run `npx playwright install chromium`
+(and `npx playwright install firefox webkit` for the cross-browser specs) once. CI
+(`.github/workflows/ci.yml`) runs all checks on pushes to `main` and on pull requests,
+including a separate Firefox + WebKit job; the deploy workflow's gate runs Chromium only.
+WebKit is Playwright's build of the Safari engine on Linux, not Safari itself.
 
 ## Deployment
 
