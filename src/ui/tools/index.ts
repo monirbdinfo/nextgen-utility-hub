@@ -4,6 +4,7 @@ import { dateFormatter } from './dateFormatter';
 import { digitConverter } from './digitConverter';
 import { emiCalculator } from './emiCalculator';
 import { imageCompressor } from './imageCompressor';
+import { imageConverter } from './imageConverter';
 import { imageCropper } from './imageCropper';
 import { imageResizer } from './imageResizer';
 import type { ToolView } from './kit';
@@ -24,6 +25,7 @@ export const toolViews: Readonly<Record<string, ToolView>> = {
   'image-resizer': imageResizer,
   'image-cropper': imageCropper,
   'image-compressor': imageCompressor,
+  'image-converter': imageConverter,
 };
 
 export type { ToolContext, ToolView } from './kit';

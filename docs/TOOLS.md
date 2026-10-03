@@ -331,3 +331,46 @@ the status suggests keeping the original. Savings are never claimed when there a
   as original" then shows an error asking for another format (tested with a mocked encoder,
   not real Safari).
 - Re-encoding removes metadata (camera details, GPS) and applies the photo's orientation.
+
+## Image Converter
+
+Route `#/tool/image-converter`. Code: `src/calc/convert.ts` (logic), `openEncoder` in
+`src/lib/imageCanvas.ts`, `src/ui/tools/imageInput.ts` (shared file loading) and
+`src/ui/tools/imageConverter.ts` (view). No dependencies were added.
+
+**Privacy.** Same as the other image tools: the image is converted in the tab and never
+uploaded, sent anywhere, written to browser storage or logged. Object URLs and canvases are
+released after use, on Replace, on Reset and when leaving the tool.
+
+**Input.** The shared checks (JPEG, PNG and WebP up to 25 MB and 50 megapixels, type read
+from the file's first bytes). The page shows the file name (as text, any script), source
+format, dimensions and size. Images over 8,192 pixels per side or 16.7 megapixels are refused
+with a suggestion to use the Image Resizer first.
+
+**Output.** "Convert to" lists JPEG, PNG and WebP; formats the browser cannot encode are
+disabled and labelled. A different format from the source is suggested (PNG for JPEG/WebP
+sources, JPEG for PNG); once the user picks a format, it is kept across Replace image and a
+language switch until Reset. Choosing the source's own format is allowed and explained as a
+re-encode. The pixel dimensions never change. The browser's returned type is checked: if it
+differs from the chosen format, an error is shown and nothing is offered for download. The
+file is named `<original name>-converted.<ext>`, with the extension of the real output.
+
+**Quality.** A slider (10–100 %, default 92 %, the same default as the Resizer and Cropper)
+for JPEG and WebP only; the page says that no quality setting guarantees a file size. PNG has
+no quality setting, so the slider is hidden and a note explains that PNG is lossless and often
+larger.
+
+**Transparency.** PNG and WebP keep transparency (checked with pixel tests). Converting an
+image that may be transparent to JPEG shows a warning first; transparent areas become white,
+and the result says when that happened. Animated images are converted as a single still
+frame.
+
+**Results.** Output format, original format, dimensions, output and original size, the size
+difference (smaller / "No change in size" / larger, in bytes and percent) and the quality
+used. A larger output is explained (normal for PNG), never presented as a saving.
+
+**Browser support and limits.** Tested only in Chromium. Output sizes differ between browsers
+and versions. WebP encoding is unavailable in Safari, so WebP is disabled there (simulated in
+Chromium by patching `toDataURL`, not tested in real Safari). Metadata (camera, GPS) is not
+carried over, colour profiles are handled by the browser, and photos are turned upright using
+their orientation tag (not yet covered by a test; see the category audit).
