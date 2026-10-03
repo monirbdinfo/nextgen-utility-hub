@@ -1599,3 +1599,36 @@ a.btn {
 .crop-fields + .field-hint {
   margin-top: var(--space-3);
 }
+
+/* ---------- Image Compressor ---------- */
+
+/* Long file names wrap instead of widening the page. */
+.image-file-name {
+  overflow-wrap: anywhere;
+}
+
+.quality-field {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+.quality-range {
+  flex: 1;
+  min-width: 0;
+  min-height: var(--touch);
+  margin: 0;
+  accent-color: var(--color-primary);
+}
+
+.quality-value {
+  min-width: 4ch;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  text-align: end;
+}
+
+.compress-controls .radio-group + .field-grid,
+.compress-controls .field-grid + .field-grid {
+  margin-top: var(--space-4);
+}

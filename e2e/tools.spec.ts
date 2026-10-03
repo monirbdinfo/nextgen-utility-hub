@@ -12,6 +12,7 @@ const TOOLS = [
   ['unicode-cleaner', 'Unicode Text Cleaner'],
   ['image-resizer', 'Image Resizer'],
   ['image-cropper', 'Image Cropper'],
+  ['image-compressor', 'Image Compressor'],
 ] as const;
 
 /** Collect console errors, uncaught exceptions and failed requests for the whole test. */

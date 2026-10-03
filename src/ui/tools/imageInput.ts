@@ -29,6 +29,7 @@ export const IMG = defineStrings({
     dropHint: 'JPEG, PNG or WebP, up to 25 MB.',
     dropActive: 'Drop the image to open it',
     original: 'Original image',
+    fileName: 'File name',
     originalAlt: 'Preview of the original image',
     dimensions: 'Dimensions',
     dimensionsValue: '{w} × {h} px',
@@ -62,6 +63,7 @@ export const IMG = defineStrings({
     dropHint: 'JPEG, PNG বা WebP, সর্বোচ্চ ২৫ MB।',
     dropActive: 'ছবিটি খুলতে এখানে ছেড়ে দিন',
     original: 'মূল ছবি',
+    fileName: 'ফাইলের নাম',
     originalAlt: 'মূল ছবির প্রিভিউ',
     dimensions: 'মাপ',
     dimensionsValue: '{w} × {h} পিক্সেল',
@@ -129,12 +131,16 @@ export function readBytes(blob: Blob): Promise<ArrayBuffer> {
   });
 }
 
-export function metaRow(label: string, value: string): HTMLElement {
+export function metaRow(label: string, value: string, wrap = false): HTMLElement {
   return h(
     'div',
     { class: 'result-row' },
     h('dt', {}, label),
-    h('dd', {}, h('span', { class: 'result-value' }, value)),
+    h(
+      'dd',
+      {},
+      h('span', { class: wrap ? 'result-value image-file-name' : 'result-value' }, value),
+    ),
   );
 }
 
@@ -172,6 +178,8 @@ export interface ImageInputOptions {
   id: string;
   /** Show the original image inside the card (the cropper shows it in its editor instead). */
   preview: boolean;
+  /** Also show the file name in the original-image details. */
+  showName?: boolean;
   isBusy(): boolean;
   /** A new image was opened (the previous one is already released). */
   onLoad(image: LoadedImage, restoring: boolean): void;
@@ -285,6 +293,7 @@ export function imageInput(ctx: ToolContext, opts: ImageInputOptions): ImageInpu
     ctx.session.set('file', file);
     if (originalImg) originalImg.src = decoded.url;
     originalMeta.replaceChildren(
+      ...(opts.showName ? [metaRow(L('fileName'), file.name, true)] : []),
       metaRow(L('dimensions'), fmt.dims(decoded)),
       metaRow(L('fileSize'), fmt.bytes(file.size)),
       metaRow(L('format'), FORMATS[check.value].label),

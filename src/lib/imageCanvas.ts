@@ -88,10 +88,10 @@ export interface ResizeResult {
 /** JPEG/WebP quality used for re-encoding. Re-encoding is lossy for these formats. */
 export const ENCODE_QUALITY = 0.92;
 
-function toBlob(canvas: HTMLCanvasElement, mime: string): Promise<Blob | null> {
+function toBlob(canvas: HTMLCanvasElement, mime: string, quality: number): Promise<Blob | null> {
   return new Promise((resolve) => {
     try {
-      canvas.toBlob(resolve, mime, ENCODE_QUALITY);
+      canvas.toBlob(resolve, mime, quality);
     } catch {
       resolve(null);
     }
@@ -139,7 +139,51 @@ async function render(
   format: ImageFormat,
   sourceMayBeTransparent: boolean,
 ): Promise<ResizeResult> {
+  const encoder = openEncoder(source, from, size, format, sourceMayBeTransparent);
+  try {
+    const out = await encoder.encode(ENCODE_QUALITY);
+    return { ...out, size, filledTransparency: encoder.filledTransparency };
+  } finally {
+    encoder.close();
+  }
+}
+
+export interface EncodedImage {
+  blob: Blob;
+  /** The format the browser actually produced (it may differ from the request). */
+  format: ImageFormat;
+}
+
+/** A drawn canvas that can be encoded repeatedly (for example at several qualities). */
+export interface Encoder {
+  /** Output is JPEG and the source had transparent pixels, which were filled with white. */
+  filledTransparency: boolean;
+  /** Encode at `quality` (0–1; ignored by the browser for PNG). */
+  encode(quality: number): Promise<EncodedImage>;
+  /** Release the canvas memory. Always call this when done. */
+  close(): void;
+}
+
+/**
+ * Draw `source` (or its `from` region at 1:1) at `size` once, ready to be encoded as
+ * `format`. Transparent pixels become white for JPEG (canvases would otherwise turn
+ * them black). Throws `ImageProcessingError('canvas')` if the canvas cannot be created.
+ */
+export function openEncoder(
+  source: CanvasImageSource,
+  from: Rect | null,
+  size: Size,
+  format: ImageFormat,
+  /** Only formats that can be transparent need the (memory-heavy) transparency scan. */
+  sourceMayBeTransparent: boolean,
+): Encoder {
   const canvas = document.createElement('canvas');
+  const close = (): void => {
+    // Shrinking the canvas releases its memory promptly.
+    canvas.width = 0;
+    canvas.height = 0;
+  };
+  let filledTransparency = false;
   try {
     canvas.width = size.width;
     canvas.height = size.height;
@@ -156,8 +200,6 @@ async function render(
       ctx.imageSmoothingQuality = 'high';
       ctx.drawImage(source, 0, 0, size.width, size.height);
     }
-
-    let filledTransparency = false;
     if (!FORMATS[format].alpha) {
       filledTransparency =
         sourceMayBeTransparent &&
@@ -166,18 +208,26 @@ async function render(
       ctx.fillStyle = '#ffffff';
       ctx.fillRect(0, 0, size.width, size.height);
     }
-
-    const blob = await toBlob(canvas, FORMATS[format].mime);
-    if (!blob || blob.size === 0) throw new ImageProcessingError('encode');
-    const produced = formatFromMime(blob.type);
-    if (!produced) throw new ImageProcessingError('encode');
-    return { blob, format: produced, size, filledTransparency };
   } catch (error) {
+    close();
     if (error instanceof ImageProcessingError) throw error;
     // Allocation failures surface as RangeError/DOMException depending on the browser.
     throw new ImageProcessingError('canvas');
-  } finally {
-    canvas.width = 0;
-    canvas.height = 0;
   }
+  return {
+    filledTransparency,
+    async encode(quality) {
+      let blob: Blob | null;
+      try {
+        blob = await toBlob(canvas, FORMATS[format].mime, quality);
+      } catch {
+        throw new ImageProcessingError('canvas');
+      }
+      if (!blob || blob.size === 0) throw new ImageProcessingError('encode');
+      const produced = formatFromMime(blob.type);
+      if (!produced) throw new ImageProcessingError('encode');
+      return { blob, format: produced };
+    },
+    close,
+  };
 }
