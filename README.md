@@ -9,9 +9,9 @@ Website (GitHub Pages): <https://monirbdinfo.github.io/nextgen-utility-hub/>, de
 `main` by GitHub Actions (first successful deployment: 2 October 2026). Changes on other
 branches appear there only after they are merged into `main`. See [Deployment](#deployment).
 
-## Status: Milestone 5 in progress (Image Resizer)
+## Status: Milestone 5 in progress (Image Resizer, Image Cropper)
 
-9 of 27 registry tools are **Available**; the other 18 are **Planned** (roadmap only, shown
+10 of 27 registry tools are **Available**; the other 17 are **Planned** (roadmap only, shown
 with a badge and not linked). See [docs/PROJECT_ROADMAP.md](docs/PROJECT_ROADMAP.md).
 
 | Available now (run entirely in your browser)                                                  | Toolkit              |
@@ -25,13 +25,14 @@ with a badge and not linked). See [docs/PROJECT_ROADMAP.md](docs/PROJECT_ROADMAP
 | Date Text Formatter — numeric, Bangla/English text, date in words                             | Bangla Number & Text |
 | Unicode Text Cleaner — spaces, blank lines, hidden characters, optional NFC/NFKC; Bangla-safe | Bangla Number & Text |
 | Image Resizer — JPEG/PNG/WebP to exact pixels, aspect lock, presets; processed on-device      | Privacy-First Files  |
+| Image Cropper — drag or type a crop, aspect presets, keyboard control; exact pixels as PNG    | Privacy-First Files  |
 
 Platform features: responsive homepage, Bangla/English toggle (persisted, sets
 `<html lang>`), light/dark theme, keyboard-accessible search, hash routing with deep links,
 typed central registry. Calculation conventions, rounding rules and limitations are in
 [docs/TOOLS.md](docs/TOOLS.md).
 
-Not available yet: image cropper, compressor and converter, photo/signature presets, PDF
+Not available yet: image compressor and converter, photo/signature presets, PDF
 tools (`pdf-lib` not added), CV/cover letter templates, network tools, bandwidth calculator.
 
 ## Toolkits
@@ -157,8 +158,8 @@ docs/         Roadmap, tool conventions, licensing
 
 - Static site: no server, accounts, cookies, analytics or external requests. Language and
   theme preferences are kept in `localStorage` only.
-- File tools process files locally. The Image Resizer decodes and resizes images inside the
-  browser tab; images are never uploaded, stored or logged (see
+- File tools process files locally. The Image Resizer and Image Cropper decode, resize and
+  crop images inside the browser tab; images are never uploaded, stored or logged (see
   [docs/TOOLS.md](docs/TOOLS.md#image-resizer)).
 - Browsers cannot open raw sockets, send ICMP pings or scan ports. Network tools will be
   limited to what the browser safely allows, and the project will not include unauthorised

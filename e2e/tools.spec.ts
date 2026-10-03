@@ -11,6 +11,7 @@ const TOOLS = [
   ['date-formatter', 'Date Text Formatter'],
   ['unicode-cleaner', 'Unicode Text Cleaner'],
   ['image-resizer', 'Image Resizer'],
+  ['image-cropper', 'Image Cropper'],
 ] as const;
 
 /** Collect console errors, uncaught exceptions and failed requests for the whole test. */

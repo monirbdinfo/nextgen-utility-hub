@@ -3,6 +3,7 @@ import { dateDifferenceTool } from './dateDifference';
 import { dateFormatter } from './dateFormatter';
 import { digitConverter } from './digitConverter';
 import { emiCalculator } from './emiCalculator';
+import { imageCropper } from './imageCropper';
 import { imageResizer } from './imageResizer';
 import type { ToolView } from './kit';
 import { numberToWordsTool } from './numberToWords';
@@ -20,6 +21,7 @@ export const toolViews: Readonly<Record<string, ToolView>> = {
   'date-formatter': dateFormatter,
   'unicode-cleaner': unicodeCleaner,
   'image-resizer': imageResizer,
+  'image-cropper': imageCropper,
 };
 
 export type { ToolContext, ToolView } from './kit';

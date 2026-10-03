@@ -12,7 +12,7 @@ This roadmap follows the real implementation. A tool is only marked **Available*
 | 2         | GitHub Pages deployment workflow                                       | Done (PR #2), site deployed                   |
 | 3         | Date/age, date difference, EMI, digits, number/Taka words, date text   | Done (PR #3, merged `9d0ed68`), site deployed |
 | 4         | Unicode text cleaning and normalization                                | Done (PR #3, merged `9d0ed68`), site deployed |
-| 5         | Image resize, crop, compression, conversion, photo/signature presets   | In progress: Image Resizer done (this branch) |
+| 5         | Image resize, crop, compression, conversion, photo/signature presets   | In progress: Resizer (PR #6), Cropper         |
 | 6         | PDF creation, merge, split, page tools, size reduction                 | Planned                                       |
 | 7         | CV and cover-letter templates with print/PDF export                    | Planned                                       |
 | 8         | Subnet/CIDR/IP-range calculators, IP/DNS lookup, latency check         | Planned                                       |
@@ -20,7 +20,7 @@ This roadmap follows the real implementation. A tool is only marked **Available*
 
 ## Tool catalog by milestone
 
-27 registry entries; 9 available after the Milestone 5 Image Resizer.
+27 registry entries; 10 available after the Milestone 5 Image Cropper.
 
 | Milestone | Category | Registry ID              | Tool                                   | Status    |
 | --------- | -------- | ------------------------ | -------------------------------------- | --------- |
@@ -34,7 +34,7 @@ This roadmap follows the real implementation. A tool is only marked **Available*
 | 4         | Bangla   | `unicode-cleaner`        | Unicode Text Cleaner                   | Available |
 | 5         | Files    | `image-compressor`       | Image Compressor & Converter (JPG/PNG) | Planned   |
 | 5         | Files    | `image-resizer`          | Image Resizer                          | Available |
-| 5         | Files    | `image-cropper`          | Image Cropper                          | Planned   |
+| 5         | Files    | `image-cropper`          | Image Cropper                          | Available |
 | 5         | Files    | `job-photo-resizer`      | Photo & Signature Resizer              | Planned   |
 | 6         | Files    | `pdf-create`             | Create PDF                             | Planned   |
 | 6         | Files    | `pdf-merge`              | PDF Merge & Split                      | Planned   |
@@ -158,7 +158,7 @@ a fixed-seed differential test (100,000 random inputs per operation) and 1,000,0
 inputs (correctness only, no timing assertion). Measured timings are in
 [TOOLS.md](TOOLS.md#unicode-text-cleaner).
 
-## Milestone 5 — Image Resizer delivered (other image tools planned)
+## Milestone 5 — Image Resizer delivered
 
 Tool: **Image Resizer** (`image-resizer`, Privacy-First File Tools, route
 `#/tool/image-resizer`). Conventions, limits and browser notes are in
@@ -195,8 +195,49 @@ An axe-core scan (WCAG 2.1 A/AA and best practices, run ad hoc; axe is not a pro
 dependency) found no violations on the empty and result states, in light and dark themes,
 English and Bangla, at 360 and 1280 px.
 
-Still planned in Milestone 5, each as a separate step: Image Cropper, Image Compressor,
-Image Converter (format conversion), and the photo/signature presets.
+The Image Resizer was merged into `main` in PR #6 (merge commit `540c02c`).
+
+## Milestone 5.2 — Image Cropper delivered
+
+Tool: **Image Cropper** (`image-cropper`, Privacy-First File Tools, route
+`#/tool/image-cropper`). The existing planned registry entry was reused; no new ID was added.
+Conventions, coordinates, limits and browser notes are in [TOOLS.md](TOOLS.md#image-cropper).
+
+Added:
+
+- `src/calc/crop.ts` — pure crop maths in source pixels: display-to-source conversion,
+  boundary clamping, moving, handle resizing (freeform and fixed ratio), ratio presets,
+  validation of typed values, keyboard steps.
+- `cropImage` in `src/lib/imageCanvas.ts` — a 1:1 copy of the selected region (no
+  resampling), sharing the resizer's encode, transparency and error handling.
+- `src/ui/tools/imageInput.ts` — the drop zone, validated loading pipeline, original-image
+  card, "Save as" list and shared strings, extracted from the Image Resizer so both tools use
+  the same validation. The resizer's behaviour and tests are unchanged.
+- `src/ui/tools/imageCropper.ts` — the view: crop editor (pointer and keyboard), aspect
+  presets, numeric X/Y/width/height, output preview and download.
+- No new dependencies. Tests: `tests/calc/crop.test.ts` (21), `tests/imageCropper.test.ts`
+  (18, canvas mocked), 1 new filename test in `tests/calc/image.test.ts`, `e2e/crop.spec.ts`
+  (17) with a new deterministic fixture `e2e/fixtures/quadrants.png`, plus the tool in the
+  desktop/mobile load checks.
+
+Validation (run locally on 3 October 2026 after a clean `npm ci`, Node 22, Chromium only):
+
+| Command                                                     | Result                                                                                          |
+| ----------------------------------------------------------- | ----------------------------------------------------------------------------------------------- |
+| `npm run format:check`, `npm run lint`, `npm run typecheck` | passed                                                                                          |
+| `npm test`                                                  | 315 tests passed in 17 files                                                                    |
+| `npm run build`                                             | succeeded (JS 154.6 kB / 48.3 kB gzip, CSS 26.6 kB)                                             |
+| `npm run test:e2e`                                          | 77 tests passed, including 17 cropper tests, all 15 resizer tests and every other tool's checks |
+
+The cropper browser tests check output pixels exactly (a 20 × 20 crop across the fixture's
+colour boundaries), drag conversion at a scaled preview, handle resizing, fixed ratios,
+keyboard use, typed-value errors, JPEG transparency, Bangla and dark mode, 360/768/1280 px
+layouts and the `/nextgen-utility-hub/` path. An ad hoc axe-core scan found no violations in
+the empty, editing and result states, in light and dark themes, English and Bangla, at 360
+and 1280 px.
+
+Still planned in Milestone 5, each as a separate step: Image Compressor, Image Converter
+(format conversion), and the photo/signature presets.
 
 ## Notes for later milestones
 
@@ -210,7 +251,7 @@ Image Converter (format conversion), and the photo/signature presets.
 
 ## Recommended next step
 
-Continue Milestone 5 one tool at a time, reusing `src/calc/image.ts` and
-`src/lib/imageCanvas.ts`: Image Cropper, then Image Compressor, then Image Converter, then
-the photo/signature presets. Exact preset dimensions and file-size limits for specific
+Continue Milestone 5 one tool at a time, reusing `src/calc/image.ts`,
+`src/lib/imageCanvas.ts` and `src/ui/tools/imageInput.ts`: Image Compressor, then Image
+Converter, then the photo/signature presets. Exact preset dimensions and file-size limits for specific
 recruiters should be confirmed from their official notices before they are hard-coded.
