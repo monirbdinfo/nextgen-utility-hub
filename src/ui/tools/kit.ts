@@ -14,6 +14,13 @@ export interface ToolContext {
    * Never persisted to storage.
    */
   memo: Record<string, string>;
+  /**
+   * In-memory objects for this tool (such as a picked File) that survive a
+   * language switch but are dropped when the user leaves the tool. Never persisted.
+   */
+  session: Map<string, unknown>;
+  /** Register work to run when this view is removed (e.g. revoking object URLs). */
+  onCleanup(fn: () => void): void;
 }
 
 export type ToolView = (ctx: ToolContext) => HTMLElement;
@@ -291,11 +298,11 @@ export function formActions(
 }
 
 /** "How this is calculated" disclosure. */
-export function notes(ctx: ToolContext, items: string[]): HTMLElement {
+export function notes(ctx: ToolContext, items: string[], title?: string): HTMLElement {
   return h(
     'details',
     { class: 'tool-notes' },
-    h('summary', {}, ctx.t('notesTitle')),
+    h('summary', {}, title ?? ctx.t('notesTitle')),
     h('ul', {}, ...items.map((i) => h('li', {}, i))),
   );
 }

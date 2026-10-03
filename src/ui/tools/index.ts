@@ -3,6 +3,7 @@ import { dateDifferenceTool } from './dateDifference';
 import { dateFormatter } from './dateFormatter';
 import { digitConverter } from './digitConverter';
 import { emiCalculator } from './emiCalculator';
+import { imageResizer } from './imageResizer';
 import type { ToolView } from './kit';
 import { numberToWordsTool } from './numberToWords';
 import { takaInWords } from './takaInWords';
@@ -18,6 +19,7 @@ export const toolViews: Readonly<Record<string, ToolView>> = {
   'taka-in-words': takaInWords,
   'date-formatter': dateFormatter,
   'unicode-cleaner': unicodeCleaner,
+  'image-resizer': imageResizer,
 };
 
 export type { ToolContext, ToolView } from './kit';

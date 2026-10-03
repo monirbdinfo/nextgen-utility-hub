@@ -152,7 +152,7 @@ describe('routing', () => {
   });
 
   it('marks every listed tool as planned and not linked', () => {
-    const root = setup('#/category/files');
+    const root = setup('#/category/network'); // a toolkit with no available tools yet
     const tools = root.querySelectorAll('.tool');
     expect(tools.length).toBeGreaterThan(0);
     for (const tool of tools) {

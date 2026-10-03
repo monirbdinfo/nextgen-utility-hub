@@ -145,3 +145,59 @@ lookbehind so the tool keeps working on Safari/iOS 15.4–16.3.
 
 **Browser note:** setting a text box's value from a script turns CR/CRLF into LF, but text
 typed or pasted into it keeps CR in Chromium. The line-ending option handles both.
+
+## Image Resizer
+
+Route `#/tool/image-resizer`. Code: `src/calc/image.ts` (logic), `src/lib/imageCanvas.ts`
+(browser decode/resize/encode) and `src/ui/tools/imageResizer.ts` (view). No dependencies
+were added; it uses the browser's own image decoder and `<canvas>`.
+
+**Privacy.** The image is read from the file picker or a drop, decoded and resized inside the
+tab. It is never uploaded or sent anywhere (the E2E tests fail on any off-origin request),
+never written to `localStorage`, `sessionStorage`, IndexedDB or cookies, and never logged:
+the code has no `console` calls and does not record file names, contents or metadata. The
+open image and result are kept only in memory, so they survive a language switch but are
+dropped when you leave the tool or press Reset. Object URLs are revoked when an image is
+replaced, reset or left behind.
+
+**Input.** JPEG, PNG and WebP, up to 25 MB. The type is checked from the file's first bytes,
+not its name or reported type, so a renamed text file is rejected. Files that pass that check
+but cannot be decoded (damaged files) show an error and nothing else changes; if an image was
+already open, it stays open. Images above 50 megapixels are rejected before resizing.
+
+**Size.** Width and height are whole pixels (English or Bangla digits). With "Keep aspect
+ratio" on, changing one side sets the other, rounded to the nearest pixel (minimum 1).
+Presets set 25/50/75/100 % of the original. Limits: at least 1 px, at most 8,192 px per side
+and 16,777,216 pixels in total (for example 4,096 × 4,096), so it also works within phone
+browsers' canvas limits. The tool never stretches silently: if the proportions differ from
+the original by more than 1 %, a warning is shown before resizing; enlarging shows a note
+that no detail is added.
+
+**Output.** "Same as original" or JPEG, PNG or WebP. JPEG and WebP are saved at quality 92 %
+(lossy); PNG is lossless but the image is still resampled, so **resizing is never lossless**.
+Formats this browser cannot encode are disabled in the list; if the browser still returns a
+different format, the result says so and the file name uses the real format. The download is
+named `<original name>-<width>x<height>.<ext>` (path parts and unsafe characters removed).
+
+**Transparency.** PNG and WebP keep transparency. JPEG cannot store it: when the source may
+be transparent and JPEG is chosen, a warning is shown before resizing, transparent areas are
+filled with white, and the result says when that actually happened.
+
+**Metadata and orientation.** The output contains no EXIF/XMP metadata from the original
+(camera, GPS, date). Photos are decoded with their orientation tag applied, so they are
+resized the right way up.
+
+**Browser support and limits.**
+
+- WebP **encoding** is not available in Safari (decoding is, from Safari 14 on macOS 11+ and
+  iOS 14+), so WebP is disabled in the "Save as" list there. "Same as original" for a WebP
+  file then makes the browser fall back to PNG, and the result states the actual format.
+  This fallback was reasoned from the canvas specification and tested with a mocked encoder;
+  it was not run in a real Safari.
+- Very large images can still fail on low-memory devices; the tool shows an error instead of
+  crashing.
+- Resampling uses the browser's high-quality smoothing, so output pixels can differ slightly
+  between browsers.
+- Colour profiles are handled by the browser; the output is saved in sRGB.
+- Drag and drop needs a pointer device; the file picker works everywhere, including with
+  the keyboard.

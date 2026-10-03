@@ -9,9 +9,9 @@ Website (GitHub Pages): <https://monirbdinfo.github.io/nextgen-utility-hub/>, de
 `main` by GitHub Actions (first successful deployment: 2 October 2026). Changes on other
 branches appear there only after they are merged into `main`. See [Deployment](#deployment).
 
-## Status: Milestone 4 (Unicode text cleaning)
+## Status: Milestone 5 in progress (Image Resizer)
 
-8 of 26 registry tools are **Available**; the other 18 are **Planned** (roadmap only, shown
+9 of 27 registry tools are **Available**; the other 18 are **Planned** (roadmap only, shown
 with a badge and not linked). See [docs/PROJECT_ROADMAP.md](docs/PROJECT_ROADMAP.md).
 
 | Available now (run entirely in your browser)                                                  | Toolkit              |
@@ -24,14 +24,15 @@ with a badge and not linked). See [docs/PROJECT_ROADMAP.md](docs/PROJECT_ROADMAP
 | Taka in Words — Taka and poisha, cheque style, never rounds                                   | Bangla Number & Text |
 | Date Text Formatter — numeric, Bangla/English text, date in words                             | Bangla Number & Text |
 | Unicode Text Cleaner — spaces, blank lines, hidden characters, optional NFC/NFKC; Bangla-safe | Bangla Number & Text |
+| Image Resizer — JPEG/PNG/WebP to exact pixels, aspect lock, presets; processed on-device      | Privacy-First Files  |
 
 Platform features: responsive homepage, Bangla/English toggle (persisted, sets
 `<html lang>`), light/dark theme, keyboard-accessible search, hash routing with deep links,
 typed central registry. Calculation conventions, rounding rules and limitations are in
 [docs/TOOLS.md](docs/TOOLS.md).
 
-Not available yet: image and PDF tools (`pdf-lib` not added), CV/cover
-letter templates, network tools, bandwidth calculator.
+Not available yet: image cropper, compressor and converter, photo/signature presets, PDF
+tools (`pdf-lib` not added), CV/cover letter templates, network tools, bandwidth calculator.
 
 ## Toolkits
 
@@ -130,13 +131,13 @@ planned or unknown tool falls back to home. Plain fragments such as
 
 ```
 src/
-  calc/       Pure calculation modules (dates, EMI, digits, number/Taka words, date text)
+  calc/       Pure calculation modules (dates, EMI, digits, words, text cleaning, image sizes)
   registry/   Typed categories, tools, lookup and search
   router/     Hash route parsing
   i18n/       English/Bangla messages and helpers
   ui/         App shell, header, search combobox, toolkits view, tool page, icons
   ui/tools/   One view per available tool + shared form/result kit
-  lib/        DOM and storage helpers
+  lib/        DOM, storage and canvas image helpers
   styles/     Design tokens (navy + teal), base and component CSS
 tests/        Vitest unit tests (tests/calc/ for calculations)
 e2e/          Playwright tests (desktop, mobile, GitHub Pages sub-path)
@@ -156,7 +157,9 @@ docs/         Roadmap, tool conventions, licensing
 
 - Static site: no server, accounts, cookies, analytics or external requests. Language and
   theme preferences are kept in `localStorage` only.
-- Local file processing is a design goal for the file tools; it is not implemented yet.
+- File tools process files locally. The Image Resizer decodes and resizes images inside the
+  browser tab; images are never uploaded, stored or logged (see
+  [docs/TOOLS.md](docs/TOOLS.md#image-resizer)).
 - Browsers cannot open raw sockets, send ICMP pings or scan ports. Network tools will be
   limited to what the browser safely allows, and the project will not include unauthorised
   scanning or other unsafe diagnostic features.

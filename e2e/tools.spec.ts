@@ -10,6 +10,7 @@ const TOOLS = [
   ['taka-in-words', 'Taka in Words'],
   ['date-formatter', 'Date Text Formatter'],
   ['unicode-cleaner', 'Unicode Text Cleaner'],
+  ['image-resizer', 'Image Resizer'],
 ] as const;
 
 /** Collect console errors, uncaught exceptions and failed requests for the whole test. */
