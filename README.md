@@ -28,14 +28,16 @@ with a badge and not linked). See [docs/PROJECT_ROADMAP.md](docs/PROJECT_ROADMAP
 | Image Cropper — drag or type a crop, aspect presets, keyboard control; exact pixels as PNG    | Privacy-First Files  |
 | Image Compressor — quality slider or target size, JPEG/WebP/PNG, honest size comparison       | Privacy-First Files  |
 | Image Converter — JPEG ⇄ PNG ⇄ WebP at the original size; verified output format              | Privacy-First Files  |
+| Photo & Signature Resizer — exact pixel size, crop or white padding (no stretching), KB limit | Privacy-First Files  |
 
 Platform features: responsive homepage, Bangla/English toggle (persisted, sets
 `<html lang>`), light/dark theme, keyboard-accessible search, hash routing with deep links,
 typed central registry. Calculation conventions, rounding rules and limitations are in
 [docs/TOOLS.md](docs/TOOLS.md).
 
-Not available yet: photo/signature presets, PDF
-tools (`pdf-lib` not added), CV/cover letter templates, network tools, bandwidth calculator.
+Not available yet: recruiter-specific photo/signature presets (no verified official source
+yet), PDF tools, CV/cover letter templates, network tools, bandwidth calculator, unit
+converter, word counter.
 
 ## Toolkits
 
@@ -164,8 +166,9 @@ docs/         Roadmap, tool conventions, category audit, licensing
 
 - Static site: no server, accounts, cookies, analytics or external requests. Language and
   theme preferences are kept in `localStorage` only.
-- File tools process files locally. The Image Resizer, Cropper, Compressor and Converter
-  decode, resize, crop and re-encode images inside the browser tab; images are never uploaded, stored or logged (see
+- File tools process files locally. The Image Resizer, Cropper, Compressor, Converter and
+  Photo & Signature Resizer decode, resize, crop and re-encode images inside the browser tab;
+  images are never uploaded, stored or logged (see
   [docs/TOOLS.md](docs/TOOLS.md#image-resizer) and the category audit in
   [docs/FILE_TOOLS_AUDIT.md](docs/FILE_TOOLS_AUDIT.md)).
 - Browsers cannot open raw sockets, send ICMP pings or scan ports. Network tools will be
