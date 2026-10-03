@@ -40,11 +40,17 @@ export interface Inspected {
   points: ColourClass[];
 }
 
-/** Fetch the blob behind a link (or an image) and inspect it in the page. */
+/**
+ * Fetch the blob behind a link (or an image) and inspect it in the page. Waits until the
+ * target points at a blob: URL first: right after a submit click the previous output has
+ * been cleared and the new one may not exist yet.
+ */
 export async function inspect(
   target: Locator,
   points: Array<[number, number]> = [],
 ): Promise<Inspected> {
+  const attr = await target.evaluate((el) => (el instanceof HTMLAnchorElement ? 'href' : 'src'));
+  await expect(target).toHaveAttribute(attr, /^blob:/);
   return target.evaluate(async (el: HTMLAnchorElement | HTMLImageElement, pts) => {
     const href = el instanceof HTMLAnchorElement ? el.href : el.src;
     const blob = await (await fetch(href)).blob();
