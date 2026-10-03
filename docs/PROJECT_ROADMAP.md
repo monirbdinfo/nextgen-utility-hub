@@ -12,7 +12,7 @@ This roadmap follows the real implementation. A tool is only marked **Available*
 | 2         | GitHub Pages deployment workflow                                       | Done (PR #2), site deployed                   |
 | 3         | Date/age, date difference, EMI, digits, number/Taka words, date text   | Done (PR #3, merged `9d0ed68`), site deployed |
 | 4         | Unicode text cleaning and normalization                                | Done (PR #3, merged `9d0ed68`), site deployed |
-| 5         | Image resize, crop, compression, conversion, photo/signature presets   | In progress: 4 image tools done; presets next |
+| 5         | Image resize, crop, compression, conversion, photo/signature resizer   | Done (presets deferred: no verified source)   |
 | 6         | PDF creation, merge, split, page tools, size reduction                 | Planned                                       |
 | 7         | CV and cover-letter templates with print/PDF export                    | Planned                                       |
 | 8         | Subnet/CIDR/IP-range calculators, IP/DNS lookup, latency check         | Planned                                       |
@@ -20,7 +20,7 @@ This roadmap follows the real implementation. A tool is only marked **Available*
 
 ## Tool catalog by milestone
 
-28 registry entries; 12 available after the Image Converter.
+28 registry entries; 13 available after the Photo & Signature Resizer.
 
 | Milestone | Category | Registry ID              | Tool                               | Status    |
 | --------- | -------- | ------------------------ | ---------------------------------- | --------- |
@@ -36,7 +36,7 @@ This roadmap follows the real implementation. A tool is only marked **Available*
 | 5         | Files    | `image-converter`        | Image Converter                    | Available |
 | 5         | Files    | `image-resizer`          | Image Resizer                      | Available |
 | 5         | Files    | `image-cropper`          | Image Cropper                      | Available |
-| 5         | Files    | `job-photo-resizer`      | Photo & Signature Resizer          | Planned   |
+| 5         | Files    | `job-photo-resizer`      | Photo & Signature Resizer          | Available |
 | 6         | Files    | `pdf-create`             | Create PDF                         | Planned   |
 | 6         | Files    | `pdf-merge`              | PDF Merge & Split                  | Planned   |
 | 6         | Files    | `pdf-tools`              | PDF Page Tools                     | Planned   |
@@ -359,6 +359,39 @@ were run only in GitHub Actions on the pull request: Firefox 19/19 and WebKit 19
 after the Cropper fix (before it, WebKit failed 1 of 19: the EXIF Cropper test). No
 accessibility scan was re-run: this change does not alter any page.
 
+## Photo & Signature Resizer delivered (no official presets)
+
+Tool: **Photo & Signature Resizer** (`job-photo-resizer`, Privacy-First File Tools, route
+`#/tool/job-photo-resizer`). The existing planned entry was reused. It makes an image an exact
+pixel size by cropping (centred) or fitting with white padding — never stretching — and can
+keep JPEG/WebP output under a file-size limit. Conventions and limits are in
+[TOOLS.md](TOOLS.md#photo--signature-resizer).
+
+**Presets were not added.** The request allowed presets only when verified from official
+requirements. The official job-portal pages could not be reached from the development
+environment (blocked by its network policy), and third-party pages are not an authoritative
+source, so the tool ships with custom dimensions only and names no recruiter, passport or
+visa size. A preset can be added later with a cited official source and date.
+
+Added:
+
+- `src/calc/photoFit.ts` — placement for crop-to-fill and fit-with-padding, the share cut off
+  or padded, enlargement detection and the limit check.
+- `openPlacedEncoder` in `src/lib/imageCanvas.ts` — draws the whole image at a placement with
+  an optional background. `openEncoder` (Resizer, Cropper, Compressor, Converter) now
+  delegates to it with the same behaviour.
+- `src/ui/tools/photoResizer.ts` — the view, reusing the shared image input, the format list
+  and the Compressor's quality search.
+- No new dependencies. Tests: `tests/calc/photoFit.test.ts` (11), `tests/photoResizer.test.ts`
+  (12, simulated encoder), `e2e/photo.spec.ts` (15, real encoding, also run in Firefox and
+  WebKit), plus the tool in the desktop/mobile load checks.
+
+Validation (run locally on 3 October 2026 after a clean `npm ci`, Node 22, Chromium): see the
+pull request for exact counts and the Firefox/WebKit results from CI. An ad hoc axe-core scan
+(not a project dependency, not run in CI) found no violations in the empty, settings, result
+and error states and on the category page, in light and dark themes, English and Bangla, at
+360 and 1280 px.
+
 ## Notes for later milestones
 
 - **Milestone 6 (PDF)** will need `pdf-lib`; add it to `docs/LICENSES.md` with verified
@@ -371,7 +404,7 @@ accessibility scan was re-run: this change does not alter any page.
 
 ## Recommended next step
 
-The P1 items in [FILE_TOOLS_AUDIT.md](FILE_TOOLS_AUDIT.md) are done. Next: the P2 items
-(align the Resizer's encoder-fallback policy, touch tests for the Cropper), then the
-photo/signature presets. Exact preset dimensions and file-size limits for specific
-recruiters should be confirmed from their official notices before they are hard-coded.
+Milestone 5 is complete apart from recruiter presets, which wait for verified official
+sources. Next: Milestone 6 (PDF tools), starting with a PDF library evaluation and Create
+PDF. Open P2 items from [FILE_TOOLS_AUDIT.md](FILE_TOOLS_AUDIT.md) (the Resizer's
+encoder-fallback policy, Cropper touch tests) remain.

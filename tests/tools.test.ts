@@ -83,7 +83,7 @@ describe('tool pages', () => {
     const root = open('');
     const counts = [...root.querySelectorAll('.card-count')].map((c) => c.textContent);
     expect(counts[0]).toBe('3 available · 3 planned');
-    expect(counts[3]).toBe('4 available · 5 planned');
+    expect(counts[3]).toBe('5 available · 4 planned');
     expect(counts[4]).toBe('5 planned tools');
   });
 

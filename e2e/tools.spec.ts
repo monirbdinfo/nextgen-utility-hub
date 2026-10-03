@@ -14,6 +14,7 @@ const TOOLS = [
   ['image-cropper', 'Image Cropper'],
   ['image-compressor', 'Image Compressor'],
   ['image-converter', 'Image Converter'],
+  ['job-photo-resizer', 'Photo & Signature Resizer'],
 ] as const;
 
 /** Collect console errors, uncaught exceptions and failed requests for the whole test. */

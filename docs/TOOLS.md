@@ -381,16 +381,82 @@ option is disabled and explained. Metadata (camera, GPS) is not carried over, co
 are handled by the browser, and photos are turned upright using their orientation tag (tested
 for orientations 1, 3, 6 and 8).
 
+## Photo & Signature Resizer
+
+Route `#/tool/job-photo-resizer` (registry ID kept from Milestone 1). Code:
+`src/calc/photoFit.ts` (placement and fit logic), `openPlacedEncoder` in
+`src/lib/imageCanvas.ts`, the shared image input, and `src/ui/tools/photoResizer.ts` (view).
+It reuses the Compressor's target-size search (`searchQuality` in `src/calc/compress.ts`).
+No dependencies were added.
+
+**Purpose.** Make a photo or signature an exact pixel size and, optionally, keep the file
+under a size limit — the two things online application forms usually check.
+
+**No official presets.** The tool has no ready-made sizes for any recruiter, exam board,
+passport or visa. Requirements (pixel size, file-size limit, format, background) differ
+between organisations and change, and they could not be verified from an official source when
+the tool was built (the official job-portal pages could not be reached from the development
+environment). Users enter the size, limit and format from the notice they are applying to;
+the page says so next to the size fields. A preset may be added later only with a cited
+official source and date (see [FILE_TOOLS_AUDIT.md](FILE_TOOLS_AUDIT.md), item 11).
+
+**Input.** The shared image checks (JPEG, PNG and WebP up to 25 MB and 50 megapixels, type
+read from the file's first bytes, upright by EXIF orientation). The file name is shown.
+
+**Size and fit.** Width and height in pixels (Bangla or English digits; 1–8,192 per side, at
+most 16.7 megapixels). The image is **never stretched**. When its proportions differ from the
+requested size, the user chooses:
+
+- **Crop to fill** (default): the image is scaled to cover the output and centred; the excess
+  is cut off at the left and right or top and bottom.
+- **Fit the whole image**: the image is scaled to fit inside and centred; the empty space is
+  filled with white.
+
+Before saving, the page states the exact output (for example "300 × 300 px JPEG") and how
+much will be cut off or added, and where. To choose which part of a photo to keep, crop it
+first with the Image Cropper. Enlarging is allowed but warned about (it cannot add detail).
+Sizes are pixels only: the tool does not set DPI, so print size in cm or inches is not defined
+by it.
+
+**Format and file-size limit.** JPEG (default), PNG or WebP; formats the browser cannot
+encode are disabled. Without a limit, JPEG and WebP are saved at quality 92 %. With a limit
+(KB, 1 KB = 1,024 bytes), JPEG and WebP use the highest quality found that fits, trying
+10–100 % with at most 8 encodes; if even 10 % is too large, the smallest result is still
+shown, marked "Over the limit", with an explanation. PNG has no quality setting: a warning
+appears when a limit is entered with PNG, and the result says whether the single PNG encode
+fits. The browser's returned type is checked; a mismatch is an error, never a mislabelled
+download.
+
+**Transparency and background.** "Fit the whole image" fills the padding and any transparent
+areas with white in every format. "Crop to fill" keeps transparency in PNG and WebP; JPEG
+fills it with white after a warning, and the result says when it happened.
+
+**Results.** Dimensions, format, real file size of the download, the limit check (within /
+over / none), the quality used and what the fit did (cropped or padded, how much and where).
+The download is named `<original name>-<width>x<height>.<ext>`. The output has no metadata.
+
+**Privacy.** The image is processed in the tab and never uploaded, sent anywhere, written to
+browser storage or logged. Object URLs are revoked and canvases released after use, on Reset
+and when leaving the tool. Settings and the result survive a language switch in memory only.
+
+**Tests.** `tests/calc/photoFit.test.ts` (placement never stretches, crop/pad shares, limits),
+`tests/photoResizer.test.ts` (view, simulated encoder: placement passed to the canvas, quality
+search, over-limit honesty, validation, Bangla digits, transparency, reset, language switch)
+and `e2e/photo.spec.ts` (real encoding: exact output pixels for crop and padding, real file
+size within a limit, an unreachable limit, transparency, invalid input, keyboard, Bangla and
+dark mode, 360/768/1280 px, the `/nextgen-utility-hub/` path). `e2e/photo.spec.ts` also runs
+in Firefox and WebKit.
+
 ## Image tools: browsers and EXIF orientation
 
-**Browsers actually tested.** The four image tools are tested with Playwright in three
+**Browsers actually tested.** The image tools are tested with Playwright in three
 engines (`playwright.config.ts`, CI job "Cross-browser image tests" plus the Chromium job):
 
-| Engine                   | Version tested (CI)        | Specs                                                  |
-| ------------------------ | -------------------------- | ------------------------------------------------------ |
-| Chromium                 | 141.0 (Playwright 1.56.1)  | every spec, including the cross-browser and EXIF specs |
-| Firefox                  | 142.0.1 (Playwright v1495) | `e2e/cross-browser.spec.ts`, `e2e/exif.spec.ts`        |
-| WebKit (Safari's engine) | 26.0 (Playwright v2215)    | `e2e/cross-browser.spec.ts`, `e2e/exif.spec.ts`        |
+| Engine                   | Version tested (CI)        | Specs                                                                |
+| ------------------------ | -------------------------- | -------------------------------------------------------------------- |
+| Chromium                 | 141.0 (Playwright 1.56.1)  | every spec                                                           |
+| Firefox                  | 142.0.1 (Playwright v1495) | `e2e/cross-browser.spec.ts`, `e2e/exif.spec.ts`, `e2e/photo.spec.ts` |
+| WebKit (Safari's engine) | 26.0 (Playwright v2215)    | `e2e/cross-browser.spec.ts`, `e2e/exif.spec.ts`, `e2e/photo.spec.ts` |
 
 WebKit here is Playwright's Linux build of the engine Safari uses, **not Safari itself**;
 real Safari on macOS or iOS and physical touch devices have not been tested. Firefox and

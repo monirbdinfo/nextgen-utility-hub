@@ -42,7 +42,7 @@ describe('registry integrity', () => {
     }
   });
 
-  it('marks exactly the Milestone 3–6 tools as available', () => {
+  it('marks exactly the implemented tools as available', () => {
     expect(tools.filter((t) => t.status === 'available').map((t) => t.id)).toEqual([
       'age-calculator',
       'date-difference',
@@ -56,6 +56,7 @@ describe('registry integrity', () => {
       'image-converter',
       'image-resizer',
       'image-cropper',
+      'job-photo-resizer',
     ]);
   });
 
