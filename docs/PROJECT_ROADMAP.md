@@ -12,7 +12,7 @@ This roadmap follows the real implementation. A tool is only marked **Available*
 | 2         | GitHub Pages deployment workflow                                       | Done (PR #2), site deployed                   |
 | 3         | Date/age, date difference, EMI, digits, number/Taka words, date text   | Done (PR #3, merged `9d0ed68`), site deployed |
 | 4         | Unicode text cleaning and normalization                                | Done (PR #3, merged `9d0ed68`), site deployed |
-| 5         | Image resize, crop, compression, conversion, photo/signature presets   | In progress: Resizer, Cropper, Compressor     |
+| 5         | Image resize, crop, compression, conversion, photo/signature presets   | In progress: 4 image tools done; presets next |
 | 6         | PDF creation, merge, split, page tools, size reduction                 | Planned                                       |
 | 7         | CV and cover-letter templates with print/PDF export                    | Planned                                       |
 | 8         | Subnet/CIDR/IP-range calculators, IP/DNS lookup, latency check         | Planned                                       |
@@ -20,7 +20,7 @@ This roadmap follows the real implementation. A tool is only marked **Available*
 
 ## Tool catalog by milestone
 
-27 registry entries; 11 available after the Image Compressor.
+28 registry entries; 12 available after the Image Converter.
 
 | Milestone | Category | Registry ID              | Tool                               | Status    |
 | --------- | -------- | ------------------------ | ---------------------------------- | --------- |
@@ -33,6 +33,7 @@ This roadmap follows the real implementation. A tool is only marked **Available*
 | 3         | Bangla   | `date-formatter`         | Date Text Formatter                | Available |
 | 4         | Bangla   | `unicode-cleaner`        | Unicode Text Cleaner               | Available |
 | 5         | Files    | `image-compressor`       | Image Compressor                   | Available |
+| 5         | Files    | `image-converter`        | Image Converter                    | Available |
 | 5         | Files    | `image-resizer`          | Image Resizer                      | Available |
 | 5         | Files    | `image-cropper`          | Image Cropper                      | Available |
 | 5         | Files    | `job-photo-resizer`      | Photo & Signature Resizer          | Planned   |
@@ -56,8 +57,8 @@ This roadmap follows the real implementation. A tool is only marked **Available*
 
 - "Image resize and compression" and "JPG/PNG compression and conversion" share
   `image-compressor`, now named **Image Compressor**: it can save as another format while
-  compressing, but a dedicated Image Converter remains a planned, separate step (it has no
-  registry entry yet). Resizing and cropping were planned together as `image-resize-crop`;
+  compressing. The dedicated **Image Converter** (`image-converter`) was added as a new
+  registry entry when it was implemented; it had previously been listed only in this roadmap. Resizing and cropping were planned together as `image-resize-crop`;
   in Milestone 5 that entry was split into `image-resizer` and `image-cropper` so each can
   ship on its own (see below).
 - "Printable and PDF-exportable application documents" and "configurable layouts" are
@@ -290,8 +291,49 @@ transparency, WebP, reachable and unreachable targets, keyboard use, Bangla and 
 scan found no violations in the empty, PNG-note, result and target-error states, in light
 and dark themes, English and Bangla, at 360 and 1280 px.
 
-Still planned in Milestone 5, each as a separate step: Image Converter (format conversion)
-and the photo/signature presets.
+## Image Converter delivered, with a category audit
+
+Tool: **Image Converter** (`image-converter`, new registry entry, route
+`#/tool/image-converter`). It converts JPEG, PNG and WebP into each other at the original
+dimensions. Conventions and limits are in [TOOLS.md](TOOLS.md#image-converter).
+
+The whole Privacy-First File Tools category was audited at the same time; the findings and a
+prioritized list of follow-up changes (with acceptance criteria) are in
+[FILE_TOOLS_AUDIT.md](FILE_TOOLS_AUDIT.md). None of those follow-ups is part of the converter
+change.
+
+Added:
+
+- `src/calc/convert.ts` — default target format and file names.
+- `src/ui/tools/imageConverter.ts` — the view. It reuses the shared image input, the
+  `openEncoder` canvas helper and the honest size comparison from `src/calc/compress.ts`.
+- `formatField` in `src/ui/tools/imageInput.ts` gained two optional settings (leave out
+  "Same as original", custom label); the other tools are unchanged.
+- No new dependencies. Tests: `tests/calc/convert.test.ts` (3),
+  `tests/imageConverter.test.ts` (14, simulated encoders), `e2e/convert.spec.ts` (19, real
+  Chromium conversions; three tests simulate a misbehaving browser by patching the canvas
+  API), plus the tool in the desktop/mobile load checks.
+
+Validation (run locally on 3 October 2026 after a clean `npm ci`, Node 22, Chromium only):
+
+| Command                                                     | Result                                                                                   |
+| ----------------------------------------------------------- | ---------------------------------------------------------------------------------------- |
+| `npm run format:check`, `npm run lint`, `npm run typecheck` | passed                                                                                   |
+| `npm test`                                                  | 364 tests passed in 21 files (0 failed, 0 skipped)                                       |
+| `npm run build`                                             | succeeded (JS 185.3 kB / 55.1 kB gzip, CSS 27.0 kB)                                      |
+| `npm run test:e2e`                                          | 118 tests passed (0 failed, 0 skipped), including all resizer, cropper, compressor tests |
+
+The converter browser tests convert the fixtures for real (JPEG → PNG, PNG → JPEG, PNG → PNG,
+JPEG → WebP, PNG → WebP, WebP → PNG) and decode the downloaded files to check the type (MIME
+and magic bytes), dimensions, byte size against the page, transparency pixels and the file
+name. An ad hoc axe-core scan found no violations for the converter (empty, PNG-note,
+slider and result states) or for the category page and all four tools' empty states, in
+light and dark themes, English and Bangla. `npm audit` reports 2 moderate advisories in the
+Vitest test runner (development only; 0 in production dependencies); fixing them needs a
+breaking Vitest upgrade, which is out of scope here.
+
+Still planned in Milestone 5: the photo/signature presets (`job-photo-resizer`), which need
+verified official specifications first.
 
 ## Notes for later milestones
 
@@ -305,7 +347,7 @@ and the photo/signature presets.
 
 ## Recommended next step
 
-Continue Milestone 5 one tool at a time, reusing `src/calc/image.ts`,
-`src/lib/imageCanvas.ts`, `src/calc/compress.ts` and `src/ui/tools/imageInput.ts`: Image
-Converter, then the photo/signature presets. Exact preset dimensions and file-size limits for specific
+Work through the P1 items in [FILE_TOOLS_AUDIT.md](FILE_TOOLS_AUDIT.md) (cross-browser
+Playwright projects, an EXIF-orientation fixture) as separate pull requests, then the
+photo/signature presets. Exact preset dimensions and file-size limits for specific
 recruiters should be confirmed from their official notices before they are hard-coded.

@@ -13,6 +13,7 @@ const TOOLS = [
   ['image-resizer', 'Image Resizer'],
   ['image-cropper', 'Image Cropper'],
   ['image-compressor', 'Image Compressor'],
+  ['image-converter', 'Image Converter'],
 ] as const;
 
 /** Collect console errors, uncaught exceptions and failed requests for the whole test. */

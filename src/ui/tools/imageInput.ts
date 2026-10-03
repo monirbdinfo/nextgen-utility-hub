@@ -145,18 +145,19 @@ export function metaRow(label: string, value: string, wrap = false): HTMLElement
 }
 
 /**
- * "Save as" list: "same as original" plus the given formats in order. Formats this
- * browser's canvas cannot encode are disabled and labelled.
+ * "Save as" list: "same as original" (unless `includeSame` is false) plus the given
+ * formats in order. Formats this browser's canvas cannot encode are disabled and labelled.
  */
 export function formatField(
   ctx: ToolContext,
   id: string,
   order: readonly ImageFormat[],
+  opts: { includeSame?: boolean; label?: string } = {},
 ): Field<HTMLSelectElement> & { setSource(format: ImageFormat): void } {
   const L = IMG(ctx.lang);
-  const options: Array<[string, string]> = [['same', '']];
+  const options: Array<[string, string]> = opts.includeSame === false ? [] : [['same', '']];
   for (const f of order) options.push([f, FORMATS[f].label]);
-  const f = field(L('outputFormat'), select(options, { id }));
+  const f = field(opts.label ?? L('outputFormat'), select(options, { id }));
   for (const opt of f.control.querySelectorAll('option')) {
     const v = opt.value as ImageFormat | 'same';
     if (v !== 'same' && !canEncode(v)) {

@@ -9,9 +9,9 @@ Website (GitHub Pages): <https://monirbdinfo.github.io/nextgen-utility-hub/>, de
 `main` by GitHub Actions (first successful deployment: 2 October 2026). Changes on other
 branches appear there only after they are merged into `main`. See [Deployment](#deployment).
 
-## Status: Milestone 5 in progress (Image Resizer, Cropper, Compressor)
+## Status: Milestone 5 in progress (image tools)
 
-11 of 27 registry tools are **Available**; the other 16 are **Planned** (roadmap only, shown
+12 of 28 registry tools are **Available**; the other 16 are **Planned** (roadmap only, shown
 with a badge and not linked). See [docs/PROJECT_ROADMAP.md](docs/PROJECT_ROADMAP.md).
 
 | Available now (run entirely in your browser)                                                  | Toolkit              |
@@ -27,13 +27,14 @@ with a badge and not linked). See [docs/PROJECT_ROADMAP.md](docs/PROJECT_ROADMAP
 | Image Resizer — JPEG/PNG/WebP to exact pixels, aspect lock, presets; processed on-device      | Privacy-First Files  |
 | Image Cropper — drag or type a crop, aspect presets, keyboard control; exact pixels as PNG    | Privacy-First Files  |
 | Image Compressor — quality slider or target size, JPEG/WebP/PNG, honest size comparison       | Privacy-First Files  |
+| Image Converter — JPEG ⇄ PNG ⇄ WebP at the original size; verified output format              | Privacy-First Files  |
 
 Platform features: responsive homepage, Bangla/English toggle (persisted, sets
 `<html lang>`), light/dark theme, keyboard-accessible search, hash routing with deep links,
 typed central registry. Calculation conventions, rounding rules and limitations are in
 [docs/TOOLS.md](docs/TOOLS.md).
 
-Not available yet: dedicated image converter, photo/signature presets, PDF
+Not available yet: photo/signature presets, PDF
 tools (`pdf-lib` not added), CV/cover letter templates, network tools, bandwidth calculator.
 
 ## Toolkits
@@ -143,7 +144,7 @@ src/
   styles/     Design tokens (navy + teal), base and component CSS
 tests/        Vitest unit tests (tests/calc/ for calculations)
 e2e/          Playwright tests (desktop, mobile, GitHub Pages sub-path)
-docs/         Roadmap, tool conventions, licensing
+docs/         Roadmap, tool conventions, category audit, licensing
 ```
 
 ## Adding a tool
@@ -159,9 +160,10 @@ docs/         Roadmap, tool conventions, licensing
 
 - Static site: no server, accounts, cookies, analytics or external requests. Language and
   theme preferences are kept in `localStorage` only.
-- File tools process files locally. The Image Resizer, Cropper and Compressor decode,
-  resize, crop and re-encode images inside the browser tab; images are never uploaded, stored or logged (see
-  [docs/TOOLS.md](docs/TOOLS.md#image-resizer)).
+- File tools process files locally. The Image Resizer, Cropper, Compressor and Converter
+  decode, resize, crop and re-encode images inside the browser tab; images are never uploaded, stored or logged (see
+  [docs/TOOLS.md](docs/TOOLS.md#image-resizer) and the category audit in
+  [docs/FILE_TOOLS_AUDIT.md](docs/FILE_TOOLS_AUDIT.md)).
 - Browsers cannot open raw sockets, send ICMP pings or scan ports. Network tools will be
   limited to what the browser safely allows, and the project will not include unauthorised
   scanning or other unsafe diagnostic features.
