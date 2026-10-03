@@ -287,8 +287,9 @@ export const tools: readonly Tool[] = [
       en: 'Crop images with aspect-ratio presets in your browser.',
       bn: 'অনুপাত প্রিসেটসহ ব্রাউজারেই ছবি ক্রপ করুন।',
     },
-    keywords: ['crop', 'cut', 'image', 'photo', 'aspect ratio', 'ছবি', 'ক্রপ', 'কাটা'],
-    status: 'planned',
+    keywords: ['crop', 'cut', 'trim', 'image', 'photo', 'aspect ratio', 'ছবি', 'ক্রপ', 'কাটা'],
+    status: 'available',
+    route: '#/tool/image-cropper',
   },
   {
     id: 'job-photo-resizer',

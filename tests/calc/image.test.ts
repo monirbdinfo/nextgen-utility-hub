@@ -8,6 +8,8 @@ import {
   heightForWidth,
   IMAGE_LIMITS,
   outputFilename,
+  croppedFilename,
+  safeBaseName,
   parseDimension,
   percentChange,
   resolveOutputFormat,
@@ -183,5 +185,16 @@ describe('size reporting', () => {
     expect(percentChange(800, 600)).toBe(-25);
     expect(percentChange(600, 900)).toBe(50);
     expect(percentChange(0, 100)).toBe(0);
+  });
+});
+
+describe('croppedFilename', () => {
+  it('names crops after the original, with the extension of the real output format', () => {
+    expect(croppedFilename('holiday photo.JPG', 'png')).toBe('holiday photo-cropped.png');
+    expect(croppedFilename('scan.png', 'jpeg')).toBe('scan-cropped.jpg');
+    expect(croppedFilename('a.b.webp', 'webp')).toBe('a.b-cropped.webp');
+    expect(croppedFilename('C:\\Users\\x\\bad<name>?.png', 'png')).toBe('bad-name-cropped.png');
+    expect(croppedFilename('...', 'png')).toBe('image-cropped.png');
+    expect(safeBaseName('folder/photo.jpeg')).toBe('photo');
   });
 });

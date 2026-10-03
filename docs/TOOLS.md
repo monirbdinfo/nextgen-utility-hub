@@ -201,3 +201,76 @@ resized the right way up.
 - Colour profiles are handled by the browser; the output is saved in sRGB.
 - Drag and drop needs a pointer device; the file picker works everywhere, including with
   the keyboard.
+
+## Image Cropper
+
+Route `#/tool/image-cropper`. Code: `src/calc/crop.ts` (crop maths), `cropImage` in
+`src/lib/imageCanvas.ts`, `src/ui/tools/imageInput.ts` (file loading shared with the Image
+Resizer) and `src/ui/tools/imageCropper.ts` (view). No dependencies were added.
+
+**Privacy.** Same approach as the Image Resizer: the image is decoded and cropped in the tab
+and never uploaded, sent anywhere, written to browser storage or logged. The file, selection
+and result are kept in memory only (they survive a language switch and are dropped on Reset or
+when leaving the tool). Object URLs are revoked when the result is outdated, on Replace, on
+Reset and when leaving the tool.
+
+**Input.** The same checks as the Image Resizer, using the same code: JPEG, PNG and WebP up to
+25 MB and 50 megapixels, the type read from the file's first bytes, and damaged files reported
+without replacing an image that is already open.
+
+**Coordinates.** Three spaces are kept apart:
+
+- _Source pixels_: the decoded image's natural pixels, after the photo's orientation tag is
+  applied. The selection, the X / Y / width / height fields and the output all use these,
+  as whole numbers measured from the top-left corner.
+- _Display pixels_: CSS pixels of the scaled preview. Pointer movements are converted with
+  the preview's current scale (source width ÷ displayed width, per axis) before they change
+  the selection, and the total movement since the drag started is used, so rounding does not
+  accumulate.
+- The on-screen box is positioned with percentages of the source size, so it stays aligned
+  with the image at any preview size and after the window is resized.
+
+**Editing.**
+
+- Drag inside the box to move it; drag one of the eight handles to resize it. The opposite
+  edge or corner stays fixed. The box cannot leave the image. Handles cannot make it smaller
+  than about 24 screen pixels, so it stays grabbable; smaller crops (down to 1 × 1) can be
+  typed.
+- Keyboard: the box and its bottom-right corner are in the tab order. Arrow keys on the box
+  move it by 1 pixel (10 with Shift); arrow keys on the corner resize it. The keys are only
+  handled while the box or corner has focus, and a polite live region announces the new
+  size and position.
+- Typed values apply when the field is left or Enter is pressed. Values that do not fit are
+  **reported, never clamped**: "X + width can be at most N pixels", or, with a fixed ratio,
+  that the size does not fit from the current position.
+- Only the box and its handles use `touch-action: none`; touching elsewhere on the image or
+  page scrolls normally.
+
+**Aspect ratios.** Freeform, 1:1, 4:3, 3:2, 16:9, 3:4, 2:3 and "passport-style" 35:45.
+The passport-style option is only the shape of a common 35 × 45 mm photo; it does not set a
+size, resolution or any official rule, and the page says so. With a fixed ratio, dragging and
+typing keep the ratio as closely as whole pixels allow (within 1 pixel); switching ratio keeps
+the selection's centre and roughly its area, shrinking only to fit. "Select whole image"
+selects the largest area with the current ratio.
+
+**Output.** The selected pixels are copied at their original size; nothing is resized. Save
+as "Same as original", PNG, WebP or JPEG. PNG copies the pixels exactly and keeps
+transparency; WebP keeps transparency but, like JPEG, is lossy at quality 92 %. Choosing
+JPEG for an image that may be transparent shows a warning first, and transparent areas become
+white. If the browser cannot encode the chosen format (WebP in Safari), the option is
+disabled, or an error is shown; the file is never saved in a different format under the
+chosen name. The download is named `<original name>-cropped.<ext>`, where the extension
+matches the real output type. Crops larger than 8,192 pixels per side or 16.7 megapixels are
+refused with an explanation (a warning appears as soon as the selection is that large).
+
+**Browser support and limits.**
+
+- Tested only in Chromium (Playwright, desktop pointer and keyboard). Pointer Events, pointer
+  capture and the `<img>`/canvas APIs used are supported in current Firefox and Safari,
+  but those browsers were not tested. Real touch dragging was not tested; touch support relies
+  on Pointer Events and `touch-action`.
+- Orientation: browsers that apply EXIF orientation when drawing an image to a canvas
+  (current Chromium, Firefox and Safari) crop the image as it is displayed. This was not
+  tested with rotated photos.
+- If the selection covers the whole preview on a phone, scroll by touching outside the image
+  or the box.

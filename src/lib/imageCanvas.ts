@@ -1,5 +1,5 @@
 /**
- * Browser-side image decoding, resizing and encoding with HTMLImageElement and
+ * Browser-side image decoding, resizing, cropping and encoding with HTMLImageElement and
  * HTMLCanvasElement only (supported by every browser the ES2022 build targets;
  * OffscreenCanvas is avoided because it needs Safari 16.4+). Nothing here makes a
  * network request: images are read from local Blob object URLs.
@@ -11,6 +11,7 @@ import {
   type ImageFormat,
   type Size,
 } from '../calc/image';
+import type { Rect } from '../calc/crop';
 
 export type ProcessingError = 'decode' | 'canvas' | 'encode';
 
@@ -102,11 +103,40 @@ function toBlob(canvas: HTMLCanvasElement, mime: string): Promise<Blob | null> {
  * white for JPEG (canvases would otherwise turn them black). The canvas is
  * shrunk to 0×0 afterwards so its memory is released promptly.
  */
-export async function resizeImage(
+export function resizeImage(
   source: CanvasImageSource,
   size: Size,
   format: ImageFormat,
   /** Only formats that can be transparent need the (memory-heavy) transparency scan. */
+  sourceMayBeTransparent: boolean,
+): Promise<ResizeResult> {
+  return render(source, null, size, format, sourceMayBeTransparent);
+}
+
+/**
+ * Copy the `rect` region (source pixels, whole numbers) at 1:1 scale, without
+ * resampling, and encode it. Same transparency and error handling as `resizeImage`.
+ */
+export function cropImage(
+  source: CanvasImageSource,
+  rect: Rect,
+  format: ImageFormat,
+  sourceMayBeTransparent: boolean,
+): Promise<ResizeResult> {
+  return render(
+    source,
+    rect,
+    { width: rect.width, height: rect.height },
+    format,
+    sourceMayBeTransparent,
+  );
+}
+
+async function render(
+  source: CanvasImageSource,
+  from: Rect | null,
+  size: Size,
+  format: ImageFormat,
   sourceMayBeTransparent: boolean,
 ): Promise<ResizeResult> {
   const canvas = document.createElement('canvas');
@@ -117,9 +147,15 @@ export async function resizeImage(
     if (!ctx || canvas.width !== size.width || canvas.height !== size.height) {
       throw new ImageProcessingError('canvas');
     }
-    ctx.imageSmoothingEnabled = true;
-    ctx.imageSmoothingQuality = 'high';
-    ctx.drawImage(source, 0, 0, size.width, size.height);
+    if (from) {
+      // 1:1 copy at whole-pixel offsets: no smoothing, so pixels are copied exactly.
+      ctx.imageSmoothingEnabled = false;
+      ctx.drawImage(source, from.x, from.y, from.width, from.height, 0, 0, size.width, size.height);
+    } else {
+      ctx.imageSmoothingEnabled = true;
+      ctx.imageSmoothingQuality = 'high';
+      ctx.drawImage(source, 0, 0, size.width, size.height);
+    }
 
     let filledTransparency = false;
     if (!FORMATS[format].alpha) {

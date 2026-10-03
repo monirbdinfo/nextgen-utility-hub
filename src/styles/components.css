@@ -1457,3 +1457,145 @@
 a.btn {
   text-decoration: none;
 }
+
+/* ---------- Image Cropper editor ---------- */
+
+/* The frame's padding leaves room for handles that sit on the image edges. */
+.crop-frame {
+  padding: var(--space-4);
+}
+
+/* Shrink-wraps the scaled image, so percentages of the stage are percentages of the image. */
+.crop-stage {
+  position: relative;
+  max-width: 100%;
+  line-height: 0;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.crop-image {
+  display: block;
+  max-width: 100%;
+  max-height: min(70vh, 640px);
+  width: auto;
+  height: auto;
+  pointer-events: none;
+  -webkit-user-drag: none;
+}
+
+/* Darkens everything outside the selection; clipped to the image. */
+.crop-dim {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.crop-hole {
+  position: absolute;
+  box-shadow: 0 0 0 100vmax rgb(0 0 0 / 55%);
+}
+
+.crop-selection {
+  --handle: 14px;
+  position: absolute;
+  box-sizing: border-box;
+  border: 2px solid #fff;
+  /* Dark outline so the white border also shows on light images. */
+  box-shadow:
+    0 0 0 1px rgb(0 0 0 / 70%),
+    inset 0 0 0 1px rgb(0 0 0 / 70%);
+  cursor: move;
+  /* Only the selection captures touch drags; the rest of the page scrolls normally. */
+  touch-action: none;
+}
+
+.crop-selection:focus-visible,
+.crop-handle:focus-visible {
+  outline: 3px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+.crop-handle {
+  position: absolute;
+  width: var(--handle);
+  height: var(--handle);
+  box-sizing: border-box;
+  border: 1px solid #111827;
+  border-radius: 3px;
+  background: #fff;
+  touch-action: none;
+}
+
+/* Larger invisible hit area around each handle. */
+.crop-handle::after {
+  content: '';
+  position: absolute;
+  inset: -10px;
+}
+
+.crop-handle-nw,
+.crop-handle-n,
+.crop-handle-ne {
+  top: calc(var(--handle) / -2);
+}
+.crop-handle-sw,
+.crop-handle-s,
+.crop-handle-se {
+  bottom: calc(var(--handle) / -2);
+}
+.crop-handle-nw,
+.crop-handle-w,
+.crop-handle-sw {
+  left: calc(var(--handle) / -2);
+}
+.crop-handle-ne,
+.crop-handle-e,
+.crop-handle-se {
+  right: calc(var(--handle) / -2);
+}
+.crop-handle-n,
+.crop-handle-s {
+  left: calc(50% - var(--handle) / 2);
+  cursor: ns-resize;
+}
+.crop-handle-e,
+.crop-handle-w {
+  top: calc(50% - var(--handle) / 2);
+  cursor: ew-resize;
+}
+.crop-handle-nw,
+.crop-handle-se {
+  cursor: nwse-resize;
+}
+.crop-handle-ne,
+.crop-handle-sw {
+  cursor: nesw-resize;
+}
+
+@media (pointer: coarse) {
+  .crop-selection {
+    --handle: 20px;
+  }
+}
+
+.crop-editor .field-hint {
+  margin-top: var(--space-3);
+}
+
+.crop-fields {
+  margin-top: var(--space-4);
+}
+
+.crop-tools {
+  margin-top: var(--space-3);
+}
+
+.crop-tools + .field-grid {
+  margin-top: var(--space-4);
+}
+
+.crop-fields + .field-hint {
+  margin-top: var(--space-3);
+}

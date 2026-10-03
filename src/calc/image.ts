@@ -127,6 +127,16 @@ export function hasTransparency(rgba: Uint8ClampedArray | Uint8Array): boolean {
  * falls back to `image`.
  */
 export function outputFilename(originalName: string, size: Size, format: ImageFormat): string {
+  return `${safeBaseName(originalName)}-${size.width}x${size.height}.${FORMATS[format].ext}`;
+}
+
+/** Download name for a crop, such as `holiday-photo-cropped.png`. */
+export function croppedFilename(originalName: string, format: ImageFormat): string {
+  return `${safeBaseName(originalName)}-cropped.${FORMATS[format].ext}`;
+}
+
+/** The original name without path or extension, with unsafe characters removed; `image` if empty. */
+export function safeBaseName(originalName: string): string {
   const withoutPath = originalName.split(/[\\/]/).pop() ?? '';
   const base = withoutPath.replace(/\.[^.]*$/, '');
   const unsafe = (c: string): boolean =>
@@ -138,7 +148,7 @@ export function outputFilename(originalName: string, size: Size, format: ImageFo
     .replace(/\s+/g, ' ')
     .replace(/^[\s.-]+|[\s.-]+$/g, '')
     .slice(0, 80);
-  return `${safe || 'image'}-${size.width}x${size.height}.${FORMATS[format].ext}`;
+  return safe || 'image';
 }
 
 /** Human-readable size with one decimal: 999 B, 12.3 KB, 4.5 MB (1 KB = 1024 bytes). */

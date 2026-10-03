@@ -53,6 +53,7 @@ describe('registry integrity', () => {
       'date-formatter',
       'unicode-cleaner',
       'image-resizer',
+      'image-cropper',
     ]);
   });
 
