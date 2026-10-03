@@ -233,10 +233,10 @@ export const tools: readonly Tool[] = [
   {
     id: 'image-compressor',
     category: 'files',
-    name: { en: 'Image Compressor & Converter', bn: 'ছবি কম্প্রেসার ও কনভার্টার' },
+    name: { en: 'Image Compressor', bn: 'ছবি কম্প্রেসার' },
     description: {
-      en: 'Compress and convert JPG/PNG images in your browser.',
-      bn: 'ব্রাউজারেই JPG/PNG ছবি কম্প্রেস ও রূপান্তর করুন।',
+      en: 'Reduce JPEG, PNG and WebP file sizes with a quality setting or a target size, in your browser.',
+      bn: 'মান বা লক্ষ্য সাইজ বেছে ব্রাউজারেই JPEG, PNG ও WebP ছবির ফাইল সাইজ কমান।',
     },
     keywords: [
       'image',
@@ -245,11 +245,15 @@ export const tools: readonly Tool[] = [
       'jpg',
       'jpeg',
       'png',
+      'webp',
       'reduce size',
+      'file size',
       'ছবি',
       'কম্প্রেস',
+      'সাইজ কমানো',
     ],
-    status: 'planned',
+    status: 'available',
+    route: '#/tool/image-compressor',
   },
   {
     id: 'image-resizer',

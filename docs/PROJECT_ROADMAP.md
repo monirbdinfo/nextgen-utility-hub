@@ -12,7 +12,7 @@ This roadmap follows the real implementation. A tool is only marked **Available*
 | 2         | GitHub Pages deployment workflow                                       | Done (PR #2), site deployed                   |
 | 3         | Date/age, date difference, EMI, digits, number/Taka words, date text   | Done (PR #3, merged `9d0ed68`), site deployed |
 | 4         | Unicode text cleaning and normalization                                | Done (PR #3, merged `9d0ed68`), site deployed |
-| 5         | Image resize, crop, compression, conversion, photo/signature presets   | In progress: Resizer (PR #6), Cropper         |
+| 5         | Image resize, crop, compression, conversion, photo/signature presets   | In progress: Resizer, Cropper, Compressor     |
 | 6         | PDF creation, merge, split, page tools, size reduction                 | Planned                                       |
 | 7         | CV and cover-letter templates with print/PDF export                    | Planned                                       |
 | 8         | Subnet/CIDR/IP-range calculators, IP/DNS lookup, latency check         | Planned                                       |
@@ -20,42 +20,44 @@ This roadmap follows the real implementation. A tool is only marked **Available*
 
 ## Tool catalog by milestone
 
-27 registry entries; 10 available after the Milestone 5 Image Cropper.
+27 registry entries; 11 available after the Image Compressor.
 
-| Milestone | Category | Registry ID              | Tool                                   | Status    |
-| --------- | -------- | ------------------------ | -------------------------------------- | --------- |
-| 3         | General  | `age-calculator`         | Age Calculator                         | Available |
-| 3         | General  | `date-difference`        | Date Difference                        | Available |
-| 3         | General  | `emi-calculator`         | Loan EMI Calculator                    | Available |
-| 3         | Bangla   | `digit-converter`        | Bangla ⇄ English Digits                | Available |
-| 3         | Bangla   | `number-to-words-bn`     | Number to Words (Bangla & English)     | Available |
-| 3         | Bangla   | `taka-in-words`          | Taka in Words                          | Available |
-| 3         | Bangla   | `date-formatter`         | Date Text Formatter                    | Available |
-| 4         | Bangla   | `unicode-cleaner`        | Unicode Text Cleaner                   | Available |
-| 5         | Files    | `image-compressor`       | Image Compressor & Converter (JPG/PNG) | Planned   |
-| 5         | Files    | `image-resizer`          | Image Resizer                          | Available |
-| 5         | Files    | `image-cropper`          | Image Cropper                          | Available |
-| 5         | Files    | `job-photo-resizer`      | Photo & Signature Resizer              | Planned   |
-| 6         | Files    | `pdf-create`             | Create PDF                             | Planned   |
-| 6         | Files    | `pdf-merge`              | PDF Merge & Split                      | Planned   |
-| 6         | Files    | `pdf-tools`              | PDF Page Tools                         | Planned   |
-| 6         | Files    | `pdf-compress`           | Reduce PDF Size                        | Planned   |
-| 7         | Jobs     | `cv-templates`           | CV / Resume Templates                  | Planned   |
-| 7         | Jobs     | `cover-letter-templates` | Cover Letter Templates                 | Planned   |
-| 7         | Jobs     | `cv-checklist`           | Application Checklist                  | Planned   |
-| 8         | Network  | `subnet-calculator`      | Subnet Calculator                      | Planned   |
-| 8         | Network  | `cidr-calculator`        | CIDR & IP Range Calculator             | Planned   |
-| 8         | Network  | `my-ip-info`             | IP Lookup                              | Planned   |
-| 8         | Network  | `dns-lookup`             | DNS Lookup                             | Planned   |
-| 8         | Network  | `latency-test`           | Latency & Packet-Loss Check            | Planned   |
-| 9         | General  | `bandwidth-calculator`   | Bandwidth & Data Usage                 | Planned   |
-| 9         | General  | `unit-converter`         | Unit Converter                         | Planned   |
-| 9         | General  | `text-counter`           | Word & Character Counter               | Planned   |
+| Milestone | Category | Registry ID              | Tool                               | Status    |
+| --------- | -------- | ------------------------ | ---------------------------------- | --------- |
+| 3         | General  | `age-calculator`         | Age Calculator                     | Available |
+| 3         | General  | `date-difference`        | Date Difference                    | Available |
+| 3         | General  | `emi-calculator`         | Loan EMI Calculator                | Available |
+| 3         | Bangla   | `digit-converter`        | Bangla ⇄ English Digits            | Available |
+| 3         | Bangla   | `number-to-words-bn`     | Number to Words (Bangla & English) | Available |
+| 3         | Bangla   | `taka-in-words`          | Taka in Words                      | Available |
+| 3         | Bangla   | `date-formatter`         | Date Text Formatter                | Available |
+| 4         | Bangla   | `unicode-cleaner`        | Unicode Text Cleaner               | Available |
+| 5         | Files    | `image-compressor`       | Image Compressor                   | Available |
+| 5         | Files    | `image-resizer`          | Image Resizer                      | Available |
+| 5         | Files    | `image-cropper`          | Image Cropper                      | Available |
+| 5         | Files    | `job-photo-resizer`      | Photo & Signature Resizer          | Planned   |
+| 6         | Files    | `pdf-create`             | Create PDF                         | Planned   |
+| 6         | Files    | `pdf-merge`              | PDF Merge & Split                  | Planned   |
+| 6         | Files    | `pdf-tools`              | PDF Page Tools                     | Planned   |
+| 6         | Files    | `pdf-compress`           | Reduce PDF Size                    | Planned   |
+| 7         | Jobs     | `cv-templates`           | CV / Resume Templates              | Planned   |
+| 7         | Jobs     | `cover-letter-templates` | Cover Letter Templates             | Planned   |
+| 7         | Jobs     | `cv-checklist`           | Application Checklist              | Planned   |
+| 8         | Network  | `subnet-calculator`      | Subnet Calculator                  | Planned   |
+| 8         | Network  | `cidr-calculator`        | CIDR & IP Range Calculator         | Planned   |
+| 8         | Network  | `my-ip-info`             | IP Lookup                          | Planned   |
+| 8         | Network  | `dns-lookup`             | DNS Lookup                         | Planned   |
+| 8         | Network  | `latency-test`           | Latency & Packet-Loss Check        | Planned   |
+| 9         | General  | `bandwidth-calculator`   | Bandwidth & Data Usage             | Planned   |
+| 9         | General  | `unit-converter`         | Unit Converter                     | Planned   |
+| 9         | General  | `text-counter`           | Word & Character Counter           | Planned   |
 
 ### How overlapping requirements were merged
 
 - "Image resize and compression" and "JPG/PNG compression and conversion" share
-  `image-compressor`. Resizing and cropping were planned together as `image-resize-crop`;
+  `image-compressor`, now named **Image Compressor**: it can save as another format while
+  compressing, but a dedicated Image Converter remains a planned, separate step (it has no
+  registry entry yet). Resizing and cropping were planned together as `image-resize-crop`;
   in Milestone 5 that entry was split into `image-resizer` and `image-cropper` so each can
   ship on its own (see below).
 - "Printable and PDF-exportable application documents" and "configurable layouts" are
@@ -247,8 +249,49 @@ move the selection. Covered by 2 new tests in `tests/calc/crop.test.ts` and 1 in
 `npm ci`: 318 unit tests in 17 files and 77 Playwright tests passed; format, lint,
 typecheck and build passed.
 
-Still planned in Milestone 5, each as a separate step: Image Compressor, Image Converter
-(format conversion), and the photo/signature presets.
+## Image Compressor delivered (requested as "Milestone 6")
+
+The request called this Milestone 6, but this roadmap already uses Milestone 6 for the PDF
+tools and lists compression under Milestone 5. To avoid renumbering every later milestone,
+the compressor is recorded here as part of the Milestone 5 image tools; the PDF tools stay
+Milestone 6.
+
+Tool: **Image Compressor** (`image-compressor`, Privacy-First File Tools, route
+`#/tool/image-compressor`). The existing planned entry was reused and renamed from "Image
+Compressor & Converter". Conventions and limits are in [TOOLS.md](TOOLS.md#image-compressor).
+
+Added:
+
+- `src/calc/compress.ts` — pure logic: honest size comparison (smaller / same / larger,
+  bytes, percent, ratio), quality range, target-size parsing, a bounded binary search over
+  quality (at most 8 encodes) and descriptive file names.
+- `openEncoder` in `src/lib/imageCanvas.ts` — draws once and encodes at several qualities.
+  `resizeImage` and `cropImage` now use it internally; their behaviour is unchanged.
+- `src/ui/tools/imageCompressor.ts` — the view, using the shared image input (which gained
+  an opt-in file-name row; the Resizer and Cropper do not show it).
+- No new dependencies. Tests: `tests/calc/compress.test.ts` (13),
+  `tests/imageCompressor.test.ts` (16, canvas mocked), `e2e/compress.spec.ts` (18), plus the
+  tool in the desktop/mobile load checks. No new fixtures were needed.
+
+Validation (run locally on 3 October 2026 after a clean `npm ci`, Node 22, Chromium only):
+
+| Command                                                     | Result                                                                                         |
+| ----------------------------------------------------------- | ---------------------------------------------------------------------------------------------- |
+| `npm run format:check`, `npm run lint`, `npm run typecheck` | passed                                                                                         |
+| `npm test`                                                  | 347 tests passed in 19 files                                                                   |
+| `npm run build`                                             | succeeded (JS 171.5 kB / 52.6 kB gzip, CSS 27.0 kB)                                            |
+| `npm run test:e2e`                                          | 97 tests passed, including 18 compressor tests and all resizer, cropper and other tools' tests |
+
+The compressor browser tests decode the downloaded file and check its real type (MIME and
+magic bytes), dimensions and byte size against what the page reports, for smaller, equal
+(a PNG that Chromium re-encodes byte for byte) and larger outputs, JPEG white fill, PNG
+transparency, WebP, reachable and unreachable targets, keyboard use, Bangla and dark mode,
+360/768/1280 px, a long file name and the `/nextgen-utility-hub/` path. An ad hoc axe-core
+scan found no violations in the empty, PNG-note, result and target-error states, in light
+and dark themes, English and Bangla, at 360 and 1280 px.
+
+Still planned in Milestone 5, each as a separate step: Image Converter (format conversion)
+and the photo/signature presets.
 
 ## Notes for later milestones
 
@@ -263,6 +306,6 @@ Still planned in Milestone 5, each as a separate step: Image Compressor, Image C
 ## Recommended next step
 
 Continue Milestone 5 one tool at a time, reusing `src/calc/image.ts`,
-`src/lib/imageCanvas.ts` and `src/ui/tools/imageInput.ts`: Image Compressor, then Image
+`src/lib/imageCanvas.ts`, `src/calc/compress.ts` and `src/ui/tools/imageInput.ts`: Image
 Converter, then the photo/signature presets. Exact preset dimensions and file-size limits for specific
 recruiters should be confirmed from their official notices before they are hard-coded.
