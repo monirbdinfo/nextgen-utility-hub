@@ -16,11 +16,12 @@ This roadmap follows the real implementation. A tool is only marked **Available*
 | 6         | PDF creation, merge, split, page tools, size reduction                 | Planned                                       |
 | 7         | CV and cover-letter templates with print/PDF export                    | Planned                                       |
 | 8         | Subnet/CIDR/IP-range calculators, IP/DNS lookup, latency check         | Planned                                       |
-| 9         | Bandwidth/data usage, integration, accessibility and regression review | Planned                                       |
+| 9         | Bandwidth/data usage, integration, accessibility and regression review | In progress: word counter done                |
 
 ## Tool catalog by milestone
 
-28 registry entries; 12 available after the Image Converter.
+28 registry entries; 13 available on `main` after the Word & Character Counter (counted on
+this branch; the Photo & Signature Resizer is in a separate pull request).
 
 | Milestone | Category | Registry ID              | Tool                               | Status    |
 | --------- | -------- | ------------------------ | ---------------------------------- | --------- |
@@ -51,7 +52,7 @@ This roadmap follows the real implementation. A tool is only marked **Available*
 | 8         | Network  | `latency-test`           | Latency & Packet-Loss Check        | Planned   |
 | 9         | General  | `bandwidth-calculator`   | Bandwidth & Data Usage             | Planned   |
 | 9         | General  | `unit-converter`         | Unit Converter                     | Planned   |
-| 9         | General  | `text-counter`           | Word & Character Counter           | Planned   |
+| 9         | General  | `text-counter`           | Word & Character Counter           | Available |
 
 ### How overlapping requirements were merged
 
@@ -358,6 +359,20 @@ environment's network policy blocks the Playwright browser download), so Firefox
 were run only in GitHub Actions on the pull request: Firefox 19/19 and WebKit 19/19 passed
 after the Cropper fix (before it, WebKit failed 1 of 19: the EXIF Cropper test). No
 accessibility scan was re-run: this change does not alter any page.
+
+## Word & Character Counter delivered (Milestone 9, General Utilities)
+
+Tool: **Word & Character Counter** (`text-counter`, route `#/tool/text-counter`). The planned
+Milestone 1 entry was reused. Rules and limitations are in
+[TOOLS.md](TOOLS.md#word--character-counter).
+
+Added `src/calc/textCount.ts` (pure, the same rules in every browser), the view
+`src/ui/tools/textCounter.ts`, 19 logic tests, 4 view tests and `e2e/general.spec.ts`, which
+also runs in Firefox and WebKit (added to `CROSS_BROWSER_SPECS` in `playwright.config.ts`; the
+CI job keeps its name "Cross-browser image tests"). No new dependencies. An ad hoc axe-core
+scan (not a project dependency, not run in CI) found no violations on the empty, filled and
+error states and the category page, in light and dark themes, English and Bangla, at 360 and
+1280 px. Exact test counts and CI results are in the pull request.
 
 ## Notes for later milestones
 

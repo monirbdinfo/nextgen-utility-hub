@@ -10,6 +10,7 @@ import { imageResizer } from './imageResizer';
 import type { ToolView } from './kit';
 import { numberToWordsTool } from './numberToWords';
 import { takaInWords } from './takaInWords';
+import { textCounter } from './textCounter';
 import { unicodeCleaner } from './unicodeCleaner';
 
 /** View for every `available` tool, keyed by registry id (checked in tests/registry.test.ts). */
@@ -17,6 +18,7 @@ export const toolViews: Readonly<Record<string, ToolView>> = {
   'age-calculator': ageCalculator,
   'date-difference': dateDifferenceTool,
   'emi-calculator': emiCalculator,
+  'text-counter': textCounter,
   'digit-converter': digitConverter,
   'number-to-words-bn': numberToWordsTool,
   'taka-in-words': takaInWords,
