@@ -397,9 +397,11 @@ real Safari on macOS or iOS and physical touch devices have not been tested. Fir
 WebKit run only in GitHub Actions (they could not be installed in the development
 environment), so their results come from CI logs.
 
-Canvas encoding support detected in CI (the same check the tools use): Chromium JPEG, PNG and
-WebP; Firefox FIREFOX_ENCODERS; WebKit WEBKIT_ENCODERS. The WebP test asserts whichever applies:
-WebP output when the encoder exists, otherwise a disabled, labelled option.
+Canvas encoding support detected in CI (the same check the tools use, printed to the test
+log): JPEG, PNG and WebP in all three engines, including Playwright's Linux WebKit build.
+Real Safari is documented not to encode WebP, so the "no WebP encoder" path (WebP option
+disabled and labelled) is covered only by tests that simulate it by patching
+`toDataURL`, not by a real engine. The WebP test asserts whichever applies.
 
 **EXIF orientation.** The tools never read EXIF themselves; they rely on the browser, which
 applies the orientation tag when decoding (`naturalWidth`/`naturalHeight`, previews and

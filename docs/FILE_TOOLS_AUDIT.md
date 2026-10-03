@@ -85,6 +85,8 @@ noted; each is proposed as a separate change.
   on the pull request: Chromium 137/137, Firefox 19/19, WebKit 19/19 (see the PR and
   [TOOLS.md](TOOLS.md#image-tools-browsers-and-exif-orientation) for versions). WebKit is
   Playwright's Linux build of Safari's engine, not Safari; real Safari is still untested.
+  That WebKit build can encode WebP, unlike real Safari, so the "no WebP encoder" path is
+  still covered only by simulated tests.
 - **EXIF orientation (item 2).** Four locally generated fixtures (Orientation 1, 3, 6, 8)
   verify displayed size, previews, downloaded pixels, crop coordinates and the absence of
   EXIF in outputs, in all three engines.
