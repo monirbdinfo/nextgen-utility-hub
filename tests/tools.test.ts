@@ -82,7 +82,7 @@ describe('tool pages', () => {
   it('show available and planned counts on cards', () => {
     const root = open('');
     const counts = [...root.querySelectorAll('.card-count')].map((c) => c.textContent);
-    expect(counts[0]).toBe('3 available · 3 planned');
+    expect(counts[0]).toBe('4 available · 2 planned');
     expect(counts[3]).toBe('4 available · 5 planned');
     expect(counts[4]).toBe('5 planned tools');
   });
@@ -464,5 +464,79 @@ describe('Unicode text cleaner', () => {
     expect($<HTMLSelectElement>(root, '#clean-blankLines').value).toBe('collapse');
     expect(root.querySelector('.result-list')).toBeNull();
     expect(document.activeElement?.id).toBe('clean-input');
+  });
+});
+
+describe('word and character counter', () => {
+  const value = (root: ParentNode, key: string): string =>
+    $<HTMLElement>(root, `#count-${key}`).textContent ?? '';
+
+  it('starts empty with an explanation, and counts live as the user types', () => {
+    const root = open('#/tool/text-counter');
+    expect($(root, 'h1').textContent).toBe('Word & Character Counter');
+    expect(value(root, 'words')).toBe('0');
+    expect($(root, '#count-message').textContent).toBe('Start typing to see the counts.');
+    set(root, '#count-input', 'Hello world. How are you?\n\nFine, thanks!');
+    expect(value(root, 'characters')).toBe('40');
+    expect(value(root, 'charactersNoSpaces')).toBe('33');
+    expect(value(root, 'words')).toBe('7');
+    expect(value(root, 'sentences')).toBe('3');
+    expect(value(root, 'lines')).toBe('3');
+    expect(value(root, 'paragraphs')).toBe('2');
+    expect(value(root, 'bytes')).toBe('40 bytes');
+    expect(value(root, 'reading')).toBe('about 2 s');
+    expect($(root, '#count-message').textContent).toBe('');
+    // Values change on every keystroke, so the list must not be a live region.
+    expect(root.querySelector('.count-list [aria-live], .count-list[aria-live]')).toBeNull();
+  });
+
+  it('counts Bangla with Bangla digits and labels', () => {
+    const root = open('#/tool/text-counter');
+    $<HTMLButtonElement>(root, '[aria-label="Switch language to Bangla"]').click();
+    set(root, '#count-input', 'আমি বাংলায় গান গাই। ক্ষমা');
+    expect($(root, 'h1').textContent).toBe('শব্দ ও অক্ষর গণনা');
+    expect(value(root, 'words')).toBe('৫');
+    expect(value(root, 'sentences')).toBe('২');
+    expect(value(root, 'reading')).toBe('প্রায় ২ সেকেন্ড');
+  });
+
+  it('shows minutes for long texts and refuses text over the limit', () => {
+    const root = open('#/tool/text-counter');
+    set(root, '#count-input', 'word '.repeat(450));
+    expect(value(root, 'words')).toBe('450');
+    expect(value(root, 'reading')).toBe('about 2 min 15 s');
+    set(root, '#count-input', 'x'.repeat(1_000_001));
+    expect($(root, '#count-input-error').textContent).toBe(
+      'The text is longer than 10,00,000 characters. Shorten it to see the counts.',
+    );
+    expect(value(root, 'words')).toBe('—');
+    set(root, '#count-input', 'ok');
+    expect($<HTMLElement>(root, '#count-input-error').hidden).toBe(true);
+  });
+
+  it('copies the counts, resets, and keeps the text across a language switch in memory only', async () => {
+    const write = vi.fn((text: string) => Promise.resolve(void text));
+    Object.defineProperty(navigator, 'clipboard', {
+      value: { writeText: write },
+      configurable: true,
+    });
+    const root = open('#/tool/text-counter');
+    $<HTMLButtonElement>(root, '#count-copy').click();
+    await vi.waitFor(() =>
+      expect($(root, '.copy-status').textContent).toBe('There is nothing to copy yet.'),
+    );
+    set(root, '#count-input', 'One two.');
+    $<HTMLButtonElement>(root, '#count-copy').click();
+    await vi.waitFor(() => expect(write).toHaveBeenCalled());
+    expect(write.mock.calls[0]?.[0]).toContain('Words: 2');
+    expect(write.mock.calls[0]?.[0]).toContain('Reading time (estimate): about 1 s');
+    $<HTMLButtonElement>(root, '[aria-label="Switch language to Bangla"]').click();
+    expect($<HTMLTextAreaElement>(root, '#count-input').value).toBe('One two.');
+    expect(value(root, 'words')).toBe('২');
+    expect(Object.keys(localStorage)).toEqual(['nguh.lang']);
+    $<HTMLButtonElement>(root, '#count-reset').click();
+    expect($<HTMLTextAreaElement>(root, '#count-input').value).toBe('');
+    expect(value(root, 'words')).toBe('০');
+    expect(document.activeElement).toBe($(root, '#count-input'));
   });
 });
