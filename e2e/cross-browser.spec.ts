@@ -172,9 +172,14 @@ test.describe('Image Converter', () => {
     expect(out.points[0]).toBe('W');
   });
 
-  test('WebP: decodes WebP input; encodes WebP only where the browser can', async ({ page }) => {
+  test('WebP: decodes WebP input; encodes WebP only where the browser can', async ({
+    page,
+    browserName,
+  }) => {
     await page.goto('/#/tool/image-converter');
     const enc = await encoders(page);
+    // Printed to the test log so CI records which engines can encode WebP.
+    console.log(`[${browserName}] canvas encoders: ${JSON.stringify(enc)}`);
     expect(enc.jpeg && enc.png).toBe(true);
     // Decoding WebP input is expected in every tested engine.
     await openImage(page, '#convert-file', 'photo.webp');
@@ -195,7 +200,6 @@ test.describe('Image Converter', () => {
       const out = await inspect(page.locator('#convert-download'));
       expect(out.magic).toBe('png');
     }
-    test.info().annotations.push({ type: 'webp-encoding', description: String(enc.webp) });
   });
 
   test('rejects invalid and damaged files', async ({ page }) => {

@@ -6,9 +6,11 @@ Scope: every registry entry in the `files` category, the shared image code
 image-tool views, their styles, translations, tests and documentation.
 
 **What this audit is and is not.** It is based on reading the source, the automated tests
-listed below (all run in Chromium only) and ad hoc axe-core scans. It is **not** a
-cross-browser, real-device, screen-reader or manual usability audit; Firefox, Safari,
-real touch devices and assistive technology were not tested. The planned PDF tools and the
+listed below and ad hoc axe-core scans. At the time of the audit only Chromium was tested;
+the reliability follow-up (see "Follow-up: reliability milestone" below) added Firefox and
+WebKit runs for the image tools. It is **not** a real-Safari, real-device, screen-reader or
+manual usability audit; real Safari, real touch devices and assistive technology were not
+tested. The planned PDF tools and the
 photo/signature tool have no code yet, so only their registry entries were reviewed.
 
 ## Tools in the category (from `src/registry/tools.ts`)
@@ -63,8 +65,8 @@ noted; each is proposed as a separate change.
 
 | #   | Priority | Finding                                                                                                                                                                                                                                                                                                   | Proposed change                                                                                                                                  | Acceptance criteria                                                                                                |
 | --- | -------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------ |
-| 1   | P1       | **Only Chromium is tested.** `playwright.config.ts` has one project. WebP encoding and EXIF handling differ in Safari/Firefox.                                                                                                                                                                            | Add Firefox and WebKit Playwright projects (CI must install those browsers; needs a workflow change, so a separate PR).                          | The image E2E suites run in Chromium, Firefox and WebKit in CI, with any browser-specific expectations documented. |
-| 2   | P1       | **EXIF orientation is untested** in every tool; the docs rely on browsers applying it.                                                                                                                                                                                                                    | Add a small fixture with an orientation tag (e.g. 6 = rotated 90°) and assert decoded/output dimensions and a pixel in each tool.                | Tests show the output is upright and its dimensions are swapped as expected.                                       |
+| 1   | P1 ✅    | **Only Chromium is tested.** `playwright.config.ts` has one project. WebP encoding and EXIF handling differ in Safari/Firefox.                                                                                                                                                                            | Add Firefox and WebKit Playwright projects (CI must install those browsers; needs a workflow change, so a separate PR).                          | The image E2E suites run in Chromium, Firefox and WebKit in CI, with any browser-specific expectations documented. |
+| 2   | P1 ✅    | **EXIF orientation is untested** in every tool; the docs rely on browsers applying it.                                                                                                                                                                                                                    | Add a small fixture with an orientation tag (e.g. 6 = rotated 90°) and assert decoded/output dimensions and a pixel in each tool.                | Tests show the output is upright and its dimensions are swapped as expected.                                       |
 | 3   | P2       | **Inconsistent encoder-fallback policy.** The Resizer accepts a different format from the encoder and names the file by the real format (with a note); the Cropper, Compressor and Converter refuse it with an error. Neither mislabels, but users see different behaviour.                               | Make the Resizer refuse a mismatched format like the others (or document the difference deliberately).                                           | All four tools show the same error for an unsupported/mismatched format; tests cover it.                           |
 | 4   | P2       | **Real touch dragging in the Cropper is untested.**                                                                                                                                                                                                                                                       | Add a touch-emulation E2E test (Playwright `hasTouch`, pointer events with `pointerType: 'touch'`).                                              | Moving and resizing by touch works; page scrolling outside the selection still works.                              |
 | 5   | P3       | **Settings stay editable while processing** in the Resizer (size, format) and Cropper (fields, ratio, format). Results stay correct (the Resizer reports the real output; the Cropper discards outdated results), but it is inconsistent with the Compressor and Converter, which disable their settings. | Disable settings while busy in the Resizer and Cropper.                                                                                          | Controls are disabled with `aria-busy` during processing in all four tools.                                        |
@@ -74,6 +76,26 @@ noted; each is proposed as a separate change.
 | 9   | P4       | **Route style differs**: two entries use string literals instead of the `route()` helper. Behaviour is identical.                                                                                                                                                                                         | Use `route()` everywhere.                                                                                                                        | No functional change; registry tests pass.                                                                         |
 | 10  | —        | **Planned PDF tools** need a library decision (`pdf-lib` is MIT) and licence entry in `docs/LICENSES.md`; the category description already mentions PDFs.                                                                                                                                                 | Separate milestone (roadmap Milestone 6).                                                                                                        | —                                                                                                                  |
 | 11  | —        | **Photo & Signature Resizer** must not hard-code passport, ID or job-portal rules without verified official notices.                                                                                                                                                                                      | Collect official specifications first; until then, users can combine the Cropper (passport-style ratio is labelled as a shape only) and Resizer. | Every preset cites its official source and date.                                                                   |
+
+## Follow-up: reliability milestone (P1 items 1 and 2 resolved)
+
+- **Cross-browser tests (item 1).** Playwright now has Firefox and WebKit projects running
+  `e2e/cross-browser.spec.ts` (core flows of all four tools, checking the downloaded files)
+  and `e2e/exif.spec.ts`; Chromium runs every spec. CI runs them in a separate job. Results
+  on the pull request: Chromium 137/137, Firefox 19/19, WebKit 19/19 (see the PR and
+  [TOOLS.md](TOOLS.md#image-tools-browsers-and-exif-orientation) for versions). WebKit is
+  Playwright's Linux build of Safari's engine, not Safari; real Safari is still untested.
+- **EXIF orientation (item 2).** Four locally generated fixtures (Orientation 1, 3, 6, 8)
+  verify displayed size, previews, downloaded pixels, crop coordinates and the absence of
+  EXIF in outputs, in all three engines.
+- **New finding, fixed in the same change:** in WebKit, the Cropper returned the wrong region
+  for EXIF-rotated photos, because WebKit's source-rectangle `drawImage` does not use the
+  upright coordinates. `cropImage` now draws the whole oriented image at an offset onto a
+  crop-sized canvas; pixels stay exact in all three engines.
+
+Remaining from the table above: P2 items 3 (Resizer's encoder-fallback policy) and 4 (real
+touch testing in the Cropper; touch emulation is still not covered), and the P3/P4 items.
+Mirrored EXIF orientations (2, 4, 5, 7) have no fixture yet.
 
 Site-wide items noticed but outside this category: the `<noscript>` message is English
 only; CI shows GitHub's Node 20 deprecation warning for `actions/checkout@v4` and
