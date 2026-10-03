@@ -261,7 +261,8 @@ const problem = (field: CropField, error: CropFieldError): FieldsResult => ({
 
 /**
  * Build a selection from the four typed values. `changed` is the field the user edited;
- * with a ratio, editing the width sets the height (and vice versa). Nothing is clamped
+ * with a ratio, editing the width sets the height (and vice versa); editing X or Y never
+ * changes the size. Nothing is clamped
  * silently: values that do not fit are reported against the field that was edited.
  */
 export function rectFromFields(
@@ -280,20 +281,23 @@ export function rectFromFields(
   const { x, y } = parsed;
   if (width < 1) return problem('width', 'too-small');
   if (height < 1) return problem('height', 'too-small');
-  if (ratio !== null) {
+  // Only a typed size is re-derived from the ratio. Moving with X or Y keeps the size
+  // exactly, because width ÷ ratio rounds back to the height only within 1 pixel.
+  const derive = ratio !== null && (changed === 'width' || changed === 'height');
+  if (derive) {
     if (changed === 'height') width = Math.max(1, Math.round(height * ratio));
     else height = Math.max(1, Math.round(width / ratio));
   }
   const blame = (axis: 'x' | 'y'): CropField => {
-    if (ratio !== null && (changed === 'width' || changed === 'height')) return changed;
+    if (derive) return changed;
     if (changed === axis || changed === (axis === 'x' ? 'width' : 'height')) return changed;
     return axis === 'x' ? 'width' : 'height';
   };
   if (x + width > bounds.width) {
-    return problem(blame('x'), ratio !== null ? 'ratio-no-fit' : 'past-right');
+    return problem(blame('x'), derive ? 'ratio-no-fit' : 'past-right');
   }
   if (y + height > bounds.height) {
-    return problem(blame('y'), ratio !== null ? 'ratio-no-fit' : 'past-bottom');
+    return problem(blame('y'), derive ? 'ratio-no-fit' : 'past-bottom');
   }
   return { ok: true, value: { x, y, width, height } };
 }
