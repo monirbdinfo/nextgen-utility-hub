@@ -95,7 +95,7 @@ describe('registry integrity', () => {
   });
 
   it('sorts available tools first without reordering otherwise', () => {
-    const sorted = sortByAvailability(toolsByCategory('general')).map((t) => t.status);
+    const sorted = sortByAvailability(toolsByCategory('files')).map((t) => t.status);
     expect(sorted.indexOf('planned')).toBeGreaterThan(sorted.lastIndexOf('available'));
   });
 
