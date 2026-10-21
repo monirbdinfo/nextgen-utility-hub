@@ -1,18 +1,7 @@
-import {
-  convertUnit,
-  unitIds,
-  type UnitKind,
-} from '../../calc/unitConvert';
+import { convertUnit, unitIds, type UnitKind } from '../../calc/unitConvert';
 import { defineStrings } from '../../i18n';
 import { h } from '../../lib/dom';
-import {
-  bindMemo,
-  copyText,
-  field,
-  select,
-  textInput,
-  type ToolView,
-} from './kit';
+import { bindMemo, copyText, field, select, textInput, type ToolView } from './kit';
 
 const S = defineStrings({
   en: {
@@ -86,10 +75,7 @@ export const unitConverter: ToolView = (ctx) => {
   const value = textInput({ id: 'unit-value', inputmode: 'decimal' });
   const from = select([], { id: 'unit-from' });
   const to = select([], { id: 'unit-to' });
-  const result = h('output', {
-    class: 'result-value',
-    'aria-live': 'polite',
-  });
+  const result = h('output', { class: 'result-value', 'aria-live': 'polite' });
   const status = h('p', { class: 'copy-status', role: 'status' });
 
   bindMemo(kind, ctx.memo, 'kind', 'length');
@@ -106,16 +92,10 @@ export const unitConverter: ToolView = (ctx) => {
     }
 
     try {
-      const converted = convertUnit(
-        number,
-        kind.value as UnitKind,
-        from.value,
-        to.value,
-      );
-      result.textContent = `${new Intl.NumberFormat(
-        ctx.lang === 'bn' ? 'bn-BD' : 'en-US',
-        { maximumSignificantDigits: 12 },
-      ).format(converted)} ${LABEL[to.value] ?? to.value}`;
+      const converted = convertUnit(number, kind.value as UnitKind, from.value, to.value);
+      result.textContent = `${new Intl.NumberFormat(ctx.lang === 'bn' ? 'bn-BD' : 'en-US', {
+        maximumSignificantDigits: 12,
+      }).format(converted)} ${LABEL[to.value] ?? to.value}`;
       status.textContent = '';
     } catch {
       result.textContent = '—';
@@ -147,11 +127,7 @@ export const unitConverter: ToolView = (ctx) => {
     control.addEventListener('change', update);
   }
 
-  const copy = h(
-    'button',
-    { type: 'button', class: 'btn btn-primary' },
-    L('copy'),
-  );
+  const copy = h('button', { type: 'button', class: 'btn btn-primary' }, L('copy'));
   copy.addEventListener('click', async () => {
     status.textContent = (await copyText(result.textContent ?? ''))
       ? ctx.t('copied')
@@ -179,4 +155,3 @@ export const unitConverter: ToolView = (ctx) => {
       status,
     ),
   );
-};
