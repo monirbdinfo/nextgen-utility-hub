@@ -98,12 +98,9 @@ export const unitConverter: ToolView = (ctx) => {
         from.value,
         to.value,
       );
-      result.textContent = `${new Intl.NumberFormat(
-        ctx.lang === 'bn' ? 'bn-BD' : 'en-US',
-        {
-          maximumSignificantDigits: 12,
-        },
-      ).format(converted)} ${LABEL[to.value] ?? to.value}`;
+      result.textContent = `${new Intl.NumberFormat(ctx.lang === 'bn' ? 'bn-BD' : 'en-US', {
+        maximumSignificantDigits: 12,
+      }).format(converted)} ${LABEL[to.value] ?? to.value}`;
       status.textContent = '';
     } catch {
       result.textContent = '—';
