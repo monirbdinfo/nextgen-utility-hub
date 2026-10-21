@@ -63,7 +63,7 @@ export const tools: readonly Tool[] = [
       'ডেটা',
       'ইন্টারনেট',
     ],
-    status: 'planned',
+    status: 'available',,
   },
   {
     id: 'unit-converter',
@@ -74,7 +74,7 @@ export const tools: readonly Tool[] = [
       bn: 'দৈর্ঘ্য, ওজন, ক্ষেত্রফল ইত্যাদি রূপান্তর।',
     },
     keywords: ['convert', 'length', 'weight', 'কনভার্ট'],
-    status: 'planned',
+    status: 'available',,
   },
   {
     id: 'text-counter',
