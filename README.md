@@ -5,7 +5,7 @@ your browser: no backend, no analytics, no uploads.
 
 Repository: <https://github.com/monirbdinfo/nextgen-utility-hub>
 
-Website (GitHub Pages): <https://monirbdinfo.github.io/nextgen-utility-hub/>, deployed from
+Website: <https://tools.nextgentechbd.com/>, deployed from
 `main` by GitHub Actions (first successful deployment: 2 October 2026). Changes on other
 branches appear there only after they are merged into `main`. See [Deployment](#deployment).
 
