@@ -145,7 +145,12 @@ describe('routing', () => {
     expect(root.querySelector('#category-heading')?.textContent).toBe(
       'Bangla Number & Text Toolkit',
     );
-    expect(root.querySelector('.chip[aria-current="page"]')?.textContent).toBe(
+    // The toolkit cards stay visible; the selected one is marked as the current page.
+    expect(root.querySelectorAll('.card')).toHaveLength(5);
+    expect(root.querySelector('.card-link[aria-current="page"]')?.textContent).toBe(
+      'Bangla Number & Text Toolkit',
+    );
+    expect(root.querySelector('.card-active .card-title')?.textContent).toBe(
       'Bangla Number & Text Toolkit',
     );
     expect(document.title).toContain('Bangla Number & Text Toolkit');
@@ -172,7 +177,52 @@ describe('routing', () => {
     history.replaceState(null, '', '/#/');
     window.dispatchEvent(new HashChangeEvent('hashchange'));
     expect(root.querySelectorAll('.card')).toHaveLength(5);
+    expect(root.querySelector('#category-heading')).toBeNull();
+    expect(root.querySelector('.card-link[aria-current]')).toBeNull();
     expect(document.activeElement?.id).toBe('toolkits-title');
+  });
+});
+
+describe('home layout', () => {
+  it('shows the brand, the hero features and stats counted from the registry', () => {
+    const root = setup();
+    const brand = root.querySelector('.brand') as HTMLAnchorElement;
+    expect(brand.getAttribute('href')).toBe('#/');
+    expect(brand.querySelector('.brand-name')?.textContent).toBe('NextGen Tech BD');
+    expect(brand.getAttribute('aria-label')).toContain('NextGen Tech BD');
+    expect(brand.querySelector('svg')?.getAttribute('aria-hidden')).toBe('true');
+    expect(root.querySelector('h1')?.textContent).toBe('Everyday tools, built for privacy.');
+    expect([...root.querySelectorAll('.feature-title')].map((e) => e.textContent)).toEqual([
+      'Private by design',
+      'Fast & lightweight',
+      'Works on your devices',
+      'Open source',
+    ]);
+    const stats = [...root.querySelectorAll('.stat')].map((s) => s.textContent);
+    expect(stats).toEqual(['5Toolkits', '16Tools available', '12Planned tools']);
+  });
+
+  it('marks Home as the current page only on the home route', () => {
+    const root = setup();
+    const home = () => root.querySelector('.nav a[href="#/"]') as HTMLAnchorElement;
+    expect(home().getAttribute('aria-current')).toBe('page');
+    history.replaceState(null, '', '/#/category/general');
+    window.dispatchEvent(new HashChangeEvent('hashchange'));
+    expect(home().hasAttribute('aria-current')).toBe(false);
+  });
+
+  it('lists a toolkit\'s tools with status, an open action or "Coming soon"', () => {
+    const root = setup('#/category/general');
+    const rows = [...root.querySelectorAll('.tool')];
+    expect(rows.length).toBe(6);
+    for (const row of rows) {
+      const available = row.querySelector('.pill')?.textContent === 'Available';
+      expect(!!row.querySelector('a.tool-link')).toBe(available);
+      expect(row.querySelector(available ? '.tool-cta' : '.tool-soon')?.textContent).toBe(
+        available ? 'Open tool' : 'Coming soon',
+      );
+      expect(row.querySelector('.tool-icon svg')).not.toBeNull();
+    }
   });
 });
 

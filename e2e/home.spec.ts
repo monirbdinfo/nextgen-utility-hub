@@ -57,7 +57,7 @@ test('search is keyboard operable end to end', async ({ page }) => {
 test('hash routes support direct load and back/forward', async ({ page }) => {
   await page.goto('/#/category/network');
   await expect(page.locator('#category-heading')).toHaveText('Network & IT Diagnostic Toolkit');
-  await page.getByRole('link', { name: 'All', exact: true }).click();
+  await page.getByRole('link', { name: 'All toolkits', exact: true }).click();
   await expect(page.locator('.card')).toHaveCount(5);
   await page.goBack();
   await expect(page.locator('#category-heading')).toHaveText('Network & IT Diagnostic Toolkit');
@@ -106,3 +106,26 @@ for (const [name, width, height] of [
     await noHorizontalScroll(page);
   });
 }
+
+test('toolkit cards stay visible, mark the open toolkit and show its tools below', async ({
+  page,
+}) => {
+  await page.goto('/');
+  await expect(
+    page.getByRole('navigation', { name: 'Primary' }).getByRole('link', { name: 'Home' }),
+  ).toHaveAttribute('aria-current', 'page');
+  await page.getByRole('link', { name: 'Job Application Toolkit' }).click();
+  await expect(page).toHaveURL(/#\/category\/jobs$/);
+  await expect(page.locator('.card')).toHaveCount(5);
+  await expect(page.getByRole('link', { name: 'Job Application Toolkit' })).toHaveAttribute(
+    'aria-current',
+    'page',
+  );
+  await expect(page.locator('#category-heading')).toHaveText('Job Application Toolkit');
+  await expect(page.locator('.tool .tool-soon').first()).toHaveText('Coming soon');
+  await expect(
+    page.getByRole('navigation', { name: 'Primary' }).getByRole('link', { name: 'Home' }),
+  ).not.toHaveAttribute('aria-current', 'page');
+  // Stats come from the registry, not fixed numbers.
+  await expect(page.locator('.stat-value')).toHaveText(['5', /^\d+$/, /^\d+$/]);
+});
