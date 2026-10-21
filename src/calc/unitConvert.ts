@@ -37,7 +37,12 @@ export function unitIds(kind: UnitKind): string[] {
   return Object.keys(UNITS[kind]);
 }
 
-export function convertUnit(value: number, kind: UnitKind, from: string, to: string): number {
+export function convertUnit(
+  value: number,
+  kind: UnitKind,
+  from: string,
+  to: string,
+): number {
   if (!Number.isFinite(value)) throw new RangeError('Value must be finite');
   if (!(from in UNITS[kind]) || !(to in UNITS[kind])) {
     throw new RangeError('Unsupported unit');
