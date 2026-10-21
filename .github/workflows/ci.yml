@@ -23,10 +23,6 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
-      - name: Diagnose exact Prettier output
-        run: |
-          npx prettier --write src/calc/bandwidth.ts src/calc/unitConvert.ts src/ui/tools/unitConverter.ts
-          git diff -- src/calc/bandwidth.ts src/calc/unitConvert.ts src/ui/tools/unitConverter.ts
       - run: npm run format:check
       - run: npm run lint
       - run: npm run typecheck
