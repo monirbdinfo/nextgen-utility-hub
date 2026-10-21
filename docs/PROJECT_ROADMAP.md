@@ -423,9 +423,14 @@ sources. Next: Milestone 6 (PDF tools), starting with a PDF library evaluation a
 PDF. Open P2 items from [FILE_TOOLS_AUDIT.md](FILE_TOOLS_AUDIT.md) (the Resizer's
 encoder-fallback policy, Cropper touch tests) remain.
 
-
 ## Milestone 9.1 — Offline utility tools delivered
 
-- **Unit Converter** (`unit-converter`): length, mass, temperature and digital storage units. Decimal storage (KB/MB/GB/TB) is distinct from binary (KiB/MiB/GiB/TiB); conversions run locally.
-- **Bandwidth & Data Usage** (`bandwidth-calculator`): estimates download time from file size and Mbps, and decimal GB usage from average Mbps over a duration. Estimates assume the full stated throughput and exclude protocol overhead.
-- Both tools are available in English and Bangla, use the shared local-only tool UI, and introduce no runtime dependencies. Validation is delegated to the repository's required CI checks before merge.
+- **Unit Converter** (`unit-converter`): length, mass, temperature and digital storage units.
+  Decimal storage (KB/MB/GB/TB) is distinct from binary (KiB/MiB/GiB/TiB); conversions
+  run locally.
+- **Bandwidth & Data Usage** (`bandwidth-calculator`): estimates download time from file
+  size and Mbps, and decimal GB usage from average Mbps over a duration. Estimates assume
+  the full stated throughput and exclude protocol overhead.
+- Both tools are available in English and Bangla, use the shared local-only tool UI, and
+  introduce no runtime dependencies. Validation is delegated to the repository's required
+  CI checks before merge.
