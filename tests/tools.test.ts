@@ -73,9 +73,9 @@ describe('tool pages', () => {
     const root = open('#/category/files');
     const items = [...root.querySelectorAll('.tool')];
     expect(items[0]?.id).toBe('tool-image-compressor');
-    expect(
-      $<HTMLAnchorElement>(items[0]!, 'a').getAttribute('href'),
-    ).toBe('#/tool/image-compressor');
+    expect($<HTMLAnchorElement>(items[0]!, 'a').getAttribute('href')).toBe(
+      '#/tool/image-compressor',
+    );
     const planned = items.filter((i) => i.querySelector('.pill')?.textContent === 'Planned');
     expect(planned.length).toBeGreaterThan(0);
     for (const p of planned) expect(p.querySelector('a')).toBeNull();
