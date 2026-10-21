@@ -2,8 +2,8 @@ import { h } from '../lib/dom';
 import {
   categories,
   getCategory,
+  getTool,
   sortByAvailability,
-  tools,
   toolsByCategory,
   type Category,
   type Tool,
@@ -14,6 +14,8 @@ import { statusKey, type AppContext } from './context';
 
 export interface ToolkitsHandle {
   el: HTMLElement;
+  /** "Featured tools", shown on the home page only. */
+  featured: HTMLElement;
   /** Re-render for the current route. */
   update(): void;
   /** Element that should receive focus after navigating to the current route. */
@@ -22,8 +24,8 @@ export interface ToolkitsHandle {
   chipNav: HTMLElement;
 }
 
-/** Icon shown next to each tool in a toolkit; tools without one use their toolkit's icon. */
-const TOOL_ICONS: Readonly<Record<string, UiIcon>> = {
+/** Icon shown next to each tool; tools without one use their toolkit's icon. */
+export const TOOL_ICONS: Readonly<Record<string, UiIcon>> = {
   'age-calculator': 'calendar',
   'date-difference': 'calendar-range',
   'emi-calculator': 'calculator',
@@ -54,32 +56,23 @@ const TOOL_ICONS: Readonly<Record<string, UiIcon>> = {
   'latency-test': 'activity',
 };
 
+/**
+ * Hand-picked shortcuts on the home page. The site collects no usage data, so this is an
+ * editorial choice, not a popularity ranking. Only available tools are shown.
+ */
+export const FEATURED_TOOLS = [
+  'age-calculator',
+  'date-difference',
+  'emi-calculator',
+  'text-counter',
+  'unit-converter',
+  'bandwidth-calculator',
+  'number-to-words-bn',
+  'image-compressor',
+] as const;
+
 export function createToolkits(ctx: AppContext): ToolkitsHandle {
   const { t, state } = ctx;
-
-  const available = tools.filter((x) => x.status === 'available').length;
-  const stats: Array<[UiIcon, number, 'statToolkits' | 'statAvailable' | 'statPlanned']> = [
-    ['gear', categories.length, 'statToolkits'],
-    ['grid', available, 'statAvailable'],
-    ['bolt', tools.length - available, 'statPlanned'],
-  ];
-  const statList = h(
-    'ul',
-    { class: 'stats', role: 'list', 'aria-label': t('statsLabel') },
-    ...stats.map(([name, n, key]) =>
-      h(
-        'li',
-        { class: `stat stat-${key}` },
-        h('span', { class: 'stat-icon' }, icon(name, 20)),
-        h(
-          'span',
-          { class: 'stat-body' },
-          h('strong', { class: 'stat-value' }, t('statValue', { n })),
-          h('span', { class: 'stat-label' }, t(key)),
-        ),
-      ),
-    ),
-  );
 
   const cardLinks = new Map<string, HTMLAnchorElement>();
   const grid = h('ul', { class: 'grid', role: 'list' }, ...categories.map(card));
@@ -88,24 +81,45 @@ export function createToolkits(ctx: AppContext): ToolkitsHandle {
   const body = h('div', { class: 'toolkits-body' });
   const el = h(
     'section',
-    {
-      id: 'toolkits',
-      class: 'container container-wide section',
-      'aria-labelledby': 'toolkits-title',
-    },
+    { id: 'toolkits', class: 'section section-toolkits', 'aria-labelledby': 'toolkits-title' },
+    // The cards speak for themselves visually; the heading keeps the page outline intact.
+    h('h2', { id: 'toolkits-title', class: 'sr-only', tabindex: '-1' }, t('toolkitsTitle')),
+    chipNav,
+    body,
+  );
+
+  const featuredList = FEATURED_TOOLS.map((id) => getTool(id)).filter(
+    (x): x is Tool => !!x && x.status === 'available',
+  );
+  const featured = h(
+    'section',
+    { id: 'featured', class: 'section', 'aria-labelledby': 'featured-title' },
     h(
       'div',
       { class: 'section-head' },
       h(
         'div',
         { class: 'section-intro' },
-        h('h2', { id: 'toolkits-title', class: 'section-title' }, t('toolkitsTitle')),
-        h('p', { class: 'section-text' }, t('toolkitsText')),
+        h(
+          'h2',
+          { id: 'featured-title', class: 'section-title section-title-icon' },
+          h('span', { class: 'title-star' }, icon('star', 26)),
+          t('featuredTitle'),
+        ),
+        h('p', { class: 'section-text' }, t('featuredText')),
       ),
-      statList,
+      h(
+        'a',
+        { href: '#toolkits', class: 'btn btn-outline' },
+        t('featuredAll'),
+        icon('arrow-right', 18),
+      ),
     ),
-    chipNav,
-    body,
+    h(
+      'ul',
+      { class: 'featured-grid', role: 'list' },
+      ...featuredList.map((tool) => featuredCard(tool)),
+    ),
   );
 
   function card(cat: Category): HTMLElement {
@@ -147,15 +161,59 @@ export function createToolkits(ctx: AppContext): ToolkitsHandle {
     return t('toolCountMixed', { available: ready, planned });
   }
 
-  function toolItem(tool: Tool, cat: Category): HTMLElement {
+  function toolIcon(tool: Tool): HTMLElement {
+    const cat = getCategory(tool.category);
+    return h(
+      'span',
+      { class: `tool-icon card-${tool.category}` },
+      icon(TOOL_ICONS[tool.id] ?? cat?.icon ?? 'toolbox', 22),
+    );
+  }
+
+  /** The tool name links to the tool; the link covers the whole card. */
+  function nameLink(tool: Tool): HTMLAnchorElement {
+    return h(
+      'a',
+      { href: toHash({ name: 'tool', id: tool.id }), class: 'tool-link' },
+      tool.name[state.lang],
+    );
+  }
+
+  function openCta(): HTMLElement {
+    return h(
+      'span',
+      { class: 'tool-cta', 'aria-hidden': 'true' },
+      t('openTool'),
+      icon('arrow-right', 16),
+    );
+  }
+
+  function featuredCard(tool: Tool): HTMLElement {
+    return h(
+      'li',
+      { class: 'tool-card tool-available' },
+      h(
+        'div',
+        { class: 'tool-card-top' },
+        toolIcon(tool),
+        h(
+          'div',
+          { class: 'tool-body' },
+          h(
+            'div',
+            { class: 'tool-card-head' },
+            h('h3', { class: 'tool-name' }, nameLink(tool)),
+            h('span', { class: `pill pill-${tool.status}` }, t(statusKey[tool.status])),
+          ),
+          h('p', { class: 'tool-desc' }, tool.description[state.lang]),
+        ),
+      ),
+      h('div', { class: 'tool-card-foot' }, openCta()),
+    );
+  }
+
+  function toolItem(tool: Tool): HTMLElement {
     const isAvailable = tool.status === 'available';
-    const name = isAvailable
-      ? h(
-          'a',
-          { href: toHash({ name: 'tool', id: tool.id }), class: 'tool-link' },
-          tool.name[state.lang],
-        )
-      : tool.name[state.lang];
     return h(
       'li',
       {
@@ -163,26 +221,18 @@ export function createToolkits(ctx: AppContext): ToolkitsHandle {
         class: `tool${isAvailable ? ' tool-available' : ''}`,
         tabindex: '-1',
       },
-      h('span', { class: 'tool-icon' }, icon(TOOL_ICONS[tool.id] ?? cat.icon, 22)),
+      toolIcon(tool),
       h(
         'div',
         { class: 'tool-body' },
-        h('h4', { class: 'tool-name' }, name),
+        h('h4', { class: 'tool-name' }, isAvailable ? nameLink(tool) : tool.name[state.lang]),
         h('p', { class: 'tool-desc' }, tool.description[state.lang]),
       ),
       h(
         'div',
         { class: 'tool-actions' },
         h('span', { class: `pill pill-${tool.status}` }, t(statusKey[tool.status])),
-        isAvailable
-          ? // The whole row is clickable through the name link; this is its visible button.
-            h(
-              'span',
-              { class: 'tool-cta', 'aria-hidden': 'true' },
-              t('openTool'),
-              icon('arrow-right', 16),
-            )
-          : h('span', { class: 'tool-soon' }, t('comingSoon')),
+        isAvailable ? openCta() : h('span', { class: 'tool-soon' }, t('comingSoon')),
       ),
     );
   }
@@ -196,6 +246,7 @@ export function createToolkits(ctx: AppContext): ToolkitsHandle {
       else link.removeAttribute('aria-current');
       link.closest('.card')?.classList.toggle('card-active', active);
     }
+    featured.hidden = route.name !== 'home';
 
     if (route.name === 'home') {
       body.replaceChildren();
@@ -233,7 +284,7 @@ export function createToolkits(ctx: AppContext): ToolkitsHandle {
         h(
           'ul',
           { class: 'tool-grid', role: 'list' },
-          ...sortByAvailability(toolsByCategory(cat.id)).map((tool) => toolItem(tool, cat)),
+          ...sortByAvailability(toolsByCategory(cat.id)).map(toolItem),
         ),
       ),
     );
@@ -246,5 +297,5 @@ export function createToolkits(ctx: AppContext): ToolkitsHandle {
   }
 
   update();
-  return { el, update, heading, chipNav };
+  return { el, featured, update, heading, chipNav };
 }

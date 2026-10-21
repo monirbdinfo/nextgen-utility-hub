@@ -31,8 +31,9 @@ with a badge and not linked). See [docs/PROJECT_ROADMAP.md](docs/PROJECT_ROADMAP
 | Image Converter — JPEG ⇄ PNG ⇄ WebP at the original size; verified output format              | Privacy-First Files  |
 | Photo & Signature Resizer — exact pixel size, crop or white padding (no stretching), KB limit | Privacy-First Files  |
 
-Platform features: NextGen Tech BD branded homepage (logo, hero with search and feature
-highlights, toolkit cards with live tool counts from the registry, per-toolkit tool lists),
+Platform features: NextGen Tech BD app shell (logo header, left sidebar with all toolkits
+that becomes a drawer on small screens, site search in the hero on the home page and in the
+header on tool pages), home page with toolkit cards, featured tools and an About strip,
 Bangla/English toggle (persisted, sets `<html lang>`), light/dark theme, keyboard-accessible
 search, hash routing with deep links, typed central registry. Calculation conventions, rounding rules and limitations are in
 [docs/TOOLS.md](docs/TOOLS.md).
