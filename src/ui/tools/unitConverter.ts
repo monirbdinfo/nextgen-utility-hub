@@ -92,12 +92,7 @@ export const unitConverter: ToolView = (ctx) => {
     }
 
     try {
-      const converted = convertUnit(
-        number,
-        kind.value as UnitKind,
-        from.value,
-        to.value,
-      );
+      const converted = convertUnit(number, kind.value as UnitKind, from.value, to.value);
       result.textContent = `${new Intl.NumberFormat(ctx.lang === 'bn' ? 'bn-BD' : 'en-US', {
         maximumSignificantDigits: 12,
       }).format(converted)} ${LABEL[to.value] ?? to.value}`;
@@ -113,12 +108,8 @@ export const unitConverter: ToolView = (ctx) => {
     const oldFrom = from.value;
     const oldTo = to.value;
 
-    from.replaceChildren(
-      ...ids.map((id) => h('option', { value: id }, LABEL[id] ?? id)),
-    );
-    to.replaceChildren(
-      ...ids.map((id) => h('option', { value: id }, LABEL[id] ?? id)),
-    );
+    from.replaceChildren(...ids.map((id) => h('option', { value: id }, LABEL[id] ?? id)));
+    to.replaceChildren(...ids.map((id) => h('option', { value: id }, LABEL[id] ?? id)));
     from.value = ids.includes(oldFrom) ? oldFrom : ids[0]!;
     to.value = ids.includes(oldTo) ? oldTo : ids[Math.min(1, ids.length - 1)]!;
     ctx.memo.from = from.value;
