@@ -20,7 +20,7 @@ This roadmap follows the real implementation. A tool is only marked **Available*
 
 ## Tool catalog by milestone
 
-28 registry entries; 13 available after the Photo & Signature Resizer.
+28 registry entries; 14 available after the Word & Character Counter.
 
 | Milestone | Category | Registry ID              | Tool                               | Status    |
 | --------- | -------- | ------------------------ | ---------------------------------- | --------- |
@@ -51,7 +51,7 @@ This roadmap follows the real implementation. A tool is only marked **Available*
 | 8         | Network  | `latency-test`           | Latency & Packet-Loss Check        | Planned   |
 | 9         | General  | `bandwidth-calculator`   | Bandwidth & Data Usage             | Planned   |
 | 9         | General  | `unit-converter`         | Unit Converter                     | Planned   |
-| 9         | General  | `text-counter`           | Word & Character Counter           | Planned   |
+| 9         | General  | `text-counter`           | Word & Character Counter           | Available |
 
 ### How overlapping requirements were merged
 
@@ -391,6 +391,20 @@ pull request for exact counts and the Firefox/WebKit results from CI. An ad hoc 
 (not a project dependency, not run in CI) found no violations in the empty, settings, result
 and error states and on the category page, in light and dark themes, English and Bangla, at
 360 and 1280 px.
+
+## Word & Character Counter delivered (Milestone 9, General Utilities)
+
+Tool: **Word & Character Counter** (`text-counter`, route `#/tool/text-counter`). The planned
+Milestone 1 entry was reused. Rules and limitations are in
+[TOOLS.md](TOOLS.md#word--character-counter).
+
+Added `src/calc/textCount.ts` (pure, the same rules in every browser), the view
+`src/ui/tools/textCounter.ts`, 19 logic tests, 4 view tests and `e2e/general.spec.ts`, which
+also runs in Firefox and WebKit (added to `CROSS_BROWSER_SPECS` in `playwright.config.ts`; the
+CI job keeps its name "Cross-browser image tests"). No new dependencies. An ad hoc axe-core
+scan (not a project dependency, not run in CI) found no violations on the empty, filled and
+error states and the category page, in light and dark themes, English and Bangla, at 360 and
+1280 px. Exact test counts and CI results are in the pull request.
 
 ## Notes for later milestones
 

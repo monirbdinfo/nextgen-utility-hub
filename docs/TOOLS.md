@@ -146,6 +146,45 @@ lookbehind so the tool keeps working on Safari/iOS 15.4–16.3.
 **Browser note:** setting a text box's value from a script turns CR/CRLF into LF, but text
 typed or pasted into it keeps CR in Chromium. The line-ending option handles both.
 
+## Word & Character Counter
+
+Route `#/tool/text-counter` (registry ID kept from Milestone 1). Code: `src/calc/textCount.ts`
+(pure counting) and `src/ui/tools/textCounter.ts` (view). No dependencies were added.
+
+**Behaviour.** Counts update as the user types or pastes (no button). The count list is not
+an ARIA live region, because it changes on every keystroke; screen-reader users move to it to
+hear the current values. Copy puts all counts on the clipboard as text; Reset clears the text
+and returns focus to it. Input is limited to 1,000,000 UTF-16 code units, the same as the
+Unicode Text Cleaner; longer text shows an error instead of counts.
+
+**Counting rules** (the same in every browser, so results are predictable):
+
+| Count                     | Rule                                                                                                                                                                                             |
+| ------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Characters                | User-perceived characters (grapheme clusters, `Intl.Segmenter`): ক্ষ, কি, 👍🏽 and 👨‍👩‍👧 each count once. Without `Intl.Segmenter` (Firefox before 125) code points are counted and the page says so. |
+| Characters without spaces | The same, leaving out every Unicode whitespace character (space, tab, line breaks, no-break space, em space …).                                                                                  |
+| Words                     | Runs of letters, combining marks and digits; an apostrophe inside a word joins it (“don’t”); hyphens and other punctuation split (“well-known” = 2).                                             |
+| Sentences                 | Text ending in `.` `!` `?` `…` `।` or `॥` followed by a space, closing quote or the end, plus a final unterminated sentence. Decimals (3.14) do not split.                                       |
+| Lines                     | Line breaks (LF, CRLF or CR) + 1; empty text has 0 lines.                                                                                                                                        |
+| Paragraphs                | Blocks of non-blank lines separated by one or more blank (or whitespace-only) lines.                                                                                                             |
+| Size in UTF-8             | Bytes when the text is saved as UTF-8 (Bangla letters take 3 bytes, most emoji 4).                                                                                                               |
+| Reading time              | Words ÷ 200 words per minute, rounded to whole seconds (at least 1 s for any word).                                                                                                              |
+
+**Limitations.** Abbreviations such as “Dr.” or “e.g.” end a sentence, so the sentence count
+is approximate. Languages written without spaces between words (Chinese, Japanese, Thai) are
+not split into words. 200 words per minute is a common average for silent reading in English;
+there is no established equivalent used here for Bangla, so the estimate is the same for both.
+
+**Privacy.** The text is processed in the tab only. It is kept in memory so a language switch
+does not lose it, never written to browser storage, and cleared when leaving the tool.
+
+**Tests.** `tests/calc/textCount.test.ts` (19: empty text, English, Bangla conjuncts, emoji,
+the code-point fallback, whitespace, words, sentences, lines, paragraphs, UTF-8 bytes against
+`TextEncoder`, reading time, a 1,000,000-character input), 4 view tests in
+`tests/tools.test.ts`, and `e2e/general.spec.ts` (7 in Chromium; also run in Firefox and
+WebKit, where the copy test is skipped because clipboard permissions can only be granted in
+Chromium).
+
 ## Image Resizer
 
 Route `#/tool/image-resizer`. Code: `src/calc/image.ts` (logic), `src/lib/imageCanvas.ts`

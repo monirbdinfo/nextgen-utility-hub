@@ -47,6 +47,7 @@ describe('registry integrity', () => {
       'age-calculator',
       'date-difference',
       'emi-calculator',
+      'text-counter',
       'digit-converter',
       'number-to-words-bn',
       'taka-in-words',

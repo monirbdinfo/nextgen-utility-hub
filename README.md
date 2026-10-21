@@ -19,6 +19,7 @@ with a badge and not linked). See [docs/PROJECT_ROADMAP.md](docs/PROJECT_ROADMAP
 | Age Calculator — age in years/months/days, next birthday                                      | General Utilities    |
 | Date Difference — Y/M/D, total days, inclusive option                                         | General Utilities    |
 | Loan EMI Calculator — installment, total repayment and interest (estimate)                    | General Utilities    |
+| Word & Character Counter — characters, words, sentences, lines, paragraphs, reading time      | General Utilities    |
 | Bangla ⇄ English Digits — digits only, all other text preserved                               | Bangla Number & Text |
 | Number to Words — Bangla and English, lakh/crore or million                                   | Bangla Number & Text |
 | Taka in Words — Taka and poisha, cheque style, never rounds                                   | Bangla Number & Text |

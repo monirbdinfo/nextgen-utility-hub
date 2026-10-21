@@ -5,6 +5,7 @@ const TOOLS = [
   ['age-calculator', 'Age Calculator'],
   ['date-difference', 'Date Difference'],
   ['emi-calculator', 'Loan EMI Calculator'],
+  ['text-counter', 'Word & Character Counter'],
   ['digit-converter', 'Bangla ⇄ English Digits'],
   ['number-to-words-bn', 'Number to Words'],
   ['taka-in-words', 'Taka in Words'],
