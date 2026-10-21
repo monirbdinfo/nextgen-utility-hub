@@ -9,6 +9,7 @@ import { imageCropper } from './imageCropper';
 import { imageResizer } from './imageResizer';
 import type { ToolView } from './kit';
 import { numberToWordsTool } from './numberToWords';
+import { photoResizer } from './photoResizer';
 import { takaInWords } from './takaInWords';
 import { textCounter } from './textCounter';
 import { unicodeCleaner } from './unicodeCleaner';
@@ -28,6 +29,7 @@ export const toolViews: Readonly<Record<string, ToolView>> = {
   'image-cropper': imageCropper,
   'image-compressor': imageCompressor,
   'image-converter': imageConverter,
+  'job-photo-resizer': photoResizer,
 };
 
 export type { ToolContext, ToolView } from './kit';

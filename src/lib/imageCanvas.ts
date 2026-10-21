@@ -12,6 +12,7 @@ import {
   type Size,
 } from '../calc/image';
 import type { Rect } from '../calc/crop';
+import type { Placement } from '../calc/photoFit';
 
 export type ProcessingError = 'decode' | 'canvas' | 'encode';
 
@@ -188,6 +189,37 @@ export function openEncoder(
   /** Only formats that can be transparent need the (memory-heavy) transparency scan. */
   sourceMayBeTransparent: boolean,
 ): Encoder {
+  // A crop is a 1:1 copy at whole-pixel offsets: no smoothing, so pixels are copied exactly.
+  // The whole image is drawn at a negative offset instead of passing a source rectangle:
+  // with EXIF-rotated photos, WebKit's source-rectangle drawImage does not use the upright
+  // (displayed) coordinates, while a whole-image draw does in every engine we test. Only
+  // the crop area lands on the crop-sized canvas.
+  const place = from ? { x: -from.x, y: -from.y, ...sourceSize(source) } : { x: 0, y: 0, ...size };
+  return openPlacedEncoder(source, place, size, format, sourceMayBeTransparent, {
+    exact: !!from,
+  });
+}
+
+/**
+ * Draw the whole `source` at `place` (which may extend past the canvas, or leave empty
+ * space) on a canvas of `size`, ready to be encoded. Always a whole-image draw, for the
+ * WebKit reason given in `openEncoder`.
+ *
+ * - `exact`: no smoothing (1:1 copies only).
+ * - `background`: fill empty and transparent areas with this colour in every format.
+ *   Without it, JPEG output gets white and PNG/WebP keep transparency.
+ *
+ * `filledTransparency` reports transparency in the drawn image itself (not in empty
+ * space around it) that a JPEG output filled with white.
+ */
+export function openPlacedEncoder(
+  source: CanvasImageSource,
+  place: Placement,
+  size: Size,
+  format: ImageFormat,
+  sourceMayBeTransparent: boolean,
+  opts: { exact?: boolean; background?: string } = {},
+): Encoder {
   const canvas = document.createElement('canvas');
   const close = (): void => {
     // Shrinking the canvas releases its memory promptly.
@@ -202,26 +234,22 @@ export function openEncoder(
     if (!ctx || canvas.width !== size.width || canvas.height !== size.height) {
       throw new ImageProcessingError('canvas');
     }
-    if (from) {
-      // 1:1 copy at whole-pixel offsets: no smoothing, so pixels are copied exactly.
-      // The whole image is drawn at a negative offset instead of passing a source
-      // rectangle: with EXIF-rotated photos, WebKit's source-rectangle drawImage does not
-      // use the upright (displayed) coordinates, while a whole-image draw does in every
-      // engine we test. Only the crop area lands on the crop-sized canvas.
-      ctx.imageSmoothingEnabled = false;
-      const full = sourceSize(source);
-      ctx.drawImage(source, -from.x, -from.y, full.width, full.height);
-    } else {
-      ctx.imageSmoothingEnabled = true;
-      ctx.imageSmoothingQuality = 'high';
-      ctx.drawImage(source, 0, 0, size.width, size.height);
-    }
-    if (!FORMATS[format].alpha) {
-      filledTransparency =
-        sourceMayBeTransparent &&
-        hasTransparency(ctx.getImageData(0, 0, size.width, size.height).data);
+    ctx.imageSmoothingEnabled = !opts.exact;
+    if (!opts.exact) ctx.imageSmoothingQuality = 'high';
+    ctx.drawImage(source, place.x, place.y, place.width, place.height);
+    const fill = opts.background ?? (FORMATS[format].alpha ? null : '#ffffff');
+    if (fill) {
+      if (!FORMATS[format].alpha && sourceMayBeTransparent) {
+        // Only whole pixels covered by the image: edges and padding are not the source's.
+        const x0 = Math.max(0, Math.ceil(place.x));
+        const y0 = Math.max(0, Math.ceil(place.y));
+        const x1 = Math.min(size.width, Math.floor(place.x + place.width));
+        const y1 = Math.min(size.height, Math.floor(place.y + place.height));
+        filledTransparency =
+          x1 > x0 && y1 > y0 && hasTransparency(ctx.getImageData(x0, y0, x1 - x0, y1 - y0).data);
+      }
       ctx.globalCompositeOperation = 'destination-over';
-      ctx.fillStyle = '#ffffff';
+      ctx.fillStyle = fill;
       ctx.fillRect(0, 0, size.width, size.height);
     }
   } catch (error) {

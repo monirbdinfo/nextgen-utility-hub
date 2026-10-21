@@ -1632,3 +1632,19 @@ a.btn {
 .compress-controls .field-grid + .field-grid {
   margin-top: var(--space-4);
 }
+
+/* ---------- Photo & Signature Resizer ---------- */
+.photo-controls .field-grid,
+.photo-controls .radio-group {
+  margin-top: var(--space-4);
+}
+
+.photo-plan {
+  margin: var(--space-4) 0 0;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.photo-plan:empty {
+  display: none;
+}

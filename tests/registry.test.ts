@@ -57,6 +57,7 @@ describe('registry integrity', () => {
       'image-converter',
       'image-resizer',
       'image-cropper',
+      'job-photo-resizer',
     ]);
   });
 

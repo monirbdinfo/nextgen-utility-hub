@@ -15,20 +15,21 @@ photo/signature tool have no code yet, so only their registry entries were revie
 
 ## Tools in the category (from `src/registry/tools.ts`)
 
-| ID                  | Name                      | Status    | Route                     | Notes                                              |
-| ------------------- | ------------------------- | --------- | ------------------------- | -------------------------------------------------- |
-| `image-compressor`  | Image Compressor          | Available | `#/tool/image-compressor` |                                                    |
-| `image-converter`   | Image Converter           | Available | `#/tool/image-converter`  | Added in this change (new registry entry)          |
-| `image-resizer`     | Image Resizer             | Available | `#/tool/image-resizer`    |                                                    |
-| `image-cropper`     | Image Cropper             | Available | `#/tool/image-cropper`    |                                                    |
-| `job-photo-resizer` | Photo & Signature Resizer | Planned   | —                         | Needs verified official size rules                 |
-| `pdf-create`        | Create PDF                | Planned   | —                         | Needs a PDF library decision (`pdf-lib`)           |
-| `pdf-merge`         | PDF Merge & Split         | Planned   | —                         | 〃                                                 |
-| `pdf-tools`         | PDF Page Tools            | Planned   | —                         | 〃                                                 |
-| `pdf-compress`      | Reduce PDF Size           | Planned   | —                         | 〃; real PDF size reduction is limited in browsers |
+| ID                  | Name                      | Status    | Route                      | Notes                                              |
+| ------------------- | ------------------------- | --------- | -------------------------- | -------------------------------------------------- |
+| `image-compressor`  | Image Compressor          | Available | `#/tool/image-compressor`  |                                                    |
+| `image-converter`   | Image Converter           | Available | `#/tool/image-converter`   | Added in this change (new registry entry)          |
+| `image-resizer`     | Image Resizer             | Available | `#/tool/image-resizer`     |                                                    |
+| `image-cropper`     | Image Cropper             | Available | `#/tool/image-cropper`     |                                                    |
+| `job-photo-resizer` | Photo & Signature Resizer | Available | `#/tool/job-photo-resizer` | Custom sizes only; no unverified official presets  |
+| `pdf-create`        | Create PDF                | Planned   | —                          | Needs a PDF library decision (`pdf-lib`)           |
+| `pdf-merge`         | PDF Merge & Split         | Planned   | —                          | 〃                                                 |
+| `pdf-tools`         | PDF Page Tools            | Planned   | —                          | 〃                                                 |
+| `pdf-compress`      | Reduce PDF Size           | Planned   | —                          | 〃; real PDF size reduction is limited in browsers |
 
 IDs and routes are unique (enforced by `tests/registry.test.ts`); planned tools have no
-route or view (also enforced). The category card shows "4 available · 5 planned".
+route or view (also enforced). The category card showed "4 available · 5 planned" at the
+time of the audit; it now shows "5 available · 4 planned".
 
 ## Shared behaviour (all four available tools)
 
@@ -103,3 +104,23 @@ Site-wide items noticed but outside this category: the `<noscript>` message is E
 only; CI shows GitHub's Node 20 deprecation warning for `actions/checkout@v4` and
 `actions/setup-node@v4`; `npm audit` reports 2 moderate advisories (Vitest dev
 dependency).
+
+## Follow-up: Photo & Signature Resizer (item 11)
+
+`job-photo-resizer` is now available. Item 11 is resolved **without presets**: official
+recruiter pages could not be reached from the development environment, so no pixel size,
+file-size limit or format was verified, and none is hard-coded or named in the tool. Users
+enter the requirements from the notice they apply to. Adding a preset still requires a cited
+official source and date.
+
+What the tool shares with the other image tools: the input pipeline, size limits, format
+honesty (`canEncode` and the returned-type check), the target-size search and the cleanup
+of object URLs and canvases. New: `openPlacedEncoder` in `src/lib/imageCanvas.ts` draws the
+whole image at a placement (used for "crop to fill" and "fit with white padding"); the
+existing `openEncoder` now delegates to it with unchanged behaviour (all earlier image tests
+pass). Details and tests: [TOOLS.md](TOOLS.md#photo--signature-resizer).
+
+Found while testing, not fixed here (separate small change): the **Image Resizer** shows a
+"must be at least 1 pixel" error for a zero _height_ on the _width_ field (the field is chosen
+only for the "side too large" rule). The new tool picks the offending field for each rule and
+tests it.
