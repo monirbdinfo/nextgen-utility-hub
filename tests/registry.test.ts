@@ -48,6 +48,8 @@ describe('registry integrity', () => {
       'date-difference',
       'emi-calculator',
       'text-counter',
+      'bandwidth-calculator',
+      'unit-converter',
       'digit-converter',
       'number-to-words-bn',
       'taka-in-words',
