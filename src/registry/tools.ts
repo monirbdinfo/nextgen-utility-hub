@@ -63,7 +63,8 @@ export const tools: readonly Tool[] = [
       'ডেটা',
       'ইন্টারনেট',
     ],
-    status: 'available',,
+    status: 'available',
+    route: route('bandwidth-calculator'),
   },
   {
     id: 'unit-converter',
@@ -74,7 +75,8 @@ export const tools: readonly Tool[] = [
       bn: 'দৈর্ঘ্য, ওজন, ক্ষেত্রফল ইত্যাদি রূপান্তর।',
     },
     keywords: ['convert', 'length', 'weight', 'কনভার্ট'],
-    status: 'available',,
+    status: 'available',
+    route: route('unit-converter'),
   },
   {
     id: 'text-counter',
