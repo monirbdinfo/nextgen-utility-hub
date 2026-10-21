@@ -434,3 +434,33 @@ encoder-fallback policy, Cropper touch tests) remain.
 - Both tools are available in English and Bangla, use the shared local-only tool UI, and
   introduce no runtime dependencies. Validation is delegated to the repository's required
   CI checks before merge.
+
+## Homepage redesign (NextGen Tech BD brand)
+
+The home page, header and footer follow the NextGen Tech BD design mockup. No tool, route or
+registry entry changed.
+
+- **Logo:** `src/ui/logo.ts` draws the "NG" ring and circuit-trace mark as an inline SVG
+  (redrawn from the brand artwork; no image request). It appears in the header, the hero and
+  the About strip. The favicon uses a simplified NG ring.
+- **Header:** logo and "NEXTGEN TECH BD" wordmark; Home (marked `aria-current` on the home
+  route), Toolkits, About and Source code links; language and theme buttons.
+- **Hero:** brand block (wide screens), headline with the accent line, search, and four
+  feature cards. The wording was kept factual: "Private by design" instead of "100% private",
+  "No sign-up, no server processing" instead of "Works offline after loading" (there is no
+  service worker, so a reload needs the network), and "Works on your devices" instead of
+  "all devices".
+- **Toolkits:** stats (toolkits, tools available, planned tools) are counted from the
+  registry, so they cannot go stale (the mockup's "22+" and "15+" were not used). The five
+  toolkit cards stay visible on a toolkit page; the open one is marked `aria-current` and its
+  tools are listed below with an icon, status pill and "Open tool" or "Coming soon". This
+  replaces the earlier chip filter.
+- **Theme:** the palette moved from teal to the logo's blue with a cyan accent and green
+  "Available" pills; every text/background pair is still checked for WCAG AA in
+  `tests/contrast.test.ts` (new pairs added for the header and the green pill).
+- **Width:** the home page uses a wider 1,360 px frame (`.container-wide`); tool pages keep
+  the 1,160 px reading width.
+
+Validation and exact counts are in the pull request. An ad hoc axe-core scan (not a project
+dependency, not run in CI) found no violations on the home page, three toolkit pages and a
+tool page, in light and dark themes, English and Bangla, at 360 and 1,440 px.

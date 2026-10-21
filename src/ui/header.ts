@@ -1,11 +1,15 @@
 import { h } from '../lib/dom';
 import { icon } from './icons';
 import { REPO_URL, type AppContext } from './context';
+import { logoMark } from './logo';
+import type { Route } from '../router/router';
 
 const DESKTOP_QUERY = '(min-width: 860px)';
 
 export interface HeaderHandle {
   el: HTMLElement;
+  /** Mark the nav link for the current route. */
+  setRoute(route: Route): void;
   destroy(): void;
 }
 
@@ -20,9 +24,11 @@ export function createHeader(ctx: AppContext): HeaderHandle {
     'aria-controls': 'site-nav',
   });
 
+  const homeLink = h('a', { href: '#/', class: 'nav-link' }, icon('home', 18), t('navHome'));
   const nav = h(
     'nav',
     { id: 'site-nav', class: 'nav', 'aria-label': t('navPrimary') },
+    homeLink,
     h('a', { href: '#toolkits', class: 'nav-link' }, t('navToolkits')),
     h('a', { href: '#about', class: 'nav-link' }, t('navAbout')),
     h(
@@ -91,12 +97,12 @@ export function createHeader(ctx: AppContext): HeaderHandle {
     { class: 'header' },
     h(
       'div',
-      { class: 'container header-inner' },
+      { class: 'container container-wide header-inner' },
       h(
         'a',
-        { class: 'brand', href: '#/' },
-        h('span', { class: 'brand-mark', 'aria-hidden': 'true' }, 'N'),
-        h('span', { class: 'brand-name' }, t('siteName')),
+        { class: 'brand', href: '#/', 'aria-label': t('brandHome') },
+        logoMark(64, { className: 'brand-mark' }),
+        h('span', { class: 'brand-name', lang: 'en' }, t('brandName')),
       ),
       nav,
       h('div', { class: 'header-actions' }, langBtn, themeBtn, menuBtn),
@@ -105,6 +111,10 @@ export function createHeader(ctx: AppContext): HeaderHandle {
 
   return {
     el,
+    setRoute(route) {
+      if (route.name === 'home') homeLink.setAttribute('aria-current', 'page');
+      else homeLink.removeAttribute('aria-current');
+    },
     destroy() {
       document.removeEventListener('keydown', onKeydown);
       document.removeEventListener('pointerdown', onPointerDown);

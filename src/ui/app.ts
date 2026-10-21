@@ -5,7 +5,8 @@ import { getCategory, getTool, type Lang } from '../registry';
 import { parseHash, toHash, type Route } from '../router/router';
 import type { AppContext, AppState, Theme } from './context';
 import { createHeader, type HeaderHandle } from './header';
-import { icon } from './icons';
+import { icon, type UiIcon } from './icons';
+import { logoMark } from './logo';
 import { createSearch, type SearchHandle } from './search';
 import { createToolkits, type ToolkitsHandle } from './toolkits';
 import { createToolPage } from './toolPage';
@@ -94,38 +95,87 @@ export function mountApp(root: HTMLElement): () => void {
   }
 
   function hero(searchEl: HTMLElement): HTMLElement {
+    const features: Array<[UiIcon, 'f1' | 'f2' | 'f3' | 'f4']> = [
+      ['shield', 'f1'],
+      ['bolt', 'f2'],
+      ['devices', 'f3'],
+      ['code', 'f4'],
+    ];
     return h(
       'section',
       { class: 'hero', 'aria-labelledby': 'hero-title' },
       h(
         'div',
-        { class: 'container hero-inner' },
+        { class: 'container container-wide hero-inner' },
         h(
-          'p',
-          { class: 'badge' },
-          h('span', { class: 'badge-dot', 'aria-hidden': 'true' }),
-          t('heroBadge'),
+          'div',
+          { class: 'hero-brand' },
+          logoMark(300, { className: 'hero-logo' }),
+          h('p', { class: 'hero-brand-name', lang: 'en' }, t('brandName')),
+          h('p', { class: 'hero-brand-tagline' }, t('brandTagline')),
         ),
-        h('h1', { id: 'hero-title', class: 'hero-title' }, t('heroTitle')),
-        h('p', { class: 'hero-text' }, t('heroText')),
-        searchEl,
+        h(
+          'div',
+          { class: 'hero-main' },
+          h(
+            'p',
+            { class: 'badge' },
+            h('span', { class: 'badge-dot', 'aria-hidden': 'true' }),
+            t('heroBadge'),
+          ),
+          h(
+            'h1',
+            { id: 'hero-title', class: 'hero-title' },
+            h('span', { class: 'hero-title-lead' }, t('heroTitleLead')),
+            ' ',
+            h('span', { class: 'hero-title-accent' }, t('heroTitleAccent')),
+          ),
+          h('p', { class: 'hero-text' }, t('heroText')),
+          searchEl,
+        ),
+        h(
+          'ul',
+          { class: 'hero-features', role: 'list', 'aria-label': t('featuresLabel') },
+          ...features.map(([name, key]) =>
+            h(
+              'li',
+              { class: 'feature' },
+              h('span', { class: 'feature-icon' }, icon(name, 24)),
+              h('strong', { class: 'feature-title' }, t(`${key}Title`)),
+              h('span', { class: 'feature-text' }, t(`${key}Text`)),
+            ),
+          ),
+        ),
       ),
     );
   }
 
   function about(): HTMLElement {
-    const principles = (['principle1', 'principle2', 'principle3'] as const).map((k) =>
-      h('li', {}, icon('check', 18), t(k)),
-    );
+    const principles: Array<[UiIcon, 'principle1' | 'principle2' | 'principle3']> = [
+      ['shield', 'principle1'],
+      ['lock', 'principle2'],
+      ['leaf', 'principle3'],
+    ];
     return h(
       'section',
-      { id: 'about', class: 'container section', 'aria-labelledby': 'about-title' },
+      { id: 'about', class: 'container container-wide section', 'aria-labelledby': 'about-title' },
       h(
         'div',
         { class: 'about' },
-        h('h2', { id: 'about-title', class: 'section-title' }, t('aboutTitle')),
-        h('p', { class: 'about-text' }, t('aboutText')),
-        h('ul', { class: 'principles', role: 'list' }, ...principles),
+        logoMark(96, { className: 'about-logo' }),
+        h(
+          'div',
+          { class: 'about-body' },
+          h('h2', { id: 'about-title', class: 'about-title' }, t('aboutTitle')),
+          h('p', { class: 'about-text' }, t('aboutText')),
+        ),
+        h(
+          'ul',
+          { class: 'principles', role: 'list' },
+          ...principles.map(([name, key]) =>
+            h('li', {}, h('span', { class: 'principle-icon' }, icon(name, 18)), t(key)),
+          ),
+        ),
       ),
     );
   }
@@ -155,6 +205,7 @@ export function mountApp(root: HTMLElement): () => void {
   function renderShell(): void {
     header?.destroy();
     header = createHeader(ctx);
+    header.setRoute(state.route);
     applyDocumentState();
     main = h('main', { id: 'main', tabindex: '-1' });
     renderMain();
@@ -168,8 +219,8 @@ export function mountApp(root: HTMLElement): () => void {
         { class: 'footer' },
         h(
           'div',
-          { class: 'container footer-inner' },
-          h('span', {}, `© 2026 ${t('siteName')}`),
+          { class: 'container container-wide footer-inner' },
+          h('span', {}, `© 2026 ${t('siteName')} · `, h('span', { lang: 'en' }, t('brandName'))),
           h('span', {}, t('footer')),
         ),
       ),
@@ -182,6 +233,7 @@ export function mountApp(root: HTMLElement): () => void {
     const prev: Route = state.route;
     const changed = toHash(next) !== toHash(prev);
     state.route = next;
+    header?.setRoute(next);
     // Leaving a tool drops its in-memory objects (picked files, results).
     if (prev.name === 'tool' && changed) toolSession.delete(prev.id);
     applyDocumentState();
