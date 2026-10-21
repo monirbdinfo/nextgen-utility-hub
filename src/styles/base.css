@@ -71,11 +71,6 @@ svg {
   padding-inline: var(--gutter);
 }
 
-/* Home page, header and footer use a wider frame; tool pages keep the reading width. */
-.container-wide {
-  max-width: calc(var(--container-wide) + 2 * var(--gutter));
-}
-
 .sr-only {
   position: absolute;
   width: 1px;

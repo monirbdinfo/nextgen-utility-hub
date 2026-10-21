@@ -114,18 +114,36 @@ test('toolkit cards stay visible, mark the open toolkit and show its tools below
   await expect(
     page.getByRole('navigation', { name: 'Primary' }).getByRole('link', { name: 'Home' }),
   ).toHaveAttribute('aria-current', 'page');
-  await page.getByRole('link', { name: 'Job Application Toolkit' }).click();
+  const cards = page.getByRole('navigation', { name: 'Filter by toolkit' });
+  await cards.getByRole('link', { name: 'Job Application Toolkit' }).click();
   await expect(page).toHaveURL(/#\/category\/jobs$/);
   await expect(page.locator('.card')).toHaveCount(5);
-  await expect(page.getByRole('link', { name: 'Job Application Toolkit' })).toHaveAttribute(
+  await expect(cards.getByRole('link', { name: 'Job Application Toolkit' })).toHaveAttribute(
     'aria-current',
     'page',
   );
+  await expect(
+    page
+      .getByRole('navigation', { name: 'Primary' })
+      .getByRole('link', { name: 'Job Application Toolkit' }),
+  ).toHaveAttribute('aria-current', 'page');
   await expect(page.locator('#category-heading')).toHaveText('Job Application Toolkit');
   await expect(page.locator('.tool .tool-soon').first()).toHaveText('Coming soon');
   await expect(
     page.getByRole('navigation', { name: 'Primary' }).getByRole('link', { name: 'Home' }),
   ).not.toHaveAttribute('aria-current', 'page');
-  // Stats come from the registry, not fixed numbers.
-  await expect(page.locator('.stat-value')).toHaveText(['5', /^\d+$/, /^\d+$/]);
+});
+
+test('tool pages have the search in the header', async ({ page }) => {
+  await page.setViewportSize({ width: 1280, height: 900 });
+  await page.goto('/#/tool/age-calculator');
+  const search = page.locator('header').getByRole('combobox', { name: 'Search tools' });
+  await expect(search).toBeVisible();
+  await page.keyboard.press('/');
+  await expect(search).toBeFocused();
+  await search.fill('taka');
+  await page.keyboard.press('ArrowDown');
+  await page.keyboard.press('Enter');
+  await expect(page).toHaveURL(/#\/tool\/taka-in-words$/);
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('Taka in Words');
 });

@@ -184,22 +184,50 @@ describe('routing', () => {
 });
 
 describe('home layout', () => {
-  it('shows the brand, the hero features and stats counted from the registry', () => {
+  it('shows the logo, brand, hero features and featured tools', () => {
     const root = setup();
     const brand = root.querySelector('.brand') as HTMLAnchorElement;
     expect(brand.getAttribute('href')).toBe('#/');
     expect(brand.querySelector('.brand-name')?.textContent).toBe('NextGen Tech BD');
+    expect(brand.querySelector('.brand-sub')?.textContent).toBe('Utility Hub');
     expect(brand.getAttribute('aria-label')).toContain('NextGen Tech BD');
-    expect(brand.querySelector('svg')?.getAttribute('aria-hidden')).toBe('true');
+    // The real logo image, decorative next to the brand name.
+    const logo = brand.querySelector('img.logo-mark') as HTMLImageElement;
+    expect(logo.getAttribute('alt')).toBe('');
+    expect(logo.getAttribute('src')).toMatch(/logo-mark.*\.png$/);
+    expect(root.querySelector('img.logo-full')).not.toBeNull();
     expect(root.querySelector('h1')?.textContent).toBe('Everyday tools, built for privacy.');
     expect([...root.querySelectorAll('.feature-title')].map((e) => e.textContent)).toEqual([
       'Private by design',
       'Fast & lightweight',
-      'Works on your devices',
       'Open source',
     ]);
-    const stats = [...root.querySelectorAll('.stat')].map((s) => s.textContent);
-    expect(stats).toEqual(['5Toolkits', '16Tools available', '12Planned tools']);
+    // Featured tools are all available and link to their pages.
+    const featured = [...root.querySelectorAll('#featured .tool-card')];
+    expect(featured.length).toBe(8);
+    for (const card of featured) {
+      expect(card.querySelector('.pill')?.textContent).toBe('Available');
+      expect(card.querySelector('a.tool-link')?.getAttribute('href')).toMatch(/^#\/tool\//);
+    }
+    // One search box: in the hero on the home view, none in the header.
+    expect(root.querySelectorAll('#search')).toHaveLength(1);
+    expect(root.querySelector('.hero #search')).not.toBeNull();
+  });
+
+  it('moves the search into the header on tool pages and hides featured tools on toolkits', () => {
+    const root = setup('#/tool/age-calculator');
+    expect(root.querySelectorAll('#search')).toHaveLength(1);
+    expect(root.querySelector('.header-search #search')).not.toBeNull();
+    history.replaceState(null, '', '/#/category/general');
+    window.dispatchEvent(new HashChangeEvent('hashchange'));
+    expect(root.querySelector('.header-search #search')).toBeNull();
+    expect((root.querySelector('#featured') as HTMLElement).hidden).toBe(true);
+  });
+
+  it('highlights the current toolkit in the sidebar', () => {
+    const root = setup('#/category/files');
+    const current = root.querySelector('#site-nav [aria-current="page"]');
+    expect(current?.textContent).toBe('Privacy-First File Tools');
   });
 
   it('marks Home as the current page only on the home route', () => {
