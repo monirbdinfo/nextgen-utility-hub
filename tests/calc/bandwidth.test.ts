@@ -1,9 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import {
-  dataUsageGB,
-  downloadSeconds,
-  formatDuration,
-} from '../../src/calc/bandwidth';
+import { dataUsageGB, downloadSeconds, formatDuration } from '../../src/calc/bandwidth';
 
 describe('bandwidth calculator', () => {
   it('estimates download time using bits and decimal bytes', () => {
