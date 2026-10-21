@@ -92,7 +92,12 @@ export const unitConverter: ToolView = (ctx) => {
     }
 
     try {
-      const converted = convertUnit(number, kind.value as UnitKind, from.value, to.value);
+      const converted = convertUnit(
+        number,
+        kind.value as UnitKind,
+        from.value,
+        to.value,
+      );
       result.textContent = `${new Intl.NumberFormat(ctx.lang === 'bn' ? 'bn-BD' : 'en-US', {
         maximumSignificantDigits: 12,
       }).format(converted)} ${LABEL[to.value] ?? to.value}`;
