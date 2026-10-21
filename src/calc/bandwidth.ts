@@ -11,7 +11,10 @@ export function downloadSeconds(
   ) {
     throw new RangeError('Size and speed must be positive');
   }
-  return (size * (unit === 'MB' ? 1e6 : unit === 'GB' ? 1e9 : 1e12) * 8) / (speedMbps * 1e6);
+  return (
+    (size * (unit === 'MB' ? 1e6 : unit === 'GB' ? 1e9 : 1e12) * 8) /
+    (speedMbps * 1e6)
+  );
 }
 
 export function dataUsageGB(speedMbps: number, hours: number): number {
