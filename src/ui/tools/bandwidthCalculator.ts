@@ -1,17 +1,7 @@
-import {
-  dataUsageGB,
-  downloadSeconds,
-  formatDuration,
-} from '../../calc/bandwidth';
+import { dataUsageGB, downloadSeconds, formatDuration } from '../../calc/bandwidth';
 import { defineStrings } from '../../i18n';
 import { h } from '../../lib/dom';
-import {
-  bindMemo,
-  field,
-  select,
-  textInput,
-  type ToolView,
-} from './kit';
+import { bindMemo, field, select, textInput, type ToolView } from './kit';
 
 const S = defineStrings({
   en: {
@@ -74,16 +64,13 @@ export const bandwidthCalculator: ToolView = (ctx) => {
     try {
       time.textContent =
         size.value.trim() && speed.value.trim()
-          ? formatDuration(
-              downloadSeconds(a, unit.value as 'MB' | 'GB' | 'TB', b),
-            )
+          ? formatDuration(downloadSeconds(a, unit.value as 'MB' | 'GB' | 'TB', b))
           : '—';
       used.textContent =
         hours.value.trim() && average.value.trim()
-          ? `${dataUsageGB(d, c).toLocaleString(
-              ctx.lang === 'bn' ? 'bn-BD' : 'en-US',
-              { maximumFractionDigits: 3 },
-            )} GB`
+          ? `${dataUsageGB(d, c).toLocaleString(ctx.lang === 'bn' ? 'bn-BD' : 'en-US', {
+              maximumFractionDigits: 3,
+            })} GB`
           : '—';
     } catch {
       time.textContent = '—';
