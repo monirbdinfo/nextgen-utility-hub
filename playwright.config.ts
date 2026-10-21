@@ -6,7 +6,12 @@ declare const process: { env: Record<string, string | undefined> };
 const PORT = 4173;
 export const SUBPATH_PORT = 4174;
 export const SUBPATH = '/nextgen-utility-hub/';
-const CROSS_BROWSER_SPECS = ['cross-browser.spec.ts', 'exif.spec.ts', 'photo.spec.ts', 'general.spec.ts'];
+const CROSS_BROWSER_SPECS = [
+  'cross-browser.spec.ts',
+  'exif.spec.ts',
+  'photo.spec.ts',
+  'general.spec.ts',
+];
 
 export default defineConfig({
   testDir: 'e2e',
@@ -18,8 +23,8 @@ export default defineConfig({
     baseURL: `http://127.0.0.1:${PORT}/`,
     trace: 'retain-on-failure',
   },
-  // Chromium runs every spec. Firefox and WebKit run the image-tool specs written to be
-  // engine-neutral (cross-browser, EXIF orientation, photo resizer and general utilities); `npm run test:e2e` stays
+  // Chromium runs every spec. Firefox and WebKit run the engine-neutral cross-browser,
+  // EXIF orientation, photo resizer and general utility specs. `npm run test:e2e` stays
   // Chromium-only and `npm run test:e2e:cross` runs the other two engines.
   projects: [
     { name: 'chromium', use: { ...devices['Desktop Chrome'] } },
