@@ -37,23 +37,13 @@ export function unitIds(kind: UnitKind): string[] {
   return Object.keys(UNITS[kind]);
 }
 
-export function convertUnit(
-  value: number,
-  kind: UnitKind,
-  from: string,
-  to: string,
-): number {
+export function convertUnit(value: number, kind: UnitKind, from: string, to: string): number {
   if (!Number.isFinite(value)) throw new RangeError('Value must be finite');
   if (!(from in UNITS[kind]) || !(to in UNITS[kind])) {
     throw new RangeError('Unsupported unit');
   }
   if (kind === 'temperature') {
-    const c =
-      from === 'c'
-        ? value
-        : from === 'f'
-          ? ((value - 32) * 5) / 9
-          : value - 273.15;
+    const c = from === 'c' ? value : from === 'f' ? ((value - 32) * 5) / 9 : value - 273.15;
     return to === 'c' ? c : to === 'f' ? (c * 9) / 5 + 32 : c + 273.15;
   }
   return (value * UNITS[kind][from]!) / UNITS[kind][to]!;
