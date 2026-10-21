@@ -70,10 +70,12 @@ describe('tool pages', () => {
   });
 
   it('link available tools from their category and keep planned ones unlinked', () => {
-    const root = open('#/category/general');
+    const root = open('#/category/files');
     const items = [...root.querySelectorAll('.tool')];
-    expect(items[0]?.id).toBe('tool-age-calculator');
-    expect($<HTMLAnchorElement>(items[0]!, 'a').getAttribute('href')).toBe('#/tool/age-calculator');
+    expect(items[0]?.id).toBe('tool-image-compressor');
+    expect($<HTMLAnchorElement>(items[0]!, 'a').getAttribute('href')).toBe(
+      '#/tool/image-compressor',
+    );
     const planned = items.filter((i) => i.querySelector('.pill')?.textContent === 'Planned');
     expect(planned.length).toBeGreaterThan(0);
     for (const p of planned) expect(p.querySelector('a')).toBeNull();
@@ -82,7 +84,7 @@ describe('tool pages', () => {
   it('show available and planned counts on cards', () => {
     const root = open('');
     const counts = [...root.querySelectorAll('.card-count')].map((c) => c.textContent);
-    expect(counts[0]).toBe('4 available · 2 planned');
+    expect(counts[0]).toBe('6 available tools');
     expect(counts[3]).toBe('5 available · 4 planned');
     expect(counts[4]).toBe('5 planned tools');
   });

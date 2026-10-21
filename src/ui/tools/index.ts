@@ -1,5 +1,7 @@
 import { ageCalculator } from './ageCalculator';
 import { dateDifferenceTool } from './dateDifference';
+import { bandwidthCalculator } from './bandwidthCalculator';
+import { unitConverter } from './unitConverter';
 import { dateFormatter } from './dateFormatter';
 import { digitConverter } from './digitConverter';
 import { emiCalculator } from './emiCalculator';
@@ -20,6 +22,8 @@ export const toolViews: Readonly<Record<string, ToolView>> = {
   'date-difference': dateDifferenceTool,
   'emi-calculator': emiCalculator,
   'text-counter': textCounter,
+  'bandwidth-calculator': bandwidthCalculator,
+  'unit-converter': unitConverter,
   'digit-converter': digitConverter,
   'number-to-words-bn': numberToWordsTool,
   'taka-in-words': takaInWords,

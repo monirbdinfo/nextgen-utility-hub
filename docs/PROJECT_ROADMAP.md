@@ -20,7 +20,7 @@ This roadmap follows the real implementation. A tool is only marked **Available*
 
 ## Tool catalog by milestone
 
-28 registry entries; 14 available after the Word & Character Counter.
+28 registry entries; 16 available after the Unit Converter and Bandwidth & Data Usage.
 
 | Milestone | Category | Registry ID              | Tool                               | Status    |
 | --------- | -------- | ------------------------ | ---------------------------------- | --------- |
@@ -49,8 +49,8 @@ This roadmap follows the real implementation. A tool is only marked **Available*
 | 8         | Network  | `my-ip-info`             | IP Lookup                          | Planned   |
 | 8         | Network  | `dns-lookup`             | DNS Lookup                         | Planned   |
 | 8         | Network  | `latency-test`           | Latency & Packet-Loss Check        | Planned   |
-| 9         | General  | `bandwidth-calculator`   | Bandwidth & Data Usage             | Planned   |
-| 9         | General  | `unit-converter`         | Unit Converter                     | Planned   |
+| 9         | General  | `bandwidth-calculator`   | Bandwidth & Data Usage             | Available |
+| 9         | General  | `unit-converter`         | Unit Converter                     | Available |
 | 9         | General  | `text-counter`           | Word & Character Counter           | Available |
 
 ### How overlapping requirements were merged
@@ -422,3 +422,15 @@ Milestone 5 is complete apart from recruiter presets, which wait for verified of
 sources. Next: Milestone 6 (PDF tools), starting with a PDF library evaluation and Create
 PDF. Open P2 items from [FILE_TOOLS_AUDIT.md](FILE_TOOLS_AUDIT.md) (the Resizer's
 encoder-fallback policy, Cropper touch tests) remain.
+
+## Milestone 9.1 — Offline utility tools delivered
+
+- **Unit Converter** (`unit-converter`): length, mass, temperature and digital storage units.
+  Decimal storage (KB/MB/GB/TB) is distinct from binary (KiB/MiB/GiB/TiB); conversions
+  run locally.
+- **Bandwidth & Data Usage** (`bandwidth-calculator`): estimates download time from file
+  size and Mbps, and decimal GB usage from average Mbps over a duration. Estimates assume
+  the full stated throughput and exclude protocol overhead.
+- Both tools are available in English and Bangla, use the shared local-only tool UI, and
+  introduce no runtime dependencies. Validation is delegated to the repository's required
+  CI checks before merge.

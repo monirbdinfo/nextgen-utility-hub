@@ -1,0 +1,111 @@
+import { dataUsageGB, downloadSeconds, formatDuration } from '../../calc/bandwidth';
+import { defineStrings } from '../../i18n';
+import { h } from '../../lib/dom';
+import { bindMemo, field, select, textInput, type ToolView } from './kit';
+
+const S = defineStrings({
+  en: {
+    download: 'Download time estimate',
+    size: 'File size',
+    unit: 'Size unit',
+    speed: 'Internet speed (Mbps)',
+    usage: 'Data usage estimate',
+    hours: 'Hours of use',
+    average: 'Average speed (Mbps)',
+    time: 'Estimated download time',
+    used: 'Estimated data used',
+    hint: 'Uses decimal MB/GB/TB and assumes the full stated speed; real results vary with network overhead.',
+  },
+  bn: {
+    download: 'ডাউনলোড সময়ের হিসাব',
+    size: 'ফাইলের আকার',
+    unit: 'আকারের একক',
+    speed: 'ইন্টারনেট গতি (Mbps)',
+    usage: 'ডেটা ব্যবহারের হিসাব',
+    hours: 'ব্যবহারের ঘণ্টা',
+    average: 'গড় গতি (Mbps)',
+    time: 'আনুমানিক ডাউনলোড সময়',
+    used: 'আনুমানিক ডেটা ব্যবহার',
+    hint: 'দশমিক MB/GB/TB এবং পূর্ণ নির্ধারিত গতি ধরে হিসাব করা হয়; বাস্তব ফল ভিন্ন হতে পারে।',
+  },
+});
+
+export const bandwidthCalculator: ToolView = (ctx) => {
+  const L = S(ctx.lang);
+  const size = textInput({ id: 'bw-size', inputmode: 'decimal' });
+  const unit = select(
+    [
+      ['MB', 'MB'],
+      ['GB', 'GB'],
+      ['TB', 'TB'],
+    ],
+    { id: 'bw-unit' },
+  );
+  const speed = textInput({ id: 'bw-speed', inputmode: 'decimal' });
+  const hours = textInput({ id: 'bw-hours', inputmode: 'decimal' });
+  const average = textInput({ id: 'bw-average', inputmode: 'decimal' });
+
+  bindMemo(size, ctx.memo, 'size', '1');
+  bindMemo(unit, ctx.memo, 'unit', 'GB');
+  bindMemo(speed, ctx.memo, 'speed', '100');
+  bindMemo(hours, ctx.memo, 'hours', '1');
+  bindMemo(average, ctx.memo, 'average', '10');
+
+  const time = h('p', { class: 'result-value' });
+  const used = h('p', { class: 'result-value' });
+  const hint = h('p', { class: 'field-hint' }, L('hint'));
+
+  function update() {
+    const a = Number(size.value);
+    const b = Number(speed.value);
+    const c = Number(hours.value);
+    const d = Number(average.value);
+
+    try {
+      time.textContent =
+        size.value.trim() && speed.value.trim()
+          ? formatDuration(downloadSeconds(a, unit.value as 'MB' | 'GB' | 'TB', b))
+          : '—';
+      used.textContent =
+        hours.value.trim() && average.value.trim()
+          ? `${dataUsageGB(d, c).toLocaleString(ctx.lang === 'bn' ? 'bn-BD' : 'en-US', {
+              maximumFractionDigits: 3,
+            })} GB`
+          : '—';
+    } catch {
+      time.textContent = '—';
+      used.textContent = '—';
+    }
+  }
+
+  for (const control of [size, unit, speed, hours, average]) {
+    control.addEventListener('input', update);
+    control.addEventListener('change', update);
+  }
+  update();
+
+  return h(
+    'div',
+    { class: 'tool-layout' },
+    h(
+      'div',
+      { class: 'tool-form' },
+      h('h2', {}, L('download')),
+      field(L('size'), size).el,
+      field(L('unit'), unit).el,
+      field(L('speed'), speed).el,
+      hint,
+    ),
+    h(
+      'section',
+      { class: 'result' },
+      h('h2', { class: 'result-title' }, L('time')),
+      time,
+      h('hr', {}),
+      h('h2', { class: 'result-title' }, L('usage')),
+      field(L('hours'), hours).el,
+      field(L('average'), average).el,
+      used,
+    ),
+  );
+};
