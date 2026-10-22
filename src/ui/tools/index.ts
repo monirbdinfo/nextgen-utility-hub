@@ -13,6 +13,7 @@ import { applicationChecklist, coverLetterTemplates, cvTemplates } from './jobAp
 import type { ToolView } from './kit';
 import { numberToWordsTool } from './numberToWords';
 import { photoResizer } from './photoResizer';
+import { pdfCreate, pdfMergeSplit, pdfPageTools, pdfReduceSize } from './pdfTools';
 import { takaInWords } from './takaInWords';
 import { textCounter } from './textCounter';
 import { unicodeCleaner } from './unicodeCleaner';
@@ -35,6 +36,10 @@ export const toolViews: Readonly<Record<string, ToolView>> = {
   'image-compressor': imageCompressor,
   'image-converter': imageConverter,
   'job-photo-resizer': photoResizer,
+  'pdf-create': pdfCreate,
+  'pdf-merge': pdfMergeSplit,
+  'pdf-tools': pdfPageTools,
+  'pdf-compress': pdfReduceSize,
   'cv-templates': cvTemplates,
   'cover-letter-templates': coverLetterTemplates,
   'cv-checklist': applicationChecklist,
