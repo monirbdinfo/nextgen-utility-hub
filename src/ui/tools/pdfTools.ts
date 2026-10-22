@@ -13,7 +13,8 @@ const copy = {
     text: 'Text to include in the PDF',
     create: 'Create PDF',
     merge: 'Merge selected PDFs',
-    split: 'Split selected PDF into one-page files (downloads a ZIP is not supported; first page will be downloaded)',
+    split:
+      'Split selected PDF into one-page files (downloads a ZIP is not supported; first page will be downloaded)',
     operation: 'Action',
     mergeAction: 'Merge all PDFs',
     splitAction: 'Extract page range',
@@ -32,7 +33,8 @@ const copy = {
     sizeBefore: 'Original size',
     sizeAfter: 'Output size',
     reduction: 'Size change',
-    limit: 'Note: pdf-lib can rewrite PDF structure, but cannot reliably recompress embedded images. The output may not be smaller.',
+    limit:
+      'Note: pdf-lib can rewrite PDF structure, but cannot reliably recompress embedded images. The output may not be smaller.',
     download: 'Download PDF',
   },
   bn: {
@@ -63,16 +65,21 @@ const copy = {
     sizeBefore: 'মূল সাইজ',
     sizeAfter: 'আউটপুট সাইজ',
     reduction: 'সাইজ পরিবর্তন',
-    limit: 'দ্রষ্টব্য: pdf-lib PDF কাঠামো নতুন করে লিখতে পারে, তবে এমবেড করা ছবি নির্ভরযোগ্যভাবে পুনরায় কমপ্রেস করতে পারে না। আউটপুট ছোট নাও হতে পারে।',
+    limit:
+      'দ্রষ্টব্য: pdf-lib PDF কাঠামো নতুন করে লিখতে পারে, তবে এমবেড করা ছবি নির্ভরযোগ্যভাবে পুনরায় কমপ্রেস করতে পারে না। আউটপুট ছোট নাও হতে পারে।',
     download: 'PDF ডাউনলোড',
   },
 } as const;
 
-const bytes = (n: number): string => n < 1024 * 1024 ? `${(n / 1024).toFixed(1)} KB` : `${(n / (1024 * 1024)).toFixed(2)} MB`;
+const bytes = (n: number): string =>
+  n < 1024 * 1024 ? `${(n / 1024).toFixed(1)} KB` : `${(n / (1024 * 1024)).toFixed(2)} MB`;
 
 function parsePages(value: string, total: number): number[] {
   const pages = new Set<number>();
-  for (const part of value.split(',').map((x) => x.trim()).filter(Boolean)) {
+  for (const part of value
+    .split(',')
+    .map((x) => x.trim())
+    .filter(Boolean)) {
     const match = /^(\d+)(?:\s*-\s*(\d+))?$/.exec(part);
     if (!match) throw new Error('range');
     const start = Number(match[1]);
@@ -96,32 +103,109 @@ function savePdf(bytesData: Uint8Array, name: string): void {
 
 function tool(ctx: ToolContext, mode: Mode): HTMLElement {
   const s = copy[ctx.lang];
-  const title = mode === 'create' ? s.createTitle : mode === 'merge' ? s.mergeTitle : mode === 'pages' ? s.pagesTitle : s.reduceTitle;
+  const title =
+    mode === 'create'
+      ? s.createTitle
+      : mode === 'merge'
+        ? s.mergeTitle
+        : mode === 'pages'
+          ? s.pagesTitle
+          : s.reduceTitle;
   const root = h('section', { class: 'tool-workspace pdf-tool' });
   const heading = h('h2', {}, title);
   const privacy = h('p', { class: 'field-hint', role: 'note' }, s.privacy);
-  const fileInput = h('input', { class: 'input', type: 'file', accept: mode === 'create' ? 'image/*,.txt,.md' : 'application/pdf,.pdf', multiple: mode === 'create' || mode === 'merge' }) as HTMLInputElement;
-  const fileField = h('div', { class: 'field' }, h('label', { class: 'field-label' }, s.files), fileInput);
-  const textArea = h('textarea', { class: 'input', rows: '8', placeholder: s.text }) as HTMLTextAreaElement;
-  const textField = h('div', { class: 'field' }, h('label', { class: 'field-label' }, s.text), textArea);
-  const actionSelect = h('select', { class: 'input' },
+  const fileInput = h('input', {
+    class: 'input',
+    type: 'file',
+    accept: mode === 'create' ? 'image/*,.txt,.md' : 'application/pdf,.pdf',
+    ...(mode === 'create' || mode === 'merge' ? { multiple: '' } : {}),
+  }) as HTMLInputElement;
+  const fileField = h(
+    'div',
+    { class: 'field' },
+    h('label', { class: 'field-label' }, s.files),
+    fileInput,
+  );
+  const textArea = h('textarea', {
+    class: 'input',
+    rows: '8',
+    placeholder: s.text,
+  }) as HTMLTextAreaElement;
+  const textField = h(
+    'div',
+    { class: 'field' },
+    h('label', { class: 'field-label' }, s.text),
+    textArea,
+  );
+  const actionSelect = h(
+    'select',
+    { class: 'input' },
     h('option', { value: 'merge' }, s.mergeAction),
     h('option', { value: 'split' }, s.splitAction),
   ) as HTMLSelectElement;
-  const actionField = h('div', { class: 'field' }, h('label', { class: 'field-label' }, s.operation), actionSelect);
-  const rangeInput = h('input', { class: 'input', type: 'text', placeholder: s.range }) as HTMLInputElement;
-  const rangeField = h('div', { class: 'field' }, h('label', { class: 'field-label' }, s.range), rangeInput);
-  const orderInput = h('input', { class: 'input', type: 'text', placeholder: s.order }) as HTMLInputElement;
-  const orderField = h('div', { class: 'field' }, h('label', { class: 'field-label' }, s.order), orderInput);
-  const rotateSelect = h('select', { class: 'input' },
+  const actionField = h(
+    'div',
+    { class: 'field' },
+    h('label', { class: 'field-label' }, s.operation),
+    actionSelect,
+  );
+  const rangeInput = h('input', {
+    class: 'input',
+    type: 'text',
+    placeholder: s.range,
+  }) as HTMLInputElement;
+  const rangeField = h(
+    'div',
+    { class: 'field' },
+    h('label', { class: 'field-label' }, s.range),
+    rangeInput,
+  );
+  const orderInput = h('input', {
+    class: 'input',
+    type: 'text',
+    placeholder: s.order,
+  }) as HTMLInputElement;
+  const orderField = h(
+    'div',
+    { class: 'field' },
+    h('label', { class: 'field-label' }, s.order),
+    orderInput,
+  );
+  const rotateSelect = h(
+    'select',
+    { class: 'input' },
     h('option', { value: '90' }, '90°'),
     h('option', { value: '180' }, '180°'),
     h('option', { value: '270' }, '270°'),
   ) as HTMLSelectElement;
-  const rotateField = h('div', { class: 'field' }, h('label', { class: 'field-label' }, s.rotate), rotateSelect);
-  const removeInput = h('input', { class: 'input', type: 'text', placeholder: s.remove }) as HTMLInputElement;
-  const removeField = h('div', { class: 'field' }, h('label', { class: 'field-label' }, s.remove), removeInput);
-  const button = h('button', { class: 'button button-primary', type: 'button' }, mode === 'create' ? s.create : mode === 'merge' ? s.merge : mode === 'pages' ? s.process : s.reduce) as HTMLButtonElement;
+  const rotateField = h(
+    'div',
+    { class: 'field' },
+    h('label', { class: 'field-label' }, s.rotate),
+    rotateSelect,
+  );
+  const removeInput = h('input', {
+    class: 'input',
+    type: 'text',
+    placeholder: s.remove,
+  }) as HTMLInputElement;
+  const removeField = h(
+    'div',
+    { class: 'field' },
+    h('label', { class: 'field-label' }, s.remove),
+    removeInput,
+  );
+  const button = h(
+    'button',
+    { class: 'button button-primary', type: 'button' },
+    mode === 'create'
+      ? s.create
+      : mode === 'merge'
+        ? s.merge
+        : mode === 'pages'
+          ? s.process
+          : s.reduce,
+  ) as HTMLButtonElement;
   const status = h('p', { class: 'result-message', role: 'status', 'aria-live': 'polite' });
   const results = h('div', { class: 'result-panel', hidden: '' });
   const sizeBefore = h('p', {});
@@ -129,17 +213,41 @@ function tool(ctx: ToolContext, mode: Mode): HTMLElement {
   const sizeChange = h('p', {});
   results.append(sizeBefore, sizeAfter, sizeChange);
   if (mode === 'create') root.append(heading, fileField, textField, privacy, button, status);
-  if (mode === 'merge') root.append(heading, fileField, actionField, rangeField, privacy, button, status);
-  if (mode === 'pages') root.append(heading, fileField, orderField, rotateField, removeField, privacy, button, status);
-  if (mode === 'reduce') root.append(heading, fileField, privacy, h('p', { class: 'field-hint' }, s.limit), button, status, results);
-  if (mode === 'merge') actionSelect.addEventListener('change', () => { rangeField.hidden = actionSelect.value !== 'split'; });
-  if (mode === 'pages') { orderField.hidden = false; rotateField.hidden = false; removeField.hidden = false; }
+  if (mode === 'merge')
+    root.append(heading, fileField, actionField, rangeField, privacy, button, status);
+  if (mode === 'pages')
+    root.append(heading, fileField, orderField, rotateField, removeField, privacy, button, status);
+  if (mode === 'reduce')
+    root.append(
+      heading,
+      fileField,
+      privacy,
+      h('p', { class: 'field-hint' }, s.limit),
+      button,
+      status,
+      results,
+    );
+  if (mode === 'merge')
+    actionSelect.addEventListener('change', () => {
+      rangeField.hidden = actionSelect.value !== 'split';
+    });
+  if (mode === 'pages') {
+    orderField.hidden = false;
+    rotateField.hidden = false;
+    removeField.hidden = false;
+  }
   let busy = false;
   button.addEventListener('click', async () => {
     if (busy) return;
     const files = [...(fileInput.files ?? [])];
-    if (mode !== 'create' && files.length === 0) { status.textContent = s.noFile; return; }
-    busy = true; button.disabled = true; status.textContent = s.working; results.hidden = true;
+    if (mode !== 'create' && files.length === 0) {
+      status.textContent = s.noFile;
+      return;
+    }
+    busy = true;
+    button.disabled = true;
+    status.textContent = s.working;
+    results.hidden = true;
     try {
       let output: Uint8Array;
       let filename = 'nextgen-document.pdf';
@@ -150,44 +258,74 @@ function tool(ctx: ToolContext, mode: Mode): HTMLElement {
           const page = pdf.addPage();
           const lines = textArea.value.split(/\r?\n/);
           let y = page.getHeight() - 52;
-          for (const line of lines) { page.drawText(line.slice(0, 160), { x: 48, y, size: 11, font, color: rgb(0.12, 0.16, 0.22), maxWidth: page.getWidth() - 96 }); y -= 16; if (y < 48) { y = page.getHeight() - 52; pdf.addPage(); } }
+          for (const line of lines) {
+            page.drawText(line.slice(0, 160), {
+              x: 48,
+              y,
+              size: 11,
+              font,
+              color: rgb(0.12, 0.16, 0.22),
+              maxWidth: page.getWidth() - 96,
+            });
+            y -= 16;
+            if (y < 48) {
+              y = page.getHeight() - 52;
+              pdf.addPage();
+            }
+          }
         }
         for (const file of files) {
           if (!file.type.startsWith('image/')) continue;
           const data = new Uint8Array(await file.arrayBuffer());
           let image;
           if (file.type === 'image/png') image = await pdf.embedPng(data);
-          else if (file.type === 'image/jpeg' || file.type === 'image/jpg') image = await pdf.embedJpg(data);
+          else if (file.type === 'image/jpeg' || file.type === 'image/jpg')
+            image = await pdf.embedJpg(data);
           else {
             const bitmap = await createImageBitmap(file);
-            const canvas = document.createElement('canvas'); canvas.width = bitmap.width; canvas.height = bitmap.height;
-            canvas.getContext('2d')!.drawImage(bitmap, 0, 0); bitmap.close();
-            const png = await new Promise<Blob>((resolve, reject) => canvas.toBlob((b) => b ? resolve(b) : reject(new Error('image')), 'image/png'));
+            const canvas = document.createElement('canvas');
+            canvas.width = bitmap.width;
+            canvas.height = bitmap.height;
+            canvas.getContext('2d')!.drawImage(bitmap, 0, 0);
+            bitmap.close();
+            const png = await new Promise<Blob>((resolve, reject) =>
+              canvas.toBlob((b) => (b ? resolve(b) : reject(new Error('image'))), 'image/png'),
+            );
             image = await pdf.embedPng(new Uint8Array(await png.arrayBuffer()));
           }
           const page = pdf.addPage([image.width, image.height]);
           page.drawImage(image, { x: 0, y: 0, width: image.width, height: image.height });
         }
-        if (!textArea.value.trim() && !files.some((f) => f.type.startsWith('image/'))) throw new Error('empty');
-        output = await pdf.save(); filename = 'nextgen-created.pdf';
+        if (!textArea.value.trim() && !files.some((f) => f.type.startsWith('image/')))
+          throw new Error('empty');
+        output = await pdf.save();
+        filename = 'nextgen-created.pdf';
       } else if (mode === 'merge') {
-        const selected = files.filter((f) => f.type === 'application/pdf' || f.name.toLowerCase().endsWith('.pdf'));
+        const selected = files.filter(
+          (f) => f.type === 'application/pdf' || f.name.toLowerCase().endsWith('.pdf'),
+        );
         if (!selected.length) throw new Error('empty');
         if (actionSelect.value === 'merge') {
           const dest = await PDFDocument.create();
           for (const file of selected) {
             const src = await PDFDocument.load(await file.arrayBuffer());
-            const pages = await dest.copyPages(src, src.getPageIndices()); pages.forEach((p) => dest.addPage(p));
+            const pages = await dest.copyPages(src, src.getPageIndices());
+            pages.forEach((p) => dest.addPage(p));
           }
-          output = await dest.save(); filename = 'merged.pdf';
+          output = await dest.save();
+          filename = 'merged.pdf';
         } else {
           const src = await PDFDocument.load(await selected[0]!.arrayBuffer());
           const indices = parsePages(rangeInput.value, src.getPageCount());
-          const dest = await PDFDocument.create(); (await dest.copyPages(src, indices)).forEach((p) => dest.addPage(p));
-          output = await dest.save(); filename = 'split-pages.pdf';
+          const dest = await PDFDocument.create();
+          (await dest.copyPages(src, indices)).forEach((p) => dest.addPage(p));
+          output = await dest.save();
+          filename = 'split-pages.pdf';
         }
       } else {
-        const file = files.find((f) => f.type === 'application/pdf' || f.name.toLowerCase().endsWith('.pdf'));
+        const file = files.find(
+          (f) => f.type === 'application/pdf' || f.name.toLowerCase().endsWith('.pdf'),
+        );
         if (!file) throw new Error('empty');
         const src = await PDFDocument.load(await file.arrayBuffer());
         if (mode === 'pages') {
@@ -195,33 +333,55 @@ function tool(ctx: ToolContext, mode: Mode): HTMLElement {
           const order = orderInput.value.trim();
           if (order) {
             const nums = order.split(',').map((n) => Number(n.trim()));
-            if (nums.length !== pages.length || nums.some((n) => !Number.isInteger(n) || n < 1 || n > pages.length) || new Set(nums).size !== pages.length) throw new Error('range');
+            if (
+              nums.length !== pages.length ||
+              nums.some((n) => !Number.isInteger(n) || n < 1 || n > pages.length) ||
+              new Set(nums).size !== pages.length
+            )
+              throw new Error('range');
             const copyDoc = await PDFDocument.create();
-            (await copyDoc.copyPages(src, nums.map((n) => n - 1))).forEach((p) => copyDoc.addPage(p));
-            output = await copyDoc.save(); filename = 'reordered.pdf';
+            (
+              await copyDoc.copyPages(
+                src,
+                nums.map((n) => n - 1),
+              )
+            ).forEach((p) => copyDoc.addPage(p));
+            output = await copyDoc.save();
+            filename = 'reordered.pdf';
           } else {
             const angle = Number(rotateSelect.value);
             pages.forEach((p) => p.setRotation(degrees((p.getRotation().angle + angle) % 360)));
             const remove = removeInput.value.trim();
             if (remove) {
               const indices = parsePages(remove, src.getPageCount());
-              indices.sort((a, b) => b - a).forEach((i) => { if (src.getPageCount() > 1) src.removePage(i); });
+              indices
+                .sort((a, b) => b - a)
+                .forEach((i) => {
+                  if (src.getPageCount() > 1) src.removePage(i);
+                });
             }
-            output = await src.save(); filename = 'edited-pages.pdf';
+            output = await src.save();
+            filename = 'edited-pages.pdf';
           }
         } else {
-          output = await src.save({ useObjectStreams: true, addDefaultPage: false }); filename = 'optimized.pdf';
+          output = await src.save({ useObjectStreams: true, addDefaultPage: false });
+          filename = 'optimized.pdf';
           sizeBefore.textContent = `${s.sizeBefore}: ${bytes(file.size)}`;
           sizeAfter.textContent = `${s.sizeAfter}: ${bytes(output.byteLength)}`;
           const delta = output.byteLength - file.size;
-          sizeChange.textContent = `${s.reduction}: ${delta <= 0 ? '−' : '+'}${bytes(Math.abs(delta))} (${Math.round(Math.abs(delta) / Math.max(file.size, 1) * 100)}%)`;
+          sizeChange.textContent = `${s.reduction}: ${delta <= 0 ? '−' : '+'}${bytes(Math.abs(delta))} (${Math.round((Math.abs(delta) / Math.max(file.size, 1)) * 100)}%)`;
           results.hidden = false;
         }
       }
-      savePdf(output, filename); status.textContent = s.done;
+      savePdf(output, filename);
+      status.textContent = s.done;
     } catch (error) {
-      status.textContent = error instanceof Error && error.message === 'range' ? s.invalidRange : s.error;
-    } finally { busy = false; button.disabled = false; }
+      status.textContent =
+        error instanceof Error && error.message === 'range' ? s.invalidRange : s.error;
+    } finally {
+      busy = false;
+      button.disabled = false;
+    }
   });
   return root;
 }
