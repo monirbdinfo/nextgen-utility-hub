@@ -376,7 +376,8 @@ export const tools: readonly Tool[] = [
       bn: 'ছবি ও অন্যান্য সমর্থিত ফাইল থেকে ব্রাউজারেই পিডিএফ তৈরি।',
     },
     keywords: ['pdf', 'create', 'images to pdf', 'jpg to pdf', 'পিডিএফ', 'তৈরি'],
-    status: 'planned',
+    status: 'available',
+    route: route('pdf-create'),
   },
   {
     id: 'pdf-merge',
@@ -387,7 +388,8 @@ export const tools: readonly Tool[] = [
       bn: 'আপলোড ছাড়াই পিডিএফ মার্জ বা স্প্লিট।',
     },
     keywords: ['pdf', 'merge', 'split', 'combine', 'পিডিএফ'],
-    status: 'planned',
+    status: 'available',
+    route: route('pdf-merge'),
   },
   {
     id: 'pdf-tools',
@@ -398,7 +400,8 @@ export const tools: readonly Tool[] = [
       bn: 'সাধারণ পিডিএফ টুল: পেজ ঘোরানো, সাজানো ও মুছে ফেলা।',
     },
     keywords: ['pdf', 'rotate', 'reorder', 'delete pages', 'পিডিএফ', 'পেজ'],
-    status: 'planned',
+    status: 'available',
+    route: route('pdf-tools'),
   },
   {
     id: 'pdf-compress',
@@ -409,7 +412,8 @@ export const tools: readonly Tool[] = [
       bn: 'ব্রাউজারে যতটা সম্ভব পিডিএফ ফাইলের সাইজ কমানো।',
     },
     keywords: ['pdf', 'compress', 'reduce size', 'file size', 'পিডিএফ', 'সাইজ'],
-    status: 'planned',
+    status: 'available',
+    route: route('pdf-compress'),
   },
 
   // ---------- Network & IT Diagnostic Toolkit ----------

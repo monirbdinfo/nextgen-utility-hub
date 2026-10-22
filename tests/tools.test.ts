@@ -64,7 +64,7 @@ describe('tool pages', () => {
   });
 
   it('do not open for planned tools', () => {
-    const root = open('#/tool/pdf-merge');
+    const root = open('#/tool/dns-lookup');
     expect(root.querySelector('#tool-title')).toBeNull();
     expect(root.querySelectorAll('.card')).toHaveLength(5);
   });
@@ -76,16 +76,22 @@ describe('tool pages', () => {
     expect($<HTMLAnchorElement>(items[0]!, 'a').getAttribute('href')).toBe(
       '#/tool/image-compressor',
     );
-    const planned = items.filter((i) => i.querySelector('.pill')?.textContent === 'Planned');
+    // Planned tools (the Network toolkit) are listed without a link.
+    history.replaceState(null, '', '/#/category/network');
+    window.dispatchEvent(new HashChangeEvent('hashchange'));
+    const planned = [...root.querySelectorAll('.tool')];
     expect(planned.length).toBeGreaterThan(0);
-    for (const p of planned) expect(p.querySelector('a')).toBeNull();
+    for (const p of planned) {
+      expect(p.querySelector('.pill')?.textContent).toBe('Planned');
+      expect(p.querySelector('a')).toBeNull();
+    }
   });
 
   it('show available and planned counts on cards', () => {
     const root = open('');
     const counts = [...root.querySelectorAll('.card-count')].map((c) => c.textContent);
     expect(counts[0]).toBe('6 available tools');
-    expect(counts[3]).toBe('5 available · 4 planned');
+    expect(counts[3]).toBe('9 available tools');
     expect(counts[4]).toBe('5 planned tools');
   });
 
