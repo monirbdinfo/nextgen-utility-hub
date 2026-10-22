@@ -125,7 +125,7 @@ test('navigation between toolkit and tools supports back and forward', async ({ 
   await page.goForward();
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('Taka in Words');
   // Planned tools have no page.
-  await page.goto('/#/tool/pdf-merge');
+  await page.goto('/#/tool/dns-lookup');
   await expect(page.locator('.card')).toHaveCount(5);
 });
 

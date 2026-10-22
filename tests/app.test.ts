@@ -74,13 +74,22 @@ describe('search combobox', () => {
     const input = type(root, 'pdf');
     const options = [...root.querySelectorAll('[role="option"]')];
     expect(options).toHaveLength(6);
-    // The four PDF tools are planned; the CV and cover-letter templates (print / save as
-    // PDF) are available.
+    // The four PDF tools and the CV and cover-letter templates (print / save as PDF) are
+    // all available.
     const status = (id: string) => root.querySelector(`#search-opt-${id} .pill`)?.textContent;
-    for (const id of ['pdf-create', 'pdf-merge', 'pdf-tools', 'pdf-compress'])
-      expect(status(id)).toBe('Planned');
-    for (const id of ['cv-templates', 'cover-letter-templates'])
+    for (const id of [
+      'pdf-create',
+      'pdf-merge',
+      'pdf-tools',
+      'pdf-compress',
+      'cv-templates',
+      'cover-letter-templates',
+    ])
       expect(status(id)).toBe('Available');
+    // Planned tools are labelled as such.
+    type(root, 'dns');
+    expect(status('dns-lookup')).toBe('Planned');
+    type(root, 'pdf');
     expect(input.getAttribute('aria-expanded')).toBe('true');
     expect(root.querySelector('[role="status"]')?.textContent).toBe('6 matching tools');
   });
@@ -120,13 +129,15 @@ describe('search combobox', () => {
 
   it('Enter on a planned tool navigates to its category', () => {
     const root = setup();
-    const input = type(root, 'merge');
+    const input = type(root, 'subnet');
     key(input, 'ArrowDown');
     key(input, 'Enter');
     window.dispatchEvent(new HashChangeEvent('hashchange'));
-    expect(location.hash).toBe('#/category/files');
-    expect(root.querySelector('#category-heading')?.textContent).toBe('Privacy-First File Tools');
-    expect(document.activeElement?.id).toBe('tool-pdf-merge');
+    expect(location.hash).toBe('#/category/network');
+    expect(root.querySelector('#category-heading')?.textContent).toBe(
+      'Network & IT Diagnostic Toolkit',
+    );
+    expect(document.activeElement?.id).toBe('tool-subnet-calculator');
   });
 
   it('Escape clears the query', () => {

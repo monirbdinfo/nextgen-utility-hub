@@ -102,8 +102,14 @@ describe('registry integrity', () => {
   });
 
   it('sorts available tools first without reordering otherwise', () => {
-    const sorted = sortByAvailability(toolsByCategory('files')).map((t) => t.status);
-    expect(sorted.indexOf('planned')).toBeGreaterThan(sorted.lastIndexOf('available'));
+    // No toolkit currently mixes available and planned tools, so mix two of them.
+    const mixed = [...toolsByCategory('network'), ...toolsByCategory('files')];
+    const sorted = sortByAvailability(mixed);
+    const statuses = sorted.map((t) => t.status);
+    expect(statuses.indexOf('planned')).toBeGreaterThan(statuses.lastIndexOf('available'));
+    // Within each status the original order is kept.
+    expect(sorted.filter((t) => t.status === 'planned')).toEqual(toolsByCategory('network'));
+    expect(sorted.filter((t) => t.status === 'available')).toEqual(toolsByCategory('files'));
   });
 
   it('gives every category at least one tool', () => {
