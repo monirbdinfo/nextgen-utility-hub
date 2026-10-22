@@ -1,5 +1,5 @@
 /*
- * Design tokens: navy + teal. Text/background pairs are checked for WCAG AA
+ * Design tokens: NextGen Tech BD navy + blue, with a cyan accent (from the logo). Text/background pairs are checked for WCAG AA
  * contrast in tests/contrast.test.ts, so keep values as 6-digit hex.
  */
 :root {
@@ -11,34 +11,38 @@
   --navy-950: #061024;
   --navy-900: #0b1b3a;
   --navy-800: #12305e;
-  --teal-300: #5eead4;
-  --teal-400: #2dd4bf;
-  --teal-700: #0f766e;
+  --blue-600: #2563eb;
+  --blue-700: #1d4ed8;
+  --cyan-400: #22d3ee;
 
-  --color-bg: #f4f7fb;
+  --color-bg: #f3f6fb;
   --color-surface: #ffffff;
   --color-surface-2: #eaf0f7;
   --color-text: #0b1b3a;
   --color-muted: #4a5a78;
   --color-border: #d6deeb;
-  --color-primary: #0f766e;
+  --color-primary: #1d4ed8;
   --color-on-primary: #ffffff;
-  --color-link: #0f766e;
-  --color-focus: #0d9488;
+  --color-link: #1d4ed8;
+  --color-focus: #2563eb;
   --color-pill-bg: #eaf0f7;
   --color-pill-text: #3d4d6b;
   --color-danger: #b42318;
-  --color-success-bg: #e6f6f3;
-  --color-success-text: #0b5f58;
+  --color-success-bg: #e7f6ee;
+  --color-success-text: #0f5132;
+  --color-ok-bg: #15803d;
+  --color-ok-text: #ffffff;
+  --color-header: #ffffff;
 
   /* Hero band is navy in both themes. */
-  --hero-bg: #0b1b3a;
+  --hero-bg: #061433;
   --hero-text: #ffffff;
   --hero-muted: #b9c7e1;
-  --hero-accent: #5eead4;
+  --hero-accent: #22d3ee;
   --hero-glow:
-    radial-gradient(50% 70% at 85% 0%, rgba(45, 212, 191, 0.28), transparent 70%),
-    radial-gradient(40% 60% at 10% 100%, rgba(18, 48, 94, 0.9), transparent 70%);
+    radial-gradient(45% 80% at 50% 0%, rgba(37, 99, 235, 0.35), transparent 70%),
+    radial-gradient(35% 70% at 0% 50%, rgba(34, 211, 238, 0.12), transparent 70%),
+    radial-gradient(40% 70% at 100% 100%, rgba(29, 78, 216, 0.3), transparent 70%);
 
   --radius-sm: 8px;
   --radius-md: 12px;
@@ -75,16 +79,19 @@
   --color-text: #e8eefc;
   --color-muted: #a9b7d3;
   --color-border: #22396a;
-  --color-primary: #2dd4bf;
-  --color-on-primary: #04211f;
-  --color-link: #5eead4;
-  --color-focus: #5eead4;
+  --color-primary: #60a5fa;
+  --color-on-primary: #06122b;
+  --color-link: #93c5fd;
+  --color-focus: #93c5fd;
   --color-pill-bg: #13284f;
   --color-pill-text: #c3cfe6;
   --color-danger: #fda4a4;
-  --color-success-bg: #0f3b44;
-  --color-success-text: #99f6e4;
-  --hero-bg: #061024;
+  --color-success-bg: #0f3b2c;
+  --color-success-text: #a7f3d0;
+  --color-ok-bg: #34d399;
+  --color-ok-text: #052e1c;
+  --color-header: #0a1834;
+  --hero-bg: #040d24;
   --shadow-sm: none;
   --shadow-md: 0 10px 30px -12px rgba(0, 0, 0, 0.6);
 }

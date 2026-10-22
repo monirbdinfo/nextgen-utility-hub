@@ -3,6 +3,7 @@ import { getCategory, toolsByCategory, type Tool } from '../registry';
 import { toHash } from '../router/router';
 import { statusKey, type AppContext } from './context';
 import { icon } from './icons';
+import { TOOL_ICONS } from './toolkits';
 import { toolViews } from './tools';
 
 /** Dedicated page for one available tool: breadcrumb, heading, the tool itself and related tools. */
@@ -42,7 +43,13 @@ export function createToolPage(ctx: AppContext, tool: Tool, store: ToolStore): H
     h(
       'header',
       { class: `tool-header card-${tool.category}` },
-      cat ? h('div', { class: 'card-icon card-icon-lg' }, icon(cat.icon, 28)) : null,
+      cat
+        ? h(
+            'div',
+            { class: `card-icon card-icon-lg card-${cat.id}` },
+            icon(TOOL_ICONS[tool.id] ?? cat.icon, 28),
+          )
+        : null,
       h(
         'div',
         { class: 'tool-heading' },

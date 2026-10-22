@@ -1,15 +1,23 @@
 import { h } from '../lib/dom';
 import { icon } from './icons';
 import { REPO_URL, type AppContext } from './context';
+import { logoImage } from './logo';
 
-const DESKTOP_QUERY = '(min-width: 860px)';
+/** Width at which the sidebar is a fixed column instead of a drawer (keep in sync with CSS). */
+const DESKTOP_QUERY = '(min-width: 1024px)';
 
 export interface HeaderHandle {
   el: HTMLElement;
+  /** Put the site search in the header (tool pages), or remove it (home, where the hero has it). */
+  setSearch(search: HTMLElement | null): void;
   destroy(): void;
 }
 
-export function createHeader(ctx: AppContext): HeaderHandle {
+/**
+ * Top bar: brand, optional search, source link, language and theme. On small screens the
+ * menu button opens `nav` (the sidebar) as a drawer.
+ */
+export function createHeader(ctx: AppContext, nav: HTMLElement): HeaderHandle {
   const { t, state } = ctx;
   let open = false;
 
@@ -17,25 +25,13 @@ export function createHeader(ctx: AppContext): HeaderHandle {
     id: 'menu-btn',
     class: 'btn btn-icon menu-toggle',
     type: 'button',
-    'aria-controls': 'site-nav',
+    'aria-controls': nav.id,
   });
-
-  const nav = h(
-    'nav',
-    { id: 'site-nav', class: 'nav', 'aria-label': t('navPrimary') },
-    h('a', { href: '#toolkits', class: 'nav-link' }, t('navToolkits')),
-    h('a', { href: '#about', class: 'nav-link' }, t('navAbout')),
-    h(
-      'a',
-      { href: REPO_URL, class: 'nav-link', rel: 'noopener' },
-      icon('code', 18),
-      t('navSource'),
-    ),
-  );
 
   function setOpen(next: boolean, returnFocus = false): void {
     open = next;
     nav.classList.toggle('open', open);
+    document.body.classList.toggle('nav-open', open);
     menuBtn.setAttribute('aria-expanded', String(open));
     menuBtn.setAttribute('aria-label', t(open ? 'menuClose' : 'menuOpen'));
     menuBtn.replaceChildren(icon(open ? 'close' : 'menu'));
@@ -44,9 +40,10 @@ export function createHeader(ctx: AppContext): HeaderHandle {
   setOpen(false);
 
   menuBtn.addEventListener('click', () => setOpen(!open));
-  nav.addEventListener('click', (e) => {
+  const onNavClick = (e: Event): void => {
     if ((e.target as HTMLElement).closest('a') && open) setOpen(false);
-  });
+  };
+  nav.addEventListener('click', onNavClick);
 
   const onKeydown = (e: KeyboardEvent): void => {
     if (e.key === 'Escape' && open) {
@@ -55,7 +52,8 @@ export function createHeader(ctx: AppContext): HeaderHandle {
     }
   };
   const onPointerDown = (e: Event): void => {
-    if (open && !el.contains(e.target as Node)) setOpen(false);
+    const target = e.target as Node;
+    if (open && !nav.contains(target) && !menuBtn.contains(target)) setOpen(false);
   };
   const mq = typeof window.matchMedia === 'function' ? window.matchMedia(DESKTOP_QUERY) : null;
   const onMq = (): void => {
@@ -86,29 +84,53 @@ export function createHeader(ctx: AppContext): HeaderHandle {
     syncTheme();
   });
 
+  const searchSlot = h('div', { class: 'header-search' });
   const el = h(
     'header',
     { class: 'header' },
     h(
       'div',
-      { class: 'container header-inner' },
+      { class: 'header-inner' },
+      menuBtn,
       h(
         'a',
-        { class: 'brand', href: '#/' },
-        h('span', { class: 'brand-mark', 'aria-hidden': 'true' }, 'N'),
-        h('span', { class: 'brand-name' }, t('siteName')),
+        { class: 'brand', href: '#/', 'aria-label': t('brandHome') },
+        logoImage('mark', 38, { className: 'brand-mark' }),
+        h(
+          'span',
+          { class: 'brand-text' },
+          h('span', { class: 'brand-name', lang: 'en' }, t('brandName')),
+          h('span', { class: 'brand-sub' }, t('brandSub')),
+        ),
       ),
-      nav,
-      h('div', { class: 'header-actions' }, langBtn, themeBtn, menuBtn),
+      searchSlot,
+      h(
+        'div',
+        { class: 'header-actions' },
+        h(
+          'a',
+          { href: REPO_URL, class: 'btn btn-ghost header-source', rel: 'noopener' },
+          icon('github', 18),
+          h('span', { class: 'header-source-label' }, t('navSource')),
+        ),
+        langBtn,
+        themeBtn,
+      ),
     ),
   );
 
   return {
     el,
+    setSearch(search) {
+      searchSlot.replaceChildren(...(search ? [search] : []));
+      el.classList.toggle('has-search', !!search);
+    },
     destroy() {
       document.removeEventListener('keydown', onKeydown);
       document.removeEventListener('pointerdown', onPointerDown);
       mq?.removeEventListener?.('change', onMq);
+      nav.removeEventListener('click', onNavClick);
+      document.body.classList.remove('nav-open');
     },
   };
 }
