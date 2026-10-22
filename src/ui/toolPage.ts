@@ -59,12 +59,19 @@ export function createToolPage(ctx: AppContext, tool: Tool, store: ToolStore): H
           'p',
           { class: 'tool-badges' },
           h('span', { class: `pill pill-${tool.status}` }, t(statusKey[tool.status])),
-          h('span', { class: 'pill pill-local' }, icon('shield', 14), t('runsLocally')),
+          tool.online
+            ? h('span', { class: 'pill pill-online' }, icon('globe', 14), t('usesInternet'))
+            : h('span', { class: 'pill pill-local' }, icon('shield', 14), t('runsLocally')),
         ),
       ),
     ),
     view ? view({ lang, t: ctx.t, ...store }) : null,
-    h('p', { class: 'tool-privacy' }, icon('shield', 18), t('toolPrivacy')),
+    h(
+      'p',
+      { class: 'tool-privacy' },
+      icon('shield', 18),
+      t(tool.online ? `toolPrivacyOnline_${tool.online}` : 'toolPrivacy'),
+    ),
     related.length
       ? h(
           'nav',

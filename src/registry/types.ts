@@ -28,4 +28,10 @@ export interface Tool {
   status: ToolStatus;
   /** Hash route, required once status is `available`. */
   route?: string;
+  /**
+   * Set for the few tools that must contact a server, and only after the user asks:
+   * `cloudflare` (Cloudflare 1.1.1.1 services) or `same-site` (the server hosting this site).
+   * Everything else runs offline in the browser.
+   */
+  online?: 'cloudflare' | 'same-site';
 }

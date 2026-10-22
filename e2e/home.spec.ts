@@ -49,9 +49,9 @@ test('search is keyboard operable end to end', async ({ page }) => {
   await page.keyboard.press('ArrowDown');
   await expect(page.getByRole('option').first()).toHaveAttribute('aria-selected', 'true');
   await page.keyboard.press('Enter');
-  await expect(page).toHaveURL(/#\/category\/network$/);
-  await expect(page.locator('#tool-dns-lookup')).toBeFocused();
-  await expect(page.locator('#tool-dns-lookup .pill')).toHaveText('Planned');
+  await expect(page).toHaveURL(/#\/tool\/dns-lookup$/);
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('DNS Lookup');
+  await expect(page.getByRole('heading', { level: 1 })).toBeFocused();
 });
 
 test('hash routes support direct load and back/forward', async ({ page }) => {
@@ -128,11 +128,10 @@ test('toolkit cards stay visible, mark the open toolkit and show its tools below
       .getByRole('link', { name: 'Job Application Toolkit' }),
   ).toHaveAttribute('aria-current', 'page');
   await expect(page.locator('#category-heading')).toHaveText('Job Application Toolkit');
-  // Job tools are available; the Network toolkit's tools are still planned.
   await expect(page.locator('.tool .tool-cta').first()).toHaveText('Open tool');
   await cards.getByRole('link', { name: 'Network & IT Diagnostic Toolkit' }).click();
   await expect(page.locator('#category-heading')).toHaveText('Network & IT Diagnostic Toolkit');
-  await expect(page.locator('.tool .tool-soon').first()).toHaveText('Coming soon');
+  await expect(page.locator('.tool .tool-cta')).toHaveCount(5);
   await expect(
     page.getByRole('navigation', { name: 'Primary' }).getByRole('link', { name: 'Home' }),
   ).not.toHaveAttribute('aria-current', 'page');

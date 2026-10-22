@@ -6,21 +6,21 @@ This roadmap follows the real implementation. A tool is only marked **Available*
 
 ## Status overview
 
-| Milestone | Scope                                                                  | Status                                        |
-| --------- | ---------------------------------------------------------------------- | --------------------------------------------- |
-| 1         | Vite + TypeScript foundation, homepage, registry, i18n, CI             | Done (PR #1)                                  |
-| 2         | GitHub Pages deployment workflow                                       | Done (PR #2), site deployed                   |
-| 3         | Date/age, date difference, EMI, digits, number/Taka words, date text   | Done (PR #3, merged `9d0ed68`), site deployed |
-| 4         | Unicode text cleaning and normalization                                | Done (PR #3, merged `9d0ed68`), site deployed |
-| 5         | Image resize, crop, compression, conversion, photo/signature resizer   | Done (presets deferred: no verified source)   |
-| 6         | PDF creation, merge, split, page tools, size reduction                 | Planned                                       |
-| 7         | CV and cover-letter templates with print/PDF export                    | Planned                                       |
-| 8         | Subnet/CIDR/IP-range calculators, IP/DNS lookup, latency check         | In progress: calculators done, online planned |
-| 9         | Bandwidth/data usage, integration, accessibility and regression review | Planned                                       |
+| Milestone | Scope                                                                  | Status                                         |
+| --------- | ---------------------------------------------------------------------- | ---------------------------------------------- |
+| 1         | Vite + TypeScript foundation, homepage, registry, i18n, CI             | Done (PR #1)                                   |
+| 2         | GitHub Pages deployment workflow                                       | Done (PR #2), site deployed                    |
+| 3         | Date/age, date difference, EMI, digits, number/Taka words, date text   | Done (PR #3, merged `9d0ed68`), site deployed  |
+| 4         | Unicode text cleaning and normalization                                | Done (PR #3, merged `9d0ed68`), site deployed  |
+| 5         | Image resize, crop, compression, conversion, photo/signature resizer   | Done (presets deferred: no verified source)    |
+| 6         | PDF creation, merge, split, page tools, size reduction                 | Planned                                        |
+| 7         | CV and cover-letter templates with print/PDF export                    | Planned                                        |
+| 8         | Subnet/CIDR/IP-range calculators, IP/DNS lookup, latency check         | Done (online tools use Cloudflare / same site) |
+| 9         | Bandwidth/data usage, integration, accessibility and regression review | Planned                                        |
 
 ## Tool catalog by milestone
 
-28 registry entries; 25 available after the Subnet and CIDR & IP Range calculators.
+28 registry entries; all 28 available after the online Network tools.
 
 | Milestone | Category | Registry ID              | Tool                               | Status    |
 | --------- | -------- | ------------------------ | ---------------------------------- | --------- |
@@ -46,9 +46,9 @@ This roadmap follows the real implementation. A tool is only marked **Available*
 | 7         | Jobs     | `cv-checklist`           | Application Checklist              | Planned   |
 | 8         | Network  | `subnet-calculator`      | Subnet Calculator                  | Available |
 | 8         | Network  | `cidr-calculator`        | CIDR & IP Range Calculator         | Available |
-| 8         | Network  | `my-ip-info`             | IP Lookup                          | Planned   |
-| 8         | Network  | `dns-lookup`             | DNS Lookup                         | Planned   |
-| 8         | Network  | `latency-test`           | Latency & Packet-Loss Check        | Planned   |
+| 8         | Network  | `my-ip-info`             | IP Lookup                          | Available |
+| 8         | Network  | `dns-lookup`             | DNS Lookup                         | Available |
+| 8         | Network  | `latency-test`           | Latency & Packet-Loss Check        | Available |
 | 9         | General  | `bandwidth-calculator`   | Bandwidth & Data Usage             | Available |
 | 9         | General  | `unit-converter`         | Unit Converter                     | Available |
 | 9         | General  | `text-counter`           | Word & Character Counter           | Available |
@@ -412,11 +412,14 @@ error states and the category page, in light and dark themes, English and Bangla
   licence data when introduced.
 - **Milestone 8 (Subnet, CIDR & IP range)** is done and fully offline: see
   [TOOLS.md](TOOLS.md#subnet-calculator-and-cidr--ip-range-calculator).
-- **Milestone 8 (IP/DNS lookup)** cannot work without contacting an external service
-  (public-IP echo, DNS-over-HTTPS). This conflicts with "no third-party requests" and needs
-  an explicit decision before implementation; the UI must say what is sent and where.
-  Browsers cannot send ICMP, so "ping" will be an HTTPS round-trip measurement and must be
-  labelled as such. No port or network scanning will be implemented.
+- **Milestone 8 (IP Lookup, DNS Lookup, Latency check)** were approved with a named
+  provider: Cloudflare (`https://1.1.1.1/cdn-cgi/trace` and the
+  `https://cloudflare-dns.com/dns-query` JSON API) for IP and DNS, and the site's own
+  server for latency. Each tool shows what is sent and to whom before its button, sends
+  nothing until pressed, and is labelled "Uses the internet when you ask". Details and
+  limits: [TOOLS.md](TOOLS.md#online-network-tools-ip-lookup-dns-lookup-latency-check).
+  Browsers cannot send ICMP, so the latency check is an HTTPS round-trip measurement and is
+  labelled as such. No port or network scanning is implemented.
 
 ## Recommended next step
 

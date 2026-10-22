@@ -63,36 +63,21 @@ describe('tool pages', () => {
     expect(root.querySelector('.hero')).toBeNull();
   });
 
-  it('do not open for planned tools', () => {
-    const root = open('#/tool/dns-lookup');
-    expect(root.querySelector('#tool-title')).toBeNull();
-    expect(root.querySelectorAll('.card')).toHaveLength(5);
-  });
-
-  it('link available tools from their category and keep planned ones unlinked', () => {
+  it('link available tools from their category', () => {
     const root = open('#/category/files');
     const items = [...root.querySelectorAll('.tool')];
     expect(items[0]?.id).toBe('tool-image-compressor');
     expect($<HTMLAnchorElement>(items[0]!, 'a').getAttribute('href')).toBe(
       '#/tool/image-compressor',
     );
-    // Planned tools (in the Network toolkit) are listed without a link.
-    history.replaceState(null, '', '/#/category/network');
-    window.dispatchEvent(new HashChangeEvent('hashchange'));
-    const planned = [...root.querySelectorAll('.tool:not(.tool-available)')];
-    expect(planned.length).toBeGreaterThan(0);
-    for (const p of planned) {
-      expect(p.querySelector('.pill')?.textContent).toBe('Planned');
-      expect(p.querySelector('a')).toBeNull();
-    }
   });
 
-  it('show available and planned counts on cards', () => {
+  it('show available counts on cards', () => {
     const root = open('');
     const counts = [...root.querySelectorAll('.card-count')].map((c) => c.textContent);
     expect(counts[0]).toBe('6 available tools');
     expect(counts[3]).toBe('9 available tools');
-    expect(counts[4]).toBe('2 available · 3 planned');
+    expect(counts[4]).toBe('5 available tools');
   });
 
   it('starts at the top of home when leaving a tool via the breadcrumb', () => {

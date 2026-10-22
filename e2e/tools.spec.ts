@@ -124,8 +124,8 @@ test('navigation between toolkit and tools supports back and forward', async ({ 
   await expect(page.locator('#category-heading')).toHaveText('Bangla Number & Text Toolkit');
   await page.goForward();
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('Taka in Words');
-  // Planned tools have no page.
-  await page.goto('/#/tool/dns-lookup');
+  // Unknown tools have no page (planned tools are covered in tests/planned.test.ts).
+  await page.goto('/#/tool/does-not-exist');
   await expect(page.locator('.card')).toHaveCount(5);
 });
 

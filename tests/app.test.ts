@@ -69,7 +69,7 @@ describe('homepage', () => {
 });
 
 describe('search combobox', () => {
-  it('labels planned and available results and exposes listbox state', () => {
+  it('labels available results and exposes listbox state', () => {
     const root = setup();
     const input = type(root, 'pdf');
     const options = [...root.querySelectorAll('[role="option"]')];
@@ -86,10 +86,7 @@ describe('search combobox', () => {
       'cover-letter-templates',
     ])
       expect(status(id)).toBe('Available');
-    // Planned tools are labelled as such.
-    type(root, 'dns');
-    expect(status('dns-lookup')).toBe('Planned');
-    type(root, 'pdf');
+    // Planned tools are labelled "Planned": see tests/planned.test.ts.
     expect(input.getAttribute('aria-expanded')).toBe('true');
     expect(root.querySelector('[role="status"]')?.textContent).toBe('6 matching tools');
   });
@@ -127,19 +124,6 @@ describe('search combobox', () => {
     expect(input.getAttribute('aria-activedescendant')).toBe(last.id);
   });
 
-  it('Enter on a planned tool navigates to its category', () => {
-    const root = setup();
-    const input = type(root, 'dns');
-    key(input, 'ArrowDown');
-    key(input, 'Enter');
-    window.dispatchEvent(new HashChangeEvent('hashchange'));
-    expect(location.hash).toBe('#/category/network');
-    expect(root.querySelector('#category-heading')?.textContent).toBe(
-      'Network & IT Diagnostic Toolkit',
-    );
-    expect(document.activeElement?.id).toBe('tool-dns-lookup');
-  });
-
   it('Escape clears the query', () => {
     const root = setup();
     const input = type(root, 'pdf');
@@ -173,19 +157,13 @@ describe('routing', () => {
     expect(document.title).toContain('Bangla Number & Text Toolkit');
   });
 
-  it('lists available tools first and leaves planned ones unlinked', () => {
-    const root = setup('#/category/network'); // a toolkit that mixes both
+  it('links every tool in a toolkit', () => {
+    const root = setup('#/category/network');
     const tools = [...root.querySelectorAll('.tool')];
-    expect(tools.map((t) => t.querySelector('.pill')?.textContent)).toEqual([
-      'Available',
-      'Available',
-      'Planned',
-      'Planned',
-      'Planned',
-    ]);
+    expect(tools).toHaveLength(5);
     for (const tool of tools) {
-      const planned = tool.querySelector('.pill')?.textContent === 'Planned';
-      expect(tool.querySelector('a') === null).toBe(planned);
+      expect(tool.querySelector('.pill')?.textContent).toBe('Available');
+      expect(tool.querySelector('a')?.getAttribute('href')).toBe(`#/tool/${tool.id.slice(5)}`);
     }
   });
 
