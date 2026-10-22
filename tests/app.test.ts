@@ -129,7 +129,7 @@ describe('search combobox', () => {
 
   it('Enter on a planned tool navigates to its category', () => {
     const root = setup();
-    const input = type(root, 'subnet');
+    const input = type(root, 'dns');
     key(input, 'ArrowDown');
     key(input, 'Enter');
     window.dispatchEvent(new HashChangeEvent('hashchange'));
@@ -137,7 +137,7 @@ describe('search combobox', () => {
     expect(root.querySelector('#category-heading')?.textContent).toBe(
       'Network & IT Diagnostic Toolkit',
     );
-    expect(document.activeElement?.id).toBe('tool-subnet-calculator');
+    expect(document.activeElement?.id).toBe('tool-dns-lookup');
   });
 
   it('Escape clears the query', () => {
@@ -173,13 +173,19 @@ describe('routing', () => {
     expect(document.title).toContain('Bangla Number & Text Toolkit');
   });
 
-  it('marks every listed tool as planned and not linked', () => {
-    const root = setup('#/category/network'); // a toolkit with no available tools yet
-    const tools = root.querySelectorAll('.tool');
-    expect(tools.length).toBeGreaterThan(0);
+  it('lists available tools first and leaves planned ones unlinked', () => {
+    const root = setup('#/category/network'); // a toolkit that mixes both
+    const tools = [...root.querySelectorAll('.tool')];
+    expect(tools.map((t) => t.querySelector('.pill')?.textContent)).toEqual([
+      'Available',
+      'Available',
+      'Planned',
+      'Planned',
+      'Planned',
+    ]);
     for (const tool of tools) {
-      expect(tool.querySelector('.pill')?.textContent).toBe('Planned');
-      expect(tool.querySelector('a')).toBeNull();
+      const planned = tool.querySelector('.pill')?.textContent === 'Planned';
+      expect(tool.querySelector('a') === null).toBe(planned);
     }
   });
 

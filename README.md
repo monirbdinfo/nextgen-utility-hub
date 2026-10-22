@@ -39,8 +39,8 @@ search, hash routing with deep links, typed central registry. Calculation conven
 [docs/TOOLS.md](docs/TOOLS.md).
 
 Not available yet: recruiter-specific photo/signature presets (no verified official source
-yet), PDF tools, CV/cover letter templates, network tools, bandwidth calculator, unit
-converter, word counter.
+yet) and the online network tools (IP Lookup, DNS Lookup, Latency & Packet-Loss Check). The
+Subnet Calculator and CIDR & IP Range Calculator are available and work offline.
 
 ## Toolkits
 
@@ -174,8 +174,9 @@ docs/         Roadmap, tool conventions, category audit, licensing
   images are never uploaded, stored or logged (see
   [docs/TOOLS.md](docs/TOOLS.md#image-resizer) and the category audit in
   [docs/FILE_TOOLS_AUDIT.md](docs/FILE_TOOLS_AUDIT.md)).
-- Browsers cannot open raw sockets, send ICMP pings or scan ports. Network tools will be
-  limited to what the browser safely allows, and the project will not include unauthorised
+- Browsers cannot open raw sockets, send ICMP pings or scan ports. The Subnet and CIDR
+  calculators are pure arithmetic and send nothing. Other network tools will be limited to
+  what the browser safely allows, and the project will not include unauthorised
   scanning or other unsafe diagnostic features.
 - Fonts come from the user’s system. Bangla text needs a Bengali-capable system font
   (present by default on current Windows, macOS, Android, iOS and most Linux desktops).

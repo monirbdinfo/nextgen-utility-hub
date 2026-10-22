@@ -426,7 +426,8 @@ export const tools: readonly Tool[] = [
       bn: 'IPv4 সাবনেটের নেটওয়ার্ক, ব্রডকাস্ট, মাস্ক ও ব্যবহারযোগ্য হোস্ট।',
     },
     keywords: ['subnet', 'ipv4', 'mask', 'network', 'সাবনেট'],
-    status: 'planned',
+    status: 'available',
+    route: route('subnet-calculator'),
   },
   {
     id: 'cidr-calculator',
@@ -437,7 +438,8 @@ export const tools: readonly Tool[] = [
       bn: 'CIDR ব্লক ও আইপি অ্যাড্রেস রেঞ্জের মধ্যে রূপান্তর।',
     },
     keywords: ['cidr', 'ip range', 'ipv4', 'block', 'আইপি'],
-    status: 'planned',
+    status: 'available',
+    route: route('cidr-calculator'),
   },
   {
     id: 'my-ip-info',

@@ -486,6 +486,43 @@ size within a limit, an unreachable limit, transparency, invalid input, keyboard
 dark mode, 360/768/1280 px, the `/nextgen-utility-hub/` path). `e2e/photo.spec.ts` also runs
 in Firefox and WebKit.
 
+## Subnet Calculator and CIDR & IP Range Calculator
+
+Both tools share `src/calc/ipv4.ts`. They are **IPv4 only** and pure arithmetic: nothing
+is sent anywhere, stored or logged.
+
+**Input.** Dotted-quad addresses (`192.168.1.10`); Bangla digits are accepted. Each octet
+must be 0–255, and leading zeros (`10.01.0.1`) are refused because some tools read them as
+octal. The prefix is `0`–`32`, `/24`, or a contiguous dotted mask (`255.255.240.0`); a mask
+with gaps (`255.0.255.0`) is refused. The Subnet Calculator also accepts `address/prefix`
+in the address field and reports a conflict if the prefix field says something else.
+
+**Arithmetic.** Addresses are numbers in 0 … 2³² − 1. JavaScript bitwise operators are
+signed 32-bit (`255 << 24` is negative), so the module uses ordinary arithmetic on powers
+of two instead: block size = 2^(32 − prefix), mask = 2³² − block size, network =
+address − (address mod block size), last = network + block size − 1, wildcard = block
+size − 1. All values are well inside `Number.MAX_SAFE_INTEGER`.
+
+| Prefix | Network / broadcast            | Usable hosts             |
+| ------ | ------------------------------ | ------------------------ |
+| /0–/30 | first / last address of block  | total − 2, network + 1 … |
+| /31    | none (RFC 3021 point-to-point) | 2 (both addresses)       |
+| /32    | none (a single address)        | 1                        |
+
+The address type (private RFC 1918, shared 100.64.0.0/10, loopback, link-local,
+documentation, benchmarking, multicast, reserved, limited broadcast, public) comes from the
+IANA special-purpose ranges. When the address has host bits set, the result notes the real
+network.
+
+**Range → CIDR** returns the fewest blocks that cover exactly the range: at each step it
+takes the largest block that is aligned on the current address and does not pass the end
+(at most 62 blocks for any IPv4 range). **CIDR → range** lists the first and last address
+of the block, including network and broadcast.
+
+Known-answer tests (`tests/calc/ipv4.test.ts`) cover /0, /1, /20, /24, /27, /30, /31, /32,
+the top of the address space, every prefix against a brute-force check, every mask from
+/0 to /32, and the 62-block worst case.
+
 ## Image tools: browsers and EXIF orientation
 
 **Browsers actually tested.** The image tools are tested with Playwright in three

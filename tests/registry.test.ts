@@ -5,6 +5,7 @@ import {
   sortByAvailability,
   tools,
   toolsByCategory,
+  type Tool,
 } from '../src/registry';
 import { parseHash } from '../src/router/router';
 import { toolViews } from '../src/ui/tools';
@@ -67,6 +68,8 @@ describe('registry integrity', () => {
       'pdf-merge',
       'pdf-tools',
       'pdf-compress',
+      'subnet-calculator',
+      'cidr-calculator',
     ]);
   });
 
@@ -102,14 +105,19 @@ describe('registry integrity', () => {
   });
 
   it('sorts available tools first without reordering otherwise', () => {
-    // No toolkit currently mixes available and planned tools, so mix two of them.
-    const mixed = [...toolsByCategory('network'), ...toolsByCategory('files')];
-    const sorted = sortByAvailability(mixed);
-    const statuses = sorted.map((t) => t.status);
-    expect(statuses.indexOf('planned')).toBeGreaterThan(statuses.lastIndexOf('available'));
-    // Within each status the original order is kept.
-    expect(sorted.filter((t) => t.status === 'planned')).toEqual(toolsByCategory('network'));
-    expect(sorted.filter((t) => t.status === 'available')).toEqual(toolsByCategory('files'));
+    // A synthetic list, so the test does not depend on which tools are still planned.
+    const base = tools[0]!;
+    const make = (id: string, status: Tool['status']): Tool => ({ ...base, id, status });
+    const mixed = [
+      make('p1', 'planned'),
+      make('a1', 'available'),
+      make('p2', 'planned'),
+      make('a2', 'available'),
+      make('a3', 'available'),
+    ];
+    // Available first; within each status the original order is kept.
+    expect(sortByAvailability(mixed).map((t) => t.id)).toEqual(['a1', 'a2', 'a3', 'p1', 'p2']);
+    expect(mixed.map((t) => t.id)).toEqual(['p1', 'a1', 'p2', 'a2', 'a3']); // input untouched
   });
 
   it('gives every category at least one tool', () => {

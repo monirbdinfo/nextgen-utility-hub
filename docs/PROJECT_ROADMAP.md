@@ -15,12 +15,12 @@ This roadmap follows the real implementation. A tool is only marked **Available*
 | 5         | Image resize, crop, compression, conversion, photo/signature resizer   | Done (presets deferred: no verified source)   |
 | 6         | PDF creation, merge, split, page tools, size reduction                 | Planned                                       |
 | 7         | CV and cover-letter templates with print/PDF export                    | Planned                                       |
-| 8         | Subnet/CIDR/IP-range calculators, IP/DNS lookup, latency check         | Planned                                       |
+| 8         | Subnet/CIDR/IP-range calculators, IP/DNS lookup, latency check         | In progress: calculators done, online planned |
 | 9         | Bandwidth/data usage, integration, accessibility and regression review | Planned                                       |
 
 ## Tool catalog by milestone
 
-28 registry entries; 16 available after the Unit Converter and Bandwidth & Data Usage.
+28 registry entries; 25 available after the Subnet and CIDR & IP Range calculators.
 
 | Milestone | Category | Registry ID              | Tool                               | Status    |
 | --------- | -------- | ------------------------ | ---------------------------------- | --------- |
@@ -44,8 +44,8 @@ This roadmap follows the real implementation. A tool is only marked **Available*
 | 7         | Jobs     | `cv-templates`           | CV / Resume Templates              | Planned   |
 | 7         | Jobs     | `cover-letter-templates` | Cover Letter Templates             | Planned   |
 | 7         | Jobs     | `cv-checklist`           | Application Checklist              | Planned   |
-| 8         | Network  | `subnet-calculator`      | Subnet Calculator                  | Planned   |
-| 8         | Network  | `cidr-calculator`        | CIDR & IP Range Calculator         | Planned   |
+| 8         | Network  | `subnet-calculator`      | Subnet Calculator                  | Available |
+| 8         | Network  | `cidr-calculator`        | CIDR & IP Range Calculator         | Available |
 | 8         | Network  | `my-ip-info`             | IP Lookup                          | Planned   |
 | 8         | Network  | `dns-lookup`             | DNS Lookup                         | Planned   |
 | 8         | Network  | `latency-test`           | Latency & Packet-Loss Check        | Planned   |
@@ -63,8 +63,8 @@ This roadmap follows the real implementation. A tool is only marked **Available*
   ship on its own (see below).
 - "Printable and PDF-exportable application documents" and "configurable layouts" are
   features of `cv-templates` and `cover-letter-templates`, not separate tools.
-- "Subnet calculator" and "CIDR and IP-range calculator" are separate entries but will
-  share one IPv4 calculation module.
+- "Subnet calculator" and "CIDR and IP-range calculator" are separate entries that share
+  one IPv4 calculation module, `src/calc/ipv4.ts`.
 - "Number-to-words" (`number-to-words-bn`) and "Taka ↔ words" (`taka-in-words`) share the
   calculation engine in `src/calc/numberWords.ts`.
 
@@ -410,6 +410,8 @@ error states and the category page, in light and dark themes, English and Bangla
 
 - **Milestone 6 (PDF)** will need `pdf-lib`; add it to `docs/LICENSES.md` with verified
   licence data when introduced.
+- **Milestone 8 (Subnet, CIDR & IP range)** is done and fully offline: see
+  [TOOLS.md](TOOLS.md#subnet-calculator-and-cidr--ip-range-calculator).
 - **Milestone 8 (IP/DNS lookup)** cannot work without contacting an external service
   (public-IP echo, DNS-over-HTTPS). This conflicts with "no third-party requests" and needs
   an explicit decision before implementation; the UI must say what is sent and where.

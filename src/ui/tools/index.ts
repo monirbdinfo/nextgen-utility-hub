@@ -11,6 +11,7 @@ import { imageCropper } from './imageCropper';
 import { imageResizer } from './imageResizer';
 import { applicationChecklist, coverLetterTemplates, cvTemplates } from './jobApplication';
 import type { ToolView } from './kit';
+import { cidrCalculator, subnetCalculator } from './networkCalculators';
 import { numberToWordsTool } from './numberToWords';
 import { photoResizer } from './photoResizer';
 import { pdfCreate, pdfMergeSplit, pdfPageTools, pdfReduceSize } from './pdfTools';
@@ -43,6 +44,8 @@ export const toolViews: Readonly<Record<string, ToolView>> = {
   'cv-templates': cvTemplates,
   'cover-letter-templates': coverLetterTemplates,
   'cv-checklist': applicationChecklist,
+  'subnet-calculator': subnetCalculator,
+  'cidr-calculator': cidrCalculator,
 };
 
 export type { ToolContext, ToolView } from './kit';
