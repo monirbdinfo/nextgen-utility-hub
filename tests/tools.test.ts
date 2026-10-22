@@ -76,10 +76,10 @@ describe('tool pages', () => {
     expect($<HTMLAnchorElement>(items[0]!, 'a').getAttribute('href')).toBe(
       '#/tool/image-compressor',
     );
-    // Planned tools (the Network toolkit) are listed without a link.
+    // Planned tools (in the Network toolkit) are listed without a link.
     history.replaceState(null, '', '/#/category/network');
     window.dispatchEvent(new HashChangeEvent('hashchange'));
-    const planned = [...root.querySelectorAll('.tool')];
+    const planned = [...root.querySelectorAll('.tool:not(.tool-available)')];
     expect(planned.length).toBeGreaterThan(0);
     for (const p of planned) {
       expect(p.querySelector('.pill')?.textContent).toBe('Planned');
@@ -92,7 +92,7 @@ describe('tool pages', () => {
     const counts = [...root.querySelectorAll('.card-count')].map((c) => c.textContent);
     expect(counts[0]).toBe('6 available tools');
     expect(counts[3]).toBe('9 available tools');
-    expect(counts[4]).toBe('5 planned tools');
+    expect(counts[4]).toBe('2 available · 3 planned');
   });
 
   it('starts at the top of home when leaving a tool via the breadcrumb', () => {

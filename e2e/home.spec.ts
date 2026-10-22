@@ -44,14 +44,14 @@ test('search is keyboard operable end to end', async ({ page }) => {
   await page.keyboard.press('/');
   const search = page.getByRole('combobox', { name: 'Search tools' });
   await expect(search).toBeFocused();
-  await search.fill('subnet');
+  await search.fill('dns');
   await expect(page.getByRole('option')).toHaveCount(1);
   await page.keyboard.press('ArrowDown');
   await expect(page.getByRole('option').first()).toHaveAttribute('aria-selected', 'true');
   await page.keyboard.press('Enter');
   await expect(page).toHaveURL(/#\/category\/network$/);
-  await expect(page.locator('#tool-subnet-calculator')).toBeFocused();
-  await expect(page.locator('#tool-subnet-calculator .pill')).toHaveText('Planned');
+  await expect(page.locator('#tool-dns-lookup')).toBeFocused();
+  await expect(page.locator('#tool-dns-lookup .pill')).toHaveText('Planned');
 });
 
 test('hash routes support direct load and back/forward', async ({ page }) => {

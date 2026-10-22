@@ -1729,6 +1729,8 @@
   min-width: 0;
   font-weight: 600;
   overflow-wrap: anywhere;
+  /* Multi-line values (such as a list of CIDR blocks) keep their line breaks. */
+  white-space: pre-line;
 }
 
 .result-row-primary {
