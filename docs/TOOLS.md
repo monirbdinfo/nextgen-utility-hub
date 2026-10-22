@@ -523,6 +523,59 @@ Known-answer tests (`tests/calc/ipv4.test.ts`) cover /0, /1, /20, /24, /27, /30,
 the top of the address space, every prefix against a brute-force check, every mask from
 /0 to /32, and the 62-block worst case.
 
+## Online Network tools (IP Lookup, DNS Lookup, Latency check)
+
+These are the only tools that use the network, and only after the user presses their
+button. The tool page shows **“Uses the internet when you ask”** instead of “Runs in your
+browser”, and a notice above the button says what is sent and to whom. All requests go
+through `src/lib/net.ts`: `GET`, `credentials: 'omit'` (no cookies), `referrerPolicy:
+'no-referrer'` (the page address is not sent), `cache: 'no-store'`, and a timeout. Nothing
+is stored; the last answer is kept in memory only, so a language switch shows it again
+without a new request.
+
+| Tool       | Recipient                                          | What is sent                                                                                                               |
+| ---------- | -------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
+| IP Lookup  | Cloudflare, `https://1.1.1.1/cdn-cgi/trace`        | One request. Like any request, it carries the user’s IP address and user agent.                                            |
+| DNS Lookup | Cloudflare, `https://cloudflare-dns.com/dns-query` | The domain name and record type (`?name=…&type=…`, header `accept: application/dns-json`), plus IP address and user agent. |
+| Latency    | This site’s own server (`latency-probe.txt`)       | One warm-up and 5, 10 or 20 requests for a 3-byte file. No third party.                                                    |
+
+**IP Lookup** parses the `key=value` text and shows only `ip`, the IP version, the country
+code (`loc`), the Cloudflare data centre (`colo`) and the HTTP/TLS versions; other fields
+are ignored and malformed values are dropped. 1.1.1.1 is an IPv4 address, so the result is
+the IPv4 address Cloudflare sees (a VPN, proxy or CGNAT address if one is in use).
+
+**DNS Lookup** accepts A, AAAA, CNAME, MX, TXT, NS, SOA and CAA. The domain is validated
+first (labels of 1–63 characters, at most 253 in total, no IP addresses; a pasted URL is
+reduced to its host and internationalised names are converted to punycode), so an invalid
+entry is never sent. The JSON `Status` is shown by name (NOERROR, NXDOMAIN, SERVFAIL,
+REFUSED), the `AD` flag as “DNSSEC validated by Cloudflare”, and the answers as a table.
+
+**Latency check** times `fetch` + reading the body with `performance.now()`, one request at
+a time 200 ms apart, each with a unique query string so no cache can answer. The warm-up
+request is not counted. It reports average, fastest, median, slowest, jitter (mean absolute
+difference between consecutive successful requests) and failed requests (errors or more than
+4 s). It is **not ICMP ping** and failed requests are **not packet loss**: TCP resends lost
+packets, so loss shows up as slower requests. Results include browser and server time and
+depend on the CDN edge serving the site.
+
+**Failure handling.** Each failure has its own message: offline (`navigator.onLine` is
+false), timeout (8 s for Cloudflare, 4 s per latency request), blocked (`fetch` rejected:
+no connection, a CORS refusal, a firewall or a blocking extension; browsers do not say
+which), HTTP error with its status (for example 429 if Cloudflare limits requests), and an
+unexpected answer format. The button is disabled while a request runs; leaving the tool or
+pressing Reset cancels it, and the Latency check has a Stop button.
+
+**What was and was not verified.** Cloudflare’s JSON API format and the trace format come
+from Cloudflare’s documentation and public examples
+([DNS over HTTPS JSON](https://developers.cloudflare.com/1.1.1.1/encryption/dns-over-https/make-api-requests/dns-json/)).
+Cloudflare does not document the CORS headers or rate limits of either endpoint, and the
+development environment could not reach Cloudflare, so **live cross-origin behaviour has not
+been tested**. Automated tests answer both endpoints with mocks (`page.route` in
+`e2e/network-online.spec.ts`, a stubbed `fetch` in unit tests) and check the request the page
+makes. If Cloudflare refuses a cross-origin request from a browser, the tool shows the
+“blocked” message; it does not fall back to any other service or proxy. The latency check
+is tested against the real preview server.
+
 ## Image tools: browsers and EXIF orientation
 
 **Browsers actually tested.** The image tools are tested with Playwright in three

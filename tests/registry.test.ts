@@ -70,6 +70,9 @@ describe('registry integrity', () => {
       'pdf-compress',
       'subnet-calculator',
       'cidr-calculator',
+      'my-ip-info',
+      'dns-lookup',
+      'latency-test',
     ]);
   });
 

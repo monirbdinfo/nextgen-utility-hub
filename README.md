@@ -39,8 +39,8 @@ search, hash routing with deep links, typed central registry. Calculation conven
 [docs/TOOLS.md](docs/TOOLS.md).
 
 Not available yet: recruiter-specific photo/signature presets (no verified official source
-yet) and the online network tools (IP Lookup, DNS Lookup, Latency & Packet-Loss Check). The
-Subnet Calculator and CIDR & IP Range Calculator are available and work offline.
+yet). Three Network tools use the internet, only when you press their button: IP Lookup and
+DNS Lookup contact Cloudflare, and the Latency check contacts this site's own server.
 
 ## Toolkits
 
@@ -168,14 +168,18 @@ docs/         Roadmap, tool conventions, category audit, licensing
 ## Privacy, security and limitations
 
 - Static site: no server, accounts, cookies, analytics or external requests. Language and
-  theme preferences are kept in `localStorage` only.
+  theme preferences are kept in `localStorage` only. The only exceptions are three Network
+  tools, and only when the user presses their button: IP Lookup and DNS Lookup send one
+  request to Cloudflare, and the Latency check sends small requests to this site's server.
+  Each says what is sent and to whom before use (see
+  [docs/TOOLS.md](docs/TOOLS.md#online-network-tools-ip-lookup-dns-lookup-latency-check)).
 - File tools process files locally. The Image Resizer, Cropper, Compressor, Converter and
   Photo & Signature Resizer decode, resize, crop and re-encode images inside the browser tab;
   images are never uploaded, stored or logged (see
   [docs/TOOLS.md](docs/TOOLS.md#image-resizer) and the category audit in
   [docs/FILE_TOOLS_AUDIT.md](docs/FILE_TOOLS_AUDIT.md)).
 - Browsers cannot open raw sockets, send ICMP pings or scan ports. The Subnet and CIDR
-  calculators are pure arithmetic and send nothing. Other network tools will be limited to
+  calculators are pure arithmetic and send nothing. The online network tools are limited to
   what the browser safely allows, and the project will not include unauthorised
   scanning or other unsafe diagnostic features.
 - Fonts come from the user’s system. Bangla text needs a Bengali-capable system font

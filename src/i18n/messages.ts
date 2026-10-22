@@ -10,7 +10,8 @@ export const messages = {
     brandSub: 'Utility Hub',
     navRoadmap: 'Roadmap',
     sidebarPrivacyTitle: 'Private by design',
-    sidebarPrivacyText: 'Available tools run in your browser. No uploads, no tracking.',
+    sidebarPrivacyText:
+      'Tools run in your browser. No uploads, no tracking. The few online network tools say what they send before you use them.',
     featuredTitle: 'Featured tools',
     featuredText: 'Quick access to frequently needed tools.',
     featuredAll: 'Browse all toolkits',
@@ -68,6 +69,11 @@ export const messages = {
     runsLocally: 'Runs in your browser',
     toolPrivacy:
       'This tool works entirely in your browser. Nothing you enter is uploaded or stored on a server.',
+    usesInternet: 'Uses the internet when you ask',
+    toolPrivacyOnline_cloudflare:
+      'This tool contacts Cloudflare only when you press its button; the notice above says exactly what is sent. This site itself receives and stores nothing.',
+    'toolPrivacyOnline_same-site':
+      'This tool sends small requests to the server that hosts this site only when you press Start. No third party is contacted and nothing is stored.',
     moreInToolkit: 'More in {category}',
     calculate: 'Calculate',
     reset: 'Reset',
@@ -95,7 +101,8 @@ export const messages = {
     brandSub: 'ইউটিলিটি হাব',
     navRoadmap: 'রোডম্যাপ',
     sidebarPrivacyTitle: 'নকশাতেই প্রাইভেট',
-    sidebarPrivacyText: 'উপলব্ধ টুলগুলো আপনার ব্রাউজারেই চলে। আপলোড নেই, ট্র্যাকিং নেই।',
+    sidebarPrivacyText:
+      'টুলগুলো আপনার ব্রাউজারেই চলে। আপলোড নেই, ট্র্যাকিং নেই। অল্প কয়েকটি অনলাইন নেটওয়ার্ক টুল ব্যবহারের আগেই জানায় কী পাঠানো হবে।',
     featuredTitle: 'বাছাই করা টুল',
     featuredText: 'প্রায়ই দরকার হয় এমন টুল দ্রুত খুলুন।',
     featuredAll: 'সব টুলকিট দেখুন',
@@ -153,6 +160,11 @@ export const messages = {
     runsLocally: 'আপনার ব্রাউজারেই চলে',
     toolPrivacy:
       'এই টুলটি সম্পূর্ণ আপনার ব্রাউজারে কাজ করে। আপনি যা লেখেন তা কোনো সার্ভারে আপলোড বা সংরক্ষণ করা হয় না।',
+    usesInternet: 'চাইলে ইন্টারনেট ব্যবহার করে',
+    toolPrivacyOnline_cloudflare:
+      'বোতাম চাপলেই কেবল এই টুল Cloudflare-এ যোগাযোগ করে; ঠিক কী পাঠানো হয় তা ওপরের নোটিশে লেখা আছে। এই সাইট নিজে কিছুই গ্রহণ বা সংরক্ষণ করে না।',
+    'toolPrivacyOnline_same-site':
+      'শুরু চাপলেই কেবল এই টুল এই সাইটের সার্ভারে ছোট কিছু রিকোয়েস্ট পাঠায়। অন্য কোনো তৃতীয় পক্ষের সঙ্গে যোগাযোগ হয় না এবং কিছুই সংরক্ষণ করা হয় না।',
     moreInToolkit: '{category}-এ আরও',
     calculate: 'হিসাব করুন',
     reset: 'রিসেট',

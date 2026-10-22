@@ -12,6 +12,7 @@ const CROSS_BROWSER_SPECS = [
   'photo.spec.ts',
   'general.spec.ts',
   'network.spec.ts',
+  'network-online.spec.ts',
 ];
 
 export default defineConfig({

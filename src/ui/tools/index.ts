@@ -12,6 +12,7 @@ import { imageResizer } from './imageResizer';
 import { applicationChecklist, coverLetterTemplates, cvTemplates } from './jobApplication';
 import type { ToolView } from './kit';
 import { cidrCalculator, subnetCalculator } from './networkCalculators';
+import { dnsLookup, ipLookup, latencyTest } from './networkOnline';
 import { numberToWordsTool } from './numberToWords';
 import { photoResizer } from './photoResizer';
 import { pdfCreate, pdfMergeSplit, pdfPageTools, pdfReduceSize } from './pdfTools';
@@ -46,6 +47,9 @@ export const toolViews: Readonly<Record<string, ToolView>> = {
   'cv-checklist': applicationChecklist,
   'subnet-calculator': subnetCalculator,
   'cidr-calculator': cidrCalculator,
+  'my-ip-info': ipLookup,
+  'dns-lookup': dnsLookup,
+  'latency-test': latencyTest,
 };
 
 export type { ToolContext, ToolView } from './kit';
