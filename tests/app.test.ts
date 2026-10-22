@@ -69,12 +69,18 @@ describe('homepage', () => {
 });
 
 describe('search combobox', () => {
-  it('shows planned results and exposes listbox state', () => {
+  it('labels planned and available results and exposes listbox state', () => {
     const root = setup();
     const input = type(root, 'pdf');
-    const options = root.querySelectorAll('[role="option"]');
+    const options = [...root.querySelectorAll('[role="option"]')];
     expect(options).toHaveLength(6);
-    for (const o of options) expect(o.querySelector('.pill')?.textContent).toBe('Planned');
+    // The four PDF tools are planned; the CV and cover-letter templates (print / save as
+    // PDF) are available.
+    const status = (id: string) => root.querySelector(`#search-opt-${id} .pill`)?.textContent;
+    for (const id of ['pdf-create', 'pdf-merge', 'pdf-tools', 'pdf-compress'])
+      expect(status(id)).toBe('Planned');
+    for (const id of ['cv-templates', 'cover-letter-templates'])
+      expect(status(id)).toBe('Available');
     expect(input.getAttribute('aria-expanded')).toBe('true');
     expect(root.querySelector('[role="status"]')?.textContent).toBe('6 matching tools');
   });

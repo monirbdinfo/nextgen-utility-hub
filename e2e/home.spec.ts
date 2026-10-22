@@ -128,6 +128,10 @@ test('toolkit cards stay visible, mark the open toolkit and show its tools below
       .getByRole('link', { name: 'Job Application Toolkit' }),
   ).toHaveAttribute('aria-current', 'page');
   await expect(page.locator('#category-heading')).toHaveText('Job Application Toolkit');
+  // Job tools are available; the Network toolkit's tools are still planned.
+  await expect(page.locator('.tool .tool-cta').first()).toHaveText('Open tool');
+  await cards.getByRole('link', { name: 'Network & IT Diagnostic Toolkit' }).click();
+  await expect(page.locator('#category-heading')).toHaveText('Network & IT Diagnostic Toolkit');
   await expect(page.locator('.tool .tool-soon').first()).toHaveText('Coming soon');
   await expect(
     page.getByRole('navigation', { name: 'Primary' }).getByRole('link', { name: 'Home' }),
