@@ -63,6 +63,10 @@ describe('registry integrity', () => {
       'image-resizer',
       'image-cropper',
       'job-photo-resizer',
+      'pdf-create',
+      'pdf-merge',
+      'pdf-tools',
+      'pdf-compress',
     ]);
   });
 
