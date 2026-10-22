@@ -5,7 +5,9 @@ import { getCategory, getTool, type Lang } from '../registry';
 import { parseHash, toHash, type Route } from '../router/router';
 import type { AppContext, AppState, Theme } from './context';
 import { createHeader, type HeaderHandle } from './header';
-import { icon } from './icons';
+import { icon, type UiIcon } from './icons';
+import { logoImage } from './logo';
+import { createSidebar, type SidebarHandle } from './sidebar';
 import { createSearch, type SearchHandle } from './search';
 import { createToolkits, type ToolkitsHandle } from './toolkits';
 import { createToolPage } from './toolPage';
@@ -32,6 +34,7 @@ export function mountApp(root: HTMLElement): () => void {
   };
 
   let header: HeaderHandle | null = null;
+  let sidebar: SidebarHandle | null = null;
   let search: SearchHandle | null = null;
   let toolkits: ToolkitsHandle | null = null;
   let pendingFocus: string | null = null;
@@ -94,38 +97,117 @@ export function mountApp(root: HTMLElement): () => void {
   }
 
   function hero(searchEl: HTMLElement): HTMLElement {
+    const features: Array<[UiIcon, 'f1' | 'f2' | 'f3', string]> = [
+      ['lock', 'f1', 'feature-green'],
+      ['bolt', 'f2', 'feature-blue'],
+      ['code', 'f3', 'feature-purple'],
+    ];
     return h(
       'section',
       { class: 'hero', 'aria-labelledby': 'hero-title' },
       h(
         'div',
-        { class: 'container hero-inner' },
+        { class: 'hero-inner' },
         h(
-          'p',
-          { class: 'badge' },
-          h('span', { class: 'badge-dot', 'aria-hidden': 'true' }),
-          t('heroBadge'),
+          'div',
+          { class: 'hero-main' },
+          h(
+            'h1',
+            { id: 'hero-title', class: 'hero-title' },
+            h('span', { class: 'hero-title-lead' }, t('heroTitleLead')),
+            ' ',
+            h('span', { class: 'hero-title-accent' }, t('heroTitleAccent')),
+          ),
+          h('p', { class: 'hero-text' }, t('heroText')),
+          searchEl,
         ),
-        h('h1', { id: 'hero-title', class: 'hero-title' }, t('heroTitle')),
-        h('p', { class: 'hero-text' }, t('heroText')),
-        searchEl,
+        heroArt(),
+        h(
+          'ul',
+          { class: 'hero-features', role: 'list', 'aria-label': t('featuresLabel') },
+          ...features.map(([name, key, tone]) =>
+            h(
+              'li',
+              { class: `feature ${tone}` },
+              h('span', { class: 'feature-icon' }, icon(name, 24)),
+              h(
+                'span',
+                { class: 'feature-body' },
+                h('strong', { class: 'feature-title' }, t(`${key}Title`)),
+                h('span', { class: 'feature-text' }, t(`${key}Text`)),
+              ),
+            ),
+          ),
+        ),
       ),
     );
   }
 
-  function about(): HTMLElement {
-    const principles = (['principle1', 'principle2', 'principle3'] as const).map((k) =>
-      h('li', {}, icon('check', 18), t(k)),
+  /** Decorative laptop with the logo on screen and floating tool icons (wide screens only). */
+  function heroArt(): HTMLElement {
+    const tiles: Array<[UiIcon, string]> = [
+      ['calculator', 'art-tile-1'],
+      ['grid', 'art-tile-2'],
+      ['network', 'art-tile-3'],
+      ['image', 'art-tile-4'],
+      ['shield', 'art-tile-5'],
+    ];
+    return h(
+      'div',
+      { class: 'hero-art', 'aria-hidden': 'true' },
+      h(
+        'div',
+        { class: 'art-laptop' },
+        h(
+          'div',
+          { class: 'art-screen' },
+          logoImage('mark', 44),
+          h('span', { class: 'art-name', lang: 'en' }, t('brandName')),
+          h('span', { class: 'art-sub', lang: 'en' }, 'Utility Hub'),
+        ),
+        h('div', { class: 'art-base' }),
+      ),
+      ...tiles.map(([name, cls]) => h('span', { class: `art-tile ${cls}` }, icon(name, 22))),
     );
+  }
+
+  function about(): HTMLElement {
+    const principles: Array<[UiIcon, 1 | 2 | 3 | 4, string]> = [
+      ['shield', 1, 'principle-green'],
+      ['doc', 2, 'principle-blue'],
+      ['eye-off', 3, 'principle-purple'],
+      ['users', 4, 'principle-orange'],
+    ];
     return h(
       'section',
-      { id: 'about', class: 'container section', 'aria-labelledby': 'about-title' },
+      { id: 'about', class: 'section', 'aria-labelledby': 'about-title' },
       h(
         'div',
         { class: 'about' },
-        h('h2', { id: 'about-title', class: 'section-title' }, t('aboutTitle')),
-        h('p', { class: 'about-text' }, t('aboutText')),
-        h('ul', { class: 'principles', role: 'list' }, ...principles),
+        logoImage('full', 64, { className: 'about-logo' }),
+        h(
+          'div',
+          { class: 'about-body' },
+          h('h2', { id: 'about-title', class: 'about-title' }, t('aboutTitle')),
+          h('p', { class: 'about-text' }, t('aboutText')),
+        ),
+        h(
+          'ul',
+          { class: 'principles', role: 'list' },
+          ...principles.map(([name, n, tone]) =>
+            h(
+              'li',
+              { class: tone },
+              h('span', { class: 'principle-icon' }, icon(name, 18)),
+              h(
+                'span',
+                { class: 'principle-body' },
+                h('strong', {}, t(`principle${n}`)),
+                h('span', {}, t(`principle${n}Text`)),
+              ),
+            ),
+          ),
+        ),
       ),
     );
   }
@@ -136,9 +218,11 @@ export function mountApp(root: HTMLElement): () => void {
     runCleanups();
     const route = state.route;
     const tool = route.name === 'tool' ? getTool(route.id) : undefined;
+    // One search box: in the hero on the home view, in the header on tool pages.
+    search = createSearch(ctx);
     if (tool) {
-      search = null;
       toolkits = null;
+      header?.setSearch(search.el);
       let memo = toolMemo.get(tool.id);
       if (!memo) toolMemo.set(tool.id, (memo = {}));
       let session = toolSession.get(tool.id);
@@ -147,14 +231,16 @@ export function mountApp(root: HTMLElement): () => void {
       main.replaceChildren(createToolPage(ctx, tool, { memo, session, onCleanup }));
       return;
     }
-    search = createSearch(ctx);
+    header?.setSearch(null);
     toolkits = createToolkits(ctx);
-    main.replaceChildren(hero(search.el), toolkits.el, about());
+    main.replaceChildren(hero(search.el), toolkits.el, toolkits.featured, about());
   }
 
   function renderShell(): void {
     header?.destroy();
-    header = createHeader(ctx);
+    sidebar = createSidebar(ctx);
+    sidebar.setRoute(state.route);
+    header = createHeader(ctx, sidebar.el);
     applyDocumentState();
     main = h('main', { id: 'main', tabindex: '-1' });
     renderMain();
@@ -162,15 +248,30 @@ export function mountApp(root: HTMLElement): () => void {
     root.replaceChildren(
       h('a', { class: 'skip-link', href: '#main' }, t('skipLink')),
       header.el,
-      main,
       h(
-        'footer',
-        { class: 'footer' },
+        'div',
+        { class: 'shell' },
+        sidebar.el,
         h(
           'div',
-          { class: 'container footer-inner' },
-          h('span', {}, `© 2026 ${t('siteName')}`),
-          h('span', {}, t('footer')),
+          { class: 'shell-main' },
+          main,
+          h(
+            'footer',
+            { class: 'footer' },
+            h(
+              'div',
+              { class: 'footer-inner' },
+              h(
+                'span',
+                {},
+                `© 2026 `,
+                h('span', { lang: 'en' }, t('brandName')),
+                ` · ${t('siteName')}`,
+              ),
+              h('span', {}, t('footer')),
+            ),
+          ),
         ),
       ),
     );
@@ -182,6 +283,7 @@ export function mountApp(root: HTMLElement): () => void {
     const prev: Route = state.route;
     const changed = toHash(next) !== toHash(prev);
     state.route = next;
+    sidebar?.setRoute(next);
     // Leaving a tool drops its in-memory objects (picked files, results).
     if (prev.name === 'tool' && changed) toolSession.delete(prev.id);
     applyDocumentState();

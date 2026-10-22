@@ -125,7 +125,8 @@ export const tools: readonly Tool[] = [
       'জীবনবৃত্তান্ত',
       'বায়োডাটা',
     ],
-    status: 'planned',
+    status: 'available',
+    route: route('cv-templates'),
   },
   {
     id: 'cover-letter-templates',
@@ -143,7 +144,8 @@ export const tools: readonly Tool[] = [
       'আবেদনপত্র',
       'দরখাস্ত',
     ],
-    status: 'planned',
+    status: 'available',
+    route: route('cover-letter-templates'),
   },
   {
     id: 'cv-checklist',
@@ -154,7 +156,8 @@ export const tools: readonly Tool[] = [
       bn: 'আবেদনের প্রয়োজনীয় কাগজপত্রের তালিকা।',
     },
     keywords: ['checklist', 'documents', 'cv', 'সিভি'],
-    status: 'planned',
+    status: 'available',
+    route: route('cv-checklist'),
   },
 
   // ---------- Bangla Number & Text Toolkit ----------

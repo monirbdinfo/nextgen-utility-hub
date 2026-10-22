@@ -69,12 +69,18 @@ describe('homepage', () => {
 });
 
 describe('search combobox', () => {
-  it('shows planned results and exposes listbox state', () => {
+  it('labels planned and available results and exposes listbox state', () => {
     const root = setup();
     const input = type(root, 'pdf');
-    const options = root.querySelectorAll('[role="option"]');
+    const options = [...root.querySelectorAll('[role="option"]')];
     expect(options).toHaveLength(6);
-    for (const o of options) expect(o.querySelector('.pill')?.textContent).toBe('Planned');
+    // The four PDF tools are planned; the CV and cover-letter templates (print / save as
+    // PDF) are available.
+    const status = (id: string) => root.querySelector(`#search-opt-${id} .pill`)?.textContent;
+    for (const id of ['pdf-create', 'pdf-merge', 'pdf-tools', 'pdf-compress'])
+      expect(status(id)).toBe('Planned');
+    for (const id of ['cv-templates', 'cover-letter-templates'])
+      expect(status(id)).toBe('Available');
     expect(input.getAttribute('aria-expanded')).toBe('true');
     expect(root.querySelector('[role="status"]')?.textContent).toBe('6 matching tools');
   });
@@ -145,7 +151,12 @@ describe('routing', () => {
     expect(root.querySelector('#category-heading')?.textContent).toBe(
       'Bangla Number & Text Toolkit',
     );
-    expect(root.querySelector('.chip[aria-current="page"]')?.textContent).toBe(
+    // The toolkit cards stay visible; the selected one is marked as the current page.
+    expect(root.querySelectorAll('.card')).toHaveLength(5);
+    expect(root.querySelector('.card-link[aria-current="page"]')?.textContent).toBe(
+      'Bangla Number & Text Toolkit',
+    );
+    expect(root.querySelector('.card-active .card-title')?.textContent).toBe(
       'Bangla Number & Text Toolkit',
     );
     expect(document.title).toContain('Bangla Number & Text Toolkit');
@@ -172,7 +183,80 @@ describe('routing', () => {
     history.replaceState(null, '', '/#/');
     window.dispatchEvent(new HashChangeEvent('hashchange'));
     expect(root.querySelectorAll('.card')).toHaveLength(5);
+    expect(root.querySelector('#category-heading')).toBeNull();
+    expect(root.querySelector('.card-link[aria-current]')).toBeNull();
     expect(document.activeElement?.id).toBe('toolkits-title');
+  });
+});
+
+describe('home layout', () => {
+  it('shows the logo, brand, hero features and featured tools', () => {
+    const root = setup();
+    const brand = root.querySelector('.brand') as HTMLAnchorElement;
+    expect(brand.getAttribute('href')).toBe('#/');
+    expect(brand.querySelector('.brand-name')?.textContent).toBe('NextGen Tech BD');
+    expect(brand.querySelector('.brand-sub')?.textContent).toBe('Utility Hub');
+    expect(brand.getAttribute('aria-label')).toContain('NextGen Tech BD');
+    // The real logo image, decorative next to the brand name.
+    const logo = brand.querySelector('img.logo-mark') as HTMLImageElement;
+    expect(logo.getAttribute('alt')).toBe('');
+    expect(logo.getAttribute('src')).toMatch(/logo-mark.*\.png$/);
+    expect(root.querySelector('img.logo-full')).not.toBeNull();
+    expect(root.querySelector('h1')?.textContent).toBe('Everyday tools, built for privacy.');
+    expect([...root.querySelectorAll('.feature-title')].map((e) => e.textContent)).toEqual([
+      'Private by design',
+      'Fast & lightweight',
+      'Open source',
+    ]);
+    // Featured tools are all available and link to their pages.
+    const featured = [...root.querySelectorAll('#featured .tool-card')];
+    expect(featured.length).toBe(8);
+    for (const card of featured) {
+      expect(card.querySelector('.pill')?.textContent).toBe('Available');
+      expect(card.querySelector('a.tool-link')?.getAttribute('href')).toMatch(/^#\/tool\//);
+    }
+    // One search box: in the hero on the home view, none in the header.
+    expect(root.querySelectorAll('#search')).toHaveLength(1);
+    expect(root.querySelector('.hero #search')).not.toBeNull();
+  });
+
+  it('moves the search into the header on tool pages and hides featured tools on toolkits', () => {
+    const root = setup('#/tool/age-calculator');
+    expect(root.querySelectorAll('#search')).toHaveLength(1);
+    expect(root.querySelector('.header-search #search')).not.toBeNull();
+    history.replaceState(null, '', '/#/category/general');
+    window.dispatchEvent(new HashChangeEvent('hashchange'));
+    expect(root.querySelector('.header-search #search')).toBeNull();
+    expect((root.querySelector('#featured') as HTMLElement).hidden).toBe(true);
+  });
+
+  it('highlights the current toolkit in the sidebar', () => {
+    const root = setup('#/category/files');
+    const current = root.querySelector('#site-nav [aria-current="page"]');
+    expect(current?.textContent).toBe('Privacy-First File Tools');
+  });
+
+  it('marks Home as the current page only on the home route', () => {
+    const root = setup();
+    const home = () => root.querySelector('.nav a[href="#/"]') as HTMLAnchorElement;
+    expect(home().getAttribute('aria-current')).toBe('page');
+    history.replaceState(null, '', '/#/category/general');
+    window.dispatchEvent(new HashChangeEvent('hashchange'));
+    expect(home().hasAttribute('aria-current')).toBe(false);
+  });
+
+  it('lists a toolkit\'s tools with status, an open action or "Coming soon"', () => {
+    const root = setup('#/category/general');
+    const rows = [...root.querySelectorAll('.tool')];
+    expect(rows.length).toBe(6);
+    for (const row of rows) {
+      const available = row.querySelector('.pill')?.textContent === 'Available';
+      expect(!!row.querySelector('a.tool-link')).toBe(available);
+      expect(row.querySelector(available ? '.tool-cta' : '.tool-soon')?.textContent).toBe(
+        available ? 'Open tool' : 'Coming soon',
+      );
+      expect(row.querySelector('.tool-icon svg')).not.toBeNull();
+    }
   });
 });
 

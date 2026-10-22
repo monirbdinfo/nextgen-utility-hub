@@ -5,7 +5,7 @@ your browser: no backend, no analytics, no uploads.
 
 Repository: <https://github.com/monirbdinfo/nextgen-utility-hub>
 
-Website (GitHub Pages): <https://monirbdinfo.github.io/nextgen-utility-hub/>, deployed from
+Website: <https://tools.nextgentechbd.com/>, deployed from
 `main` by GitHub Actions (first successful deployment: 2 October 2026). Changes on other
 branches appear there only after they are merged into `main`. See [Deployment](#deployment).
 
@@ -31,9 +31,11 @@ with a badge and not linked). See [docs/PROJECT_ROADMAP.md](docs/PROJECT_ROADMAP
 | Image Converter — JPEG ⇄ PNG ⇄ WebP at the original size; verified output format              | Privacy-First Files  |
 | Photo & Signature Resizer — exact pixel size, crop or white padding (no stretching), KB limit | Privacy-First Files  |
 
-Platform features: responsive homepage, Bangla/English toggle (persisted, sets
-`<html lang>`), light/dark theme, keyboard-accessible search, hash routing with deep links,
-typed central registry. Calculation conventions, rounding rules and limitations are in
+Platform features: NextGen Tech BD app shell (logo header, left sidebar with all toolkits
+that becomes a drawer on small screens, site search in the hero on the home page and in the
+header on tool pages), home page with toolkit cards, featured tools and an About strip,
+Bangla/English toggle (persisted, sets `<html lang>`), light/dark theme, keyboard-accessible
+search, hash routing with deep links, typed central registry. Calculation conventions, rounding rules and limitations are in
 [docs/TOOLS.md](docs/TOOLS.md).
 
 Not available yet: recruiter-specific photo/signature presets (no verified official source

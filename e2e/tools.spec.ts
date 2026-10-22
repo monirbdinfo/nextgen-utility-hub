@@ -139,7 +139,7 @@ test('works under the GitHub Pages sub-path', async ({ page }) => {
   await expect(page.locator('.result-row-primary .result-value').first()).toHaveText(
     'Two Thousand Twenty-Six',
   );
-  await page.getByRole('link', { name: 'Home' }).click();
+  await page.getByLabel('Breadcrumb').getByRole('link', { name: 'Home' }).click();
   await expect(page).toHaveURL(`${base}#/`);
   await expect(page.locator('.card')).toHaveCount(5);
   expect(errors).toEqual([]);

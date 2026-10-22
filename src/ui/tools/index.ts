@@ -9,6 +9,7 @@ import { imageCompressor } from './imageCompressor';
 import { imageConverter } from './imageConverter';
 import { imageCropper } from './imageCropper';
 import { imageResizer } from './imageResizer';
+import { applicationChecklist, coverLetterTemplates, cvTemplates } from './jobApplication';
 import type { ToolView } from './kit';
 import { numberToWordsTool } from './numberToWords';
 import { photoResizer } from './photoResizer';
@@ -34,6 +35,9 @@ export const toolViews: Readonly<Record<string, ToolView>> = {
   'image-compressor': imageCompressor,
   'image-converter': imageConverter,
   'job-photo-resizer': photoResizer,
+  'cv-templates': cvTemplates,
+  'cover-letter-templates': coverLetterTemplates,
+  'cv-checklist': applicationChecklist,
 };
 
 export type { ToolContext, ToolView } from './kit';

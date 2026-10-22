@@ -57,7 +57,7 @@ test('search is keyboard operable end to end', async ({ page }) => {
 test('hash routes support direct load and back/forward', async ({ page }) => {
   await page.goto('/#/category/network');
   await expect(page.locator('#category-heading')).toHaveText('Network & IT Diagnostic Toolkit');
-  await page.getByRole('link', { name: 'All', exact: true }).click();
+  await page.getByRole('link', { name: 'All toolkits', exact: true }).click();
   await expect(page.locator('.card')).toHaveCount(5);
   await page.goBack();
   await expect(page.locator('#category-heading')).toHaveText('Network & IT Diagnostic Toolkit');
@@ -106,3 +106,48 @@ for (const [name, width, height] of [
     await noHorizontalScroll(page);
   });
 }
+
+test('toolkit cards stay visible, mark the open toolkit and show its tools below', async ({
+  page,
+}) => {
+  await page.goto('/');
+  await expect(
+    page.getByRole('navigation', { name: 'Primary' }).getByRole('link', { name: 'Home' }),
+  ).toHaveAttribute('aria-current', 'page');
+  const cards = page.getByRole('navigation', { name: 'Filter by toolkit' });
+  await cards.getByRole('link', { name: 'Job Application Toolkit' }).click();
+  await expect(page).toHaveURL(/#\/category\/jobs$/);
+  await expect(page.locator('.card')).toHaveCount(5);
+  await expect(cards.getByRole('link', { name: 'Job Application Toolkit' })).toHaveAttribute(
+    'aria-current',
+    'page',
+  );
+  await expect(
+    page
+      .getByRole('navigation', { name: 'Primary' })
+      .getByRole('link', { name: 'Job Application Toolkit' }),
+  ).toHaveAttribute('aria-current', 'page');
+  await expect(page.locator('#category-heading')).toHaveText('Job Application Toolkit');
+  // Job tools are available; the Network toolkit's tools are still planned.
+  await expect(page.locator('.tool .tool-cta').first()).toHaveText('Open tool');
+  await cards.getByRole('link', { name: 'Network & IT Diagnostic Toolkit' }).click();
+  await expect(page.locator('#category-heading')).toHaveText('Network & IT Diagnostic Toolkit');
+  await expect(page.locator('.tool .tool-soon').first()).toHaveText('Coming soon');
+  await expect(
+    page.getByRole('navigation', { name: 'Primary' }).getByRole('link', { name: 'Home' }),
+  ).not.toHaveAttribute('aria-current', 'page');
+});
+
+test('tool pages have the search in the header', async ({ page }) => {
+  await page.setViewportSize({ width: 1280, height: 900 });
+  await page.goto('/#/tool/age-calculator');
+  const search = page.locator('header').getByRole('combobox', { name: 'Search tools' });
+  await expect(search).toBeVisible();
+  await page.keyboard.press('/');
+  await expect(search).toBeFocused();
+  await search.fill('taka');
+  await page.keyboard.press('ArrowDown');
+  await page.keyboard.press('Enter');
+  await expect(page).toHaveURL(/#\/tool\/taka-in-words$/);
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('Taka in Words');
+});

@@ -11,9 +11,15 @@ substantial portions. The software is provided “as is”, without warranty.
 
 ## What ships to users
 
-The production build (`dist/`) contains only this project’s own TypeScript, CSS and HTML.
-There are **no runtime dependencies**, no web fonts, no CDN scripts and no third-party
-assets. Icons are hand-written SVG paths in `src/ui/icons.ts`.
+The production build (`dist/`) contains only this project’s own TypeScript, CSS and HTML,
+plus the NextGen Tech BD logo. There are **no runtime dependencies**, no web fonts, no CDN
+scripts and no third-party assets. Icons are hand-written SVG paths in `src/ui/icons.ts`.
+
+**Logo.** `src/assets/brand/nextgen-tech-bd-logo.png` (250 × 250, transparent PNG) was
+supplied by the project owner as the brand logo. `logo-mark.png` (the "NG" mark, 212 × 70)
+and `logo-full.png` (mark and wordmark, 218 × 92) are exact 1:1 pixel crops of it. The logo
+is the NextGen Tech BD brand mark; whether the MIT licence above also covers reuse of the
+logo outside this project is for the owner to state.
 
 ## Development dependencies
 
