@@ -94,12 +94,18 @@ describe('planned tools', () => {
     expect(last.querySelector('.pill')?.textContent).toBe('Planned');
     expect(last.querySelector('a')).toBeNull();
     expect(last.querySelector('.tool-soon')?.textContent).toBe('Coming soon');
-    for (const item of items.slice(0, -1)) expect(item.querySelector('a')).not.toBeNull();
+    let sawPlanned = false;
+    for (const item of items) {
+      const planned = item.querySelector('.pill')?.textContent === 'Planned';
+      if (planned) sawPlanned = true;
+      expect(!!item.querySelector('a')).toBe(!planned);
+      if (!planned) expect(sawPlanned).toBe(false);
+    }
   });
 
   it('are counted separately on the toolkit card', () => {
     const root = setup();
     const counts = [...root.querySelectorAll('.card-count')].map((c) => c.textContent);
-    expect(counts[4]).toBe('5 available · 22 planned');
+    expect(counts[4]).toBe('5 available · 21 planned');
   });
 });
