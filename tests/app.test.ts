@@ -180,7 +180,7 @@ describe('routing', () => {
     const root = setup('#/category/files');
     history.replaceState(null, '', '/#/');
     window.dispatchEvent(new HashChangeEvent('hashchange'));
-    expect(root.querySelectorAll('.card')).toHaveLength(5);
+    expect(root.querySelectorAll('.card')).toHaveLength(7);
     expect(root.querySelector('#category-heading')).toBeNull();
     expect(root.querySelector('.card-link[aria-current]')).toBeNull();
     expect(document.activeElement?.id).toBe('toolkits-title');
