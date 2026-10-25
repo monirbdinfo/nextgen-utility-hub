@@ -246,7 +246,7 @@ describe('home layout', () => {
   it('lists a toolkit\'s tools with status, an open action or "Coming soon"', () => {
     const root = setup('#/category/general');
     const rows = [...root.querySelectorAll('.tool')];
-    expect(rows.length).toBe(6);
+    expect(rows.length).toBe(5);
     for (const row of rows) {
       const available = row.querySelector('.pill')?.textContent === 'Available';
       expect(!!row.querySelector('a.tool-link')).toBe(available);
