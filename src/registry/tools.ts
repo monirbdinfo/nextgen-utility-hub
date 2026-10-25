@@ -565,5 +565,8 @@ export const tools: readonly Tool[] = [
     ['internet-speed-test','Internet Speed Test','ইন্টারনেট স্পিড টেস্ট','Measure approximate download and upload speeds using an explicit test service.','নির্বাচিত টেস্ট সার্ভিস দিয়ে আনুমানিক ডাউনলোড ও আপলোড গতি মাপুন।',['internet speed','download','upload','গতি']],
     // prettier-ignore
     ['wifi-qr-scanner','WiFi QR Scanner','Wi-Fi QR স্ক্যানার','Read Wi-Fi network details encoded in a compatible QR code.','সামঞ্জস্যপূর্ণ QR কোডে থাকা Wi-Fi নেটওয়ার্কের তথ্য পড়ুন।',['wifi','qr scanner','ওয়াইফাই']],
-  ] as const).map(([id,en,bn,de,db,keywords]) => {\n    const available = ['qr-code-generator','qr-scanner','lorem-ipsum','time-card-calculator','credit-card-checker','reverse-image-search','notepad-online','small-text-generator','rot13-decoder','morse-translator','runic-translator','invisible-character','internet-speed-test','wifi-qr-scanner'].includes(id);\n    return {id,category:'productivity' as const,name:{en,bn},description:{en:de,bn:db},keywords:[...keywords,'productivity tools','প্রোডাক্টিভিটি'],status:available ? 'available' as const : 'planned' as const,...(available ? {route: route(id)} : {})};\n  }),
+  ] as const).map(([id,en,bn,de,db,keywords]) => {
+    const available = ['qr-code-generator','qr-scanner','lorem-ipsum','time-card-calculator','credit-card-checker','reverse-image-search','notepad-online','small-text-generator','rot13-decoder','morse-translator','runic-translator','invisible-character','internet-speed-test','wifi-qr-scanner'].includes(id);
+    return { id, category: 'productivity' as const, name: { en, bn }, description: { en: de, bn: db }, keywords: [...keywords, 'productivity tools', 'প্রোডাক্টিভিটি'], status: available ? 'available' as const : 'planned' as const, ...(available ? { route: route(id) } : {}) };
+  }),
 ];
