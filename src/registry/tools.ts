@@ -481,8 +481,8 @@ export const tools: readonly Tool[] = [
     route: route('latency-test'),
     online: 'same-site',
   },
+  // prettier-ignore
   ...([
-    // prettier-ignore
     ['ping-ipv4','Ping IPv4 Address','IPv4 পিং','Check IPv4 reachability where supported.','সমর্থিত পরিবেশে IPv4 সংযোগ পরীক্ষা করুন।',['ping','ipv4','পিং']],
     // prettier-ignore
     ['ping-ipv6','Ping IPv6 Address','IPv6 পিং','Check IPv6 reachability where supported.','সমর্থিত পরিবেশে IPv6 সংযোগ পরীক্ষা করুন।',['ping','ipv6','পিং']],
