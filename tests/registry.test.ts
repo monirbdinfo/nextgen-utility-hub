@@ -12,7 +12,15 @@ import { toolViews } from '../src/ui/tools';
 
 describe('registry integrity', () => {
   it('defines the utility categories', () => {
-    expect(categories.map((c) => c.id)).toEqual(['general', 'jobs', 'bangla', 'files', 'network', 'ip-tools', 'productivity']);
+    expect(categories.map((c) => c.id)).toEqual([
+      'general',
+      'jobs',
+      'bangla',
+      'files',
+      'network',
+      'ip-tools',
+      'productivity',
+    ]);
   });
 
   it('has unique tool ids', () => {
