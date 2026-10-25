@@ -141,7 +141,7 @@ test('works under the GitHub Pages sub-path', async ({ page }) => {
   );
   await page.getByLabel('Breadcrumb').getByRole('link', { name: 'Home' }).click();
   await expect(page).toHaveURL(`${base}#/`);
-  await expect(page.locator('.card')).toHaveCount(5);
+  await expect(page.locator('.card')).toHaveCount(7);
   expect(errors).toEqual([]);
 });
 
