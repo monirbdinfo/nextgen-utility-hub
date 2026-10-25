@@ -77,14 +77,14 @@ describe('tool pages', () => {
     const counts = [...root.querySelectorAll('.card-count')].map((c) => c.textContent);
     expect(counts[0]).toBe('6 available tools');
     expect(counts[3]).toBe('9 available tools');
-    expect(counts[4]).toBe('5 available tools');
+    expect(counts[4]).toBe('1 available tools');
   });
 
   it('starts at the top of home when leaving a tool via the breadcrumb', () => {
     const root = open('#/tool/date-formatter');
     history.replaceState(null, '', '/#/');
     window.dispatchEvent(new HashChangeEvent('hashchange'));
-    expect(root.querySelectorAll('.card')).toHaveLength(5);
+    expect(root.querySelectorAll('.card')).toHaveLength(7);
     expect(document.activeElement?.id).toBe('main');
   });
 
