@@ -420,7 +420,7 @@ export const tools: readonly Tool[] = [
   // ---------- Network & IT Diagnostic Toolkit ----------
   {
     id: 'subnet-calculator',
-    category: 'ip-tools',
+    category: 'network',
     name: { en: 'Subnet Calculator', bn: 'সাবনেট ক্যালকুলেটর' },
     description: {
       en: 'Network, broadcast, mask and usable hosts for an IPv4 subnet.',
@@ -432,7 +432,7 @@ export const tools: readonly Tool[] = [
   },
   {
     id: 'cidr-calculator',
-    category: 'ip-tools',
+    category: 'network',
     name: { en: 'CIDR & IP Range Calculator', bn: 'CIDR ও আইপি রেঞ্জ ক্যালকুলেটর' },
     description: {
       en: 'Convert between CIDR blocks and IP address ranges.',
@@ -444,7 +444,7 @@ export const tools: readonly Tool[] = [
   },
   {
     id: 'my-ip-info',
-    category: 'ip-tools',
+    category: 'network',
     name: { en: 'IP Lookup', bn: 'আইপি লুকআপ' },
     description: {
       en: 'See the public IP address Cloudflare sees for you. Contacts Cloudflare only when you press the button.',
@@ -457,7 +457,7 @@ export const tools: readonly Tool[] = [
   },
   {
     id: 'dns-lookup',
-    category: 'ip-tools',
+    category: 'network',
     name: { en: 'DNS Lookup', bn: 'ডিএনএস লুকআপ' },
     description: {
       en: 'Look up public DNS records for a domain using Cloudflare DNS-over-HTTPS. Sends the domain to Cloudflare when you press the button.',
@@ -524,7 +524,7 @@ export const tools: readonly Tool[] = [
     ['my-isp','What Is My ISP','আমার ISP কী','Look up the internet service provider associated with a public IP.','পাবলিক আইপির সঙ্গে যুক্ত ইন্টারনেট সেবাদাতা দেখুন।',['isp','provider','আইএসপি']],
     // prettier-ignore
     ['domain-to-ip','Domain to IP Lookup','ডোমেইন থেকে আইপি','Resolve a domain to its public DNS address records.','ডোমেইনের পাবলিক DNS অ্যাড্রেস রেকর্ড বের করুন।',['domain','ip lookup','ডোমেইন']],
-  ] as const).map(([id,en,bn,de,db,keywords]) => ({id,category:'ip-tools' as const,name:{en,bn},description:{en:de,bn:db},keywords:[...keywords,'ip tools','আইপি টুলস'],status:'planned' as const})),
+  ] as const).map(([id,en,bn,de,db,keywords]) => ({id,category:'network' as const,name:{en,bn},description:{en:de,bn:db},keywords:[...keywords,'ip tools','আইপি টুলস'],status:'planned' as const})),
   // prettier-ignore
   ...([
     // prettier-ignore
