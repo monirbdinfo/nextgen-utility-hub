@@ -40,7 +40,7 @@ afterEach(() => {
 });
 
 describe('homepage', () => {
-  it('renders seven category cards with the specified names', () => {
+  it('renders six category cards with the specified names', () => {
     const root = setup();
     const titles = [...root.querySelectorAll('.card-title')].map((e) => e.textContent);
     expect(titles).toEqual([
@@ -49,7 +49,6 @@ describe('homepage', () => {
       'Bangla Number & Text Toolkit',
       'Privacy-First File Tools',
       'Network & IT Diagnostic Toolkit',
-      'IP Tools',
       'Productivity Tools',
     ]);
   });
@@ -149,7 +148,7 @@ describe('routing', () => {
       'Bangla Number & Text Toolkit',
     );
     // The toolkit cards stay visible; the selected one is marked as the current page.
-    expect(root.querySelectorAll('.card')).toHaveLength(7);
+    expect(root.querySelectorAll('.card')).toHaveLength(6);
     expect(root.querySelector('.card-link[aria-current="page"]')?.textContent).toBe(
       'Bangla Number & Text Toolkit',
     );
@@ -162,11 +161,16 @@ describe('routing', () => {
   it('links every tool in a toolkit', () => {
     const root = setup('#/category/network');
     const tools = [...root.querySelectorAll('.tool')];
-    expect(tools).toHaveLength(1);
+    expect(tools).toHaveLength(26);
+    let sawPlanned = false;
     for (const tool of tools) {
-      expect(tool.id).toBe('tool-latency-test');
-      expect(tool.querySelector('.pill')?.textContent).toBe('Available');
-      expect(tool.querySelector('a')?.getAttribute('href')).toBe(`#/tool/${tool.id.slice(5)}`);
+      const available = tool.querySelector('.pill')?.textContent === 'Available';
+      if (!available) sawPlanned = true;
+      expect(!!tool.querySelector('a.tool-link')).toBe(available);
+      expect(tool.querySelector(available ? '.tool-cta' : '.tool-soon')?.textContent).toBe(
+        available ? 'Open tool' : 'Coming soon',
+      );
+      if (available) expect(sawPlanned).toBe(false);
     }
   });
 
@@ -180,7 +184,7 @@ describe('routing', () => {
     const root = setup('#/category/files');
     history.replaceState(null, '', '/#/');
     window.dispatchEvent(new HashChangeEvent('hashchange'));
-    expect(root.querySelectorAll('.card')).toHaveLength(7);
+    expect(root.querySelectorAll('.card')).toHaveLength(6);
     expect(root.querySelector('#category-heading')).toBeNull();
     expect(root.querySelector('.card-link[aria-current]')).toBeNull();
     expect(document.activeElement?.id).toBe('toolkits-title');

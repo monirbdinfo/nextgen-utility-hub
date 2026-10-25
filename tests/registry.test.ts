@@ -18,7 +18,6 @@ describe('registry integrity', () => {
       'bangla',
       'files',
       'network',
-      'ip-tools',
       'productivity',
     ]);
   });

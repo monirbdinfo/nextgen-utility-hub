@@ -6,7 +6,6 @@ const CATEGORY_NAMES = [
   'Bangla Number & Text Toolkit',
   'Privacy-First File Tools',
   'Network & IT Diagnostic Toolkit',
-  'IP Tools',
   'Productivity Tools',
 ];
 
@@ -17,7 +16,7 @@ async function noHorizontalScroll(page: Page): Promise<void> {
   expect(overflow).toBeLessThanOrEqual(0);
 }
 
-test('homepage renders seven toolkits and only same-origin requests', async ({ page, baseURL }) => {
+test('homepage renders six toolkits and only same-origin requests', async ({ page, baseURL }) => {
   const foreign: string[] = [];
   page.on('request', (req) => {
     const url = new URL(req.url());
@@ -60,13 +59,13 @@ test('hash routes support direct load and back/forward', async ({ page }) => {
   await page.goto('/#/category/network');
   await expect(page.locator('#category-heading')).toHaveText('Network & IT Diagnostic Toolkit');
   await page.getByRole('link', { name: 'All toolkits', exact: true }).click();
-  await expect(page.locator('.card')).toHaveCount(7);
+  await expect(page.locator('.card')).toHaveCount(6);
   await page.goBack();
   await expect(page.locator('#category-heading')).toHaveText('Network & IT Diagnostic Toolkit');
   await page.goForward();
-  await expect(page.locator('.card')).toHaveCount(7);
+  await expect(page.locator('.card')).toHaveCount(6);
   await page.goto('/#/category/does-not-exist');
-  await expect(page.locator('.card')).toHaveCount(7);
+  await expect(page.locator('.card')).toHaveCount(6);
 });
 
 test('skip link moves focus to main content', async ({ page }) => {
@@ -119,7 +118,7 @@ test('toolkit cards stay visible, mark the open toolkit and show its tools below
   const cards = page.getByRole('navigation', { name: 'Filter by toolkit' });
   await cards.getByRole('link', { name: 'Job Application Toolkit' }).click();
   await expect(page).toHaveURL(/#\/category\/jobs$/);
-  await expect(page.locator('.card')).toHaveCount(7);
+  await expect(page.locator('.card')).toHaveCount(6);
   await expect(cards.getByRole('link', { name: 'Job Application Toolkit' })).toHaveAttribute(
     'aria-current',
     'page',
@@ -133,7 +132,7 @@ test('toolkit cards stay visible, mark the open toolkit and show its tools below
   await expect(page.locator('.tool .tool-cta').first()).toHaveText('Open tool');
   await cards.getByRole('link', { name: 'Network & IT Diagnostic Toolkit' }).click();
   await expect(page.locator('#category-heading')).toHaveText('Network & IT Diagnostic Toolkit');
-  await expect(page.locator('.tool .tool-cta')).toHaveCount(1);
+  await expect(page.locator('.tool .tool-cta')).toHaveCount(5);
   await expect(
     page.getByRole('navigation', { name: 'Primary' }).getByRole('link', { name: 'Home' }),
   ).not.toHaveAttribute('aria-current', 'page');
