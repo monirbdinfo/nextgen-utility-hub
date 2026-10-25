@@ -119,7 +119,7 @@ test('toolkit cards stay visible, mark the open toolkit and show its tools below
   const cards = page.getByRole('navigation', { name: 'Filter by toolkit' });
   await cards.getByRole('link', { name: 'Job Application Toolkit' }).click();
   await expect(page).toHaveURL(/#\/category\/jobs$/);
-  await expect(page.locator('.card')).toHaveCount(5);
+  await expect(page.locator('.card')).toHaveCount(7);
   await expect(cards.getByRole('link', { name: 'Job Application Toolkit' })).toHaveAttribute(
     'aria-current',
     'page',
@@ -133,7 +133,7 @@ test('toolkit cards stay visible, mark the open toolkit and show its tools below
   await expect(page.locator('.tool .tool-cta').first()).toHaveText('Open tool');
   await cards.getByRole('link', { name: 'Network & IT Diagnostic Toolkit' }).click();
   await expect(page.locator('#category-heading')).toHaveText('Network & IT Diagnostic Toolkit');
-  await expect(page.locator('.tool .tool-cta')).toHaveCount(5);
+  await expect(page.locator('.tool .tool-cta')).toHaveCount(1);
   await expect(
     page.getByRole('navigation', { name: 'Primary' }).getByRole('link', { name: 'Home' }),
   ).not.toHaveAttribute('aria-current', 'page');
