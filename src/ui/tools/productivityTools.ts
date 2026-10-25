@@ -167,15 +167,35 @@ export const usernameChecker: ToolView = () => shell('Name Checker', 'Availabili
 });
 
 export const binChecker: ToolView = () => shell('BIN Checker', 'A BIN lookup requires a maintained provider. This tool opens a public search and does not submit card numbers or query a private database.', (root) => {
-  const bin = input('First 6–8 digits', 'text'); bin.control.inputMode = 'numeric'; const link = h('a', { class: 'button button-primary', target: '_blank', rel: 'noopener noreferrer', href: 'https://binlist.net/' }, 'Open BIN lookup');
-  root.append(bin.el, button('Validate BIN format', () => { const value = bin.control.value.replace(/\s/g,''); if (!/^\d{6,8}$/.test(value)) { setResult(status, 'Enter 6–8 digits.'); return; } link.href = 'https://binlist.net/'; link.textContent = 'Look up BIN ' + value; setResult(status, 'Format looks valid. Issuer details must be confirmed by the lookup provider.'); }), link, status);
+  const bin = input('First 6–8 digits', 'text');
+  bin.control.inputMode = 'numeric';
+  const link = h('a', { class: 'button button-primary', target: '_blank', rel: 'noopener noreferrer', href: 'https://binlist.net/' }, 'Open BIN lookup');
   const status = result();
+  root.append(bin.el, button('Validate BIN format', () => {
+    const value = bin.control.value.replace(/\s/g, '');
+    if (!/^\d{6,8}$/.test(value)) {
+      setResult(status, 'Enter 6–8 digits.');
+      return;
+    }
+    link.href = 'https://binlist.net/';
+    link.textContent = 'Look up BIN ' + value;
+    setResult(status, 'Format looks valid. Issuer details must be confirmed by the lookup provider.');
+  }), link, status);
 });
 
 export const bimiChecker: ToolView = () => shell('BIMI Checker & Generator', 'BIMI requires DNS and brand-logo configuration. Enter a domain to open a public checker; this page does not modify DNS.', (root) => {
-  const domain = input('Domain'); domain.control.placeholder = 'example.com'; const link = h('a', { class: 'button button-primary', target: '_blank', rel: 'noopener noreferrer', href: 'https://bimigroup.org/' }, 'Open BIMI Group');
-  root.append(domain.el, button('Prepare domain lookup', () => { const value = domain.control.value.trim().replace(/^https?:\/\//,'').replace(/\/$/,''); if (!/^(?=.{1,253}$)[a-z0-9.-]+\.[a-z]{2,}$/i.test(value)) { setResult(status, 'Enter a valid domain.'); return; } setResult(status, 'BIMI DNS record name: default._bimi.' + value + '\nCheck the TXT record with your DNS provider or a trusted BIMI checker.'); }), link, status);
+  const domain = input('Domain');
+  domain.control.placeholder = 'example.com';
+  const link = h('a', { class: 'button button-primary', target: '_blank', rel: 'noopener noreferrer', href: 'https://bimigroup.org/' }, 'Open BIMI Group');
   const status = result();
+  root.append(domain.el, button('Prepare domain lookup', () => {
+    const value = domain.control.value.trim().replace(/^https?:\/\//, '').replace(/\/$/, '');
+    if (!/^(?=.{1,253}$)[a-z0-9.-]+\.[a-z]{2,}$/i.test(value)) {
+      setResult(status, 'Enter a valid domain.');
+      return;
+    }
+    setResult(status, 'BIMI DNS record name: default._bimi.' + value + '\nCheck the TXT record with your DNS provider or a trusted BIMI checker.');
+  }), link, status);
 });
 
 export const imageToText: ToolView = () => shell('Image to Text Converter', 'OCR requires a downloadable language model. To keep this site lightweight and avoid silently uploading images, this tool currently guides you to use your device’s built-in OCR.', (root) => {
