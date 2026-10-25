@@ -80,6 +80,20 @@ describe('registry integrity', () => {
       'my-ip-info',
       'dns-lookup',
       'latency-test',
+      'qr-code-generator',
+      'qr-scanner',
+      'lorem-ipsum',
+      'time-card-calculator',
+      'credit-card-checker',
+      'reverse-image-search',
+      'notepad-online',
+      'small-text-generator',
+      'rot13-decoder',
+      'morse-translator',
+      'runic-translator',
+      'invisible-character',
+      'internet-speed-test',
+      'wifi-qr-scanner',
     ]);
   });
 
