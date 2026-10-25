@@ -107,7 +107,7 @@ export const notepadOnline: ToolView = () => shell('Notepad Online', 'Temporary 
     const blob = new Blob([note.control.value], { type: 'text/plain;charset=utf-8' }); const url = URL.createObjectURL(blob); const a = h('a', { href: url, download: 'note.txt' }); a.click(); URL.revokeObjectURL(url); status.textContent = 'Download requested.';
   });
   const clear = button('Clear note', () => { note.control.value = ''; status.textContent = 'Note cleared.'; });
-  root.append(note.el, h('p', { class: 'field-hint' }, () => String(note.control.value.length) + ' characters'), download, clear, status);
+  const count = h('p', { class: 'field-hint' });\n  note.control.addEventListener('input', () => { count.textContent = note.control.value.length + ' characters'; });\n  count.textContent = '0 characters';\n  root.append(note.el, count, download, clear, status);
 });
 
 export const qrScanner: ToolView = () => shell('QR Scanner', 'Uses the browser BarcodeDetector API when supported. Camera access is requested only after you press Start camera.', (root) => {
