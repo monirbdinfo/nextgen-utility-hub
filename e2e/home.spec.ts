@@ -6,6 +6,8 @@ const CATEGORY_NAMES = [
   'Bangla Number & Text Toolkit',
   'Privacy-First File Tools',
   'Network & IT Diagnostic Toolkit',
+  'IP Tools',
+  'Productivity Tools',
 ];
 
 async function noHorizontalScroll(page: Page): Promise<void> {
@@ -15,7 +17,7 @@ async function noHorizontalScroll(page: Page): Promise<void> {
   expect(overflow).toBeLessThanOrEqual(0);
 }
 
-test('homepage renders five toolkits and only same-origin requests', async ({ page, baseURL }) => {
+test('homepage renders seven toolkits and only same-origin requests', async ({ page, baseURL }) => {
   const foreign: string[] = [];
   page.on('request', (req) => {
     const url = new URL(req.url());
@@ -58,7 +60,7 @@ test('hash routes support direct load and back/forward', async ({ page }) => {
   await page.goto('/#/category/network');
   await expect(page.locator('#category-heading')).toHaveText('Network & IT Diagnostic Toolkit');
   await page.getByRole('link', { name: 'All toolkits', exact: true }).click();
-  await expect(page.locator('.card')).toHaveCount(5);
+  await expect(page.locator('.card')).toHaveCount(7);
   await page.goBack();
   await expect(page.locator('#category-heading')).toHaveText('Network & IT Diagnostic Toolkit');
   await page.goForward();
