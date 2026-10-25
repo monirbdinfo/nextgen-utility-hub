@@ -8,7 +8,7 @@ export interface LocalizedText {
 /** Only `available` tools may be linked/launched. Everything else is roadmap. */
 export type ToolStatus = 'planned' | 'in-progress' | 'available';
 
-export type CategoryId = 'general' | 'jobs' | 'bangla' | 'files' | 'network';
+export type CategoryId = 'general' | 'jobs' | 'bangla' | 'files' | 'network' | 'ip-tools' | 'productivity';
 
 export type IconName = 'toolbox' | 'briefcase' | 'bangla' | 'shield' | 'network';
 
