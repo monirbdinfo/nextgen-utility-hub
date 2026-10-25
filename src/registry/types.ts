@@ -8,6 +8,7 @@ export interface LocalizedText {
 /** Only `available` tools may be linked/launched. Everything else is roadmap. */
 export type ToolStatus = 'planned' | 'in-progress' | 'available';
 
+// prettier-ignore
 export type CategoryId =
   | 'general'
   | 'jobs'
@@ -17,6 +18,7 @@ export type CategoryId =
   | 'ip-tools'
   | 'productivity';
 
+// prettier-ignore
 export type IconName = 'toolbox' | 'briefcase' | 'bangla' | 'shield' | 'network';
 
 export interface Category {
