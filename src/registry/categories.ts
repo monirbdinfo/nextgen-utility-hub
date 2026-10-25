@@ -46,4 +46,22 @@ export const categories: readonly Category[] = [
       bn: 'নিরাপদ, ব্রাউজারভিত্তিক ডায়াগনস্টিক। অন্যের সিস্টেম স্ক্যান নয়।',
     },
   },
+  {
+    id: 'ip-tools',
+    icon: 'network',
+    name: { en: 'IP Tools', bn: 'আইপি টুলস' },
+    description: {
+      en: 'IP lookup, DNS, address conversion and network diagnostics.',
+      bn: 'আইপি লুকআপ, DNS, অ্যাড্রেস রূপান্তর ও নেটওয়ার্ক ডায়াগনস্টিক।',
+    },
+  },
+  {
+    id: 'productivity',
+    icon: 'toolbox',
+    name: { en: 'Productivity Tools', bn: 'প্রোডাক্টিভিটি টুলস' },
+    description: {
+      en: 'Quick helpers for text, QR codes, validation and everyday workflows.',
+      bn: 'টেক্সট, QR কোড, যাচাই ও দৈনন্দিন কাজের দ্রুত টুল।',
+    },
+  },
 ];

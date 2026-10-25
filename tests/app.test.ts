@@ -40,7 +40,7 @@ afterEach(() => {
 });
 
 describe('homepage', () => {
-  it('renders five category cards with the specified names', () => {
+  it('renders seven category cards with the specified names', () => {
     const root = setup();
     const titles = [...root.querySelectorAll('.card-title')].map((e) => e.textContent);
     expect(titles).toEqual([
@@ -49,6 +49,8 @@ describe('homepage', () => {
       'Bangla Number & Text Toolkit',
       'Privacy-First File Tools',
       'Network & IT Diagnostic Toolkit',
+      'IP Tools',
+      'Productivity Tools',
     ]);
   });
 
@@ -147,7 +149,7 @@ describe('routing', () => {
       'Bangla Number & Text Toolkit',
     );
     // The toolkit cards stay visible; the selected one is marked as the current page.
-    expect(root.querySelectorAll('.card')).toHaveLength(5);
+    expect(root.querySelectorAll('.card')).toHaveLength(7);
     expect(root.querySelector('.card-link[aria-current="page"]')?.textContent).toBe(
       'Bangla Number & Text Toolkit',
     );
@@ -160,8 +162,9 @@ describe('routing', () => {
   it('links every tool in a toolkit', () => {
     const root = setup('#/category/network');
     const tools = [...root.querySelectorAll('.tool')];
-    expect(tools).toHaveLength(5);
+    expect(tools).toHaveLength(1);
     for (const tool of tools) {
+      expect(tool.id).toBe('tool-latency-test');
       expect(tool.querySelector('.pill')?.textContent).toBe('Available');
       expect(tool.querySelector('a')?.getAttribute('href')).toBe(`#/tool/${tool.id.slice(5)}`);
     }
@@ -177,7 +180,7 @@ describe('routing', () => {
     const root = setup('#/category/files');
     history.replaceState(null, '', '/#/');
     window.dispatchEvent(new HashChangeEvent('hashchange'));
-    expect(root.querySelectorAll('.card')).toHaveLength(5);
+    expect(root.querySelectorAll('.card')).toHaveLength(7);
     expect(root.querySelector('#category-heading')).toBeNull();
     expect(root.querySelector('.card-link[aria-current]')).toBeNull();
     expect(document.activeElement?.id).toBe('toolkits-title');
@@ -243,7 +246,7 @@ describe('home layout', () => {
   it('lists a toolkit\'s tools with status, an open action or "Coming soon"', () => {
     const root = setup('#/category/general');
     const rows = [...root.querySelectorAll('.tool')];
-    expect(rows.length).toBe(6);
+    expect(rows.length).toBe(5);
     for (const row of rows) {
       const available = row.querySelector('.pill')?.textContent === 'Available';
       expect(!!row.querySelector('a.tool-link')).toBe(available);

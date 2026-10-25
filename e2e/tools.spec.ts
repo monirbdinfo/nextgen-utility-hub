@@ -126,7 +126,7 @@ test('navigation between toolkit and tools supports back and forward', async ({ 
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('Taka in Words');
   // Unknown tools have no page (planned tools are covered in tests/planned.test.ts).
   await page.goto('/#/tool/does-not-exist');
-  await expect(page.locator('.card')).toHaveCount(5);
+  await expect(page.locator('.card')).toHaveCount(7);
 });
 
 test('works under the GitHub Pages sub-path', async ({ page }) => {
@@ -141,7 +141,7 @@ test('works under the GitHub Pages sub-path', async ({ page }) => {
   );
   await page.getByLabel('Breadcrumb').getByRole('link', { name: 'Home' }).click();
   await expect(page).toHaveURL(`${base}#/`);
-  await expect(page.locator('.card')).toHaveCount(5);
+  await expect(page.locator('.card')).toHaveCount(7);
   expect(errors).toEqual([]);
 });
 
