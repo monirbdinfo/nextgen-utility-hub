@@ -480,7 +480,8 @@ export const tools: readonly Tool[] = [
     route: route('latency-test'),
     online: 'same-site',
   },,
-  ...[
+  // prettier-ignore
+  ...([
     ['ping-ipv4','Ping IPv4 Address','IPv4 পিং','Check IPv4 reachability where supported.','সমর্থিত পরিবেশে IPv4 সংযোগ পরীক্ষা করুন।',['ping','ipv4','পিং']],
     ['ping-ipv6','Ping IPv6 Address','IPv6 পিং','Check IPv6 reachability where supported.','সমর্থিত পরিবেশে IPv6 সংযোগ পরীক্ষা করুন।',['ping','ipv6','পিং']],
     ['traceroute','Traceroute','ট্রেসরুট','Inspect the network path where a supported diagnostic service is available.','সমর্থিত ডায়াগনস্টিক সার্ভিস থাকলে নেটওয়ার্ক পথ দেখুন।',['traceroute','route','ট্রেসরুট']],
@@ -502,8 +503,9 @@ export const tools: readonly Tool[] = [
     ['ipv6-compatibility','IPv6 Compatibility Checker','IPv6 সামঞ্জস্য পরীক্ষা','Check IPv6 support using a supported test endpoint.','সমর্থিত টেস্ট এন্ডপয়েন্ট দিয়ে IPv6 সাপোর্ট পরীক্ষা করুন।',['ipv6','compatibility','সামঞ্জস্য']],
     ['my-isp','What Is My ISP','আমার ISP কী','Look up the internet service provider associated with a public IP.','পাবলিক আইপির সঙ্গে যুক্ত ইন্টারনেট সেবাদাতা দেখুন।',['isp','provider','আইএসপি']],
     ['domain-to-ip','Domain to IP Lookup','ডোমেইন থেকে আইপি','Resolve a domain to its public DNS address records.','ডোমেইনের পাবলিক DNS অ্যাড্রেস রেকর্ড বের করুন।',['domain','ip lookup','ডোমেইন']],
-  ].map(([id,en,bn,de,db,keywords]) => ({id,category:'ip-tools' as const,name:{en,bn},description:{en:de,bn:db},keywords:[...keywords,'ip tools','আইপি টুলস'],status:'planned' as const})),
-  ...[
+  ] as const).map(([id,en,bn,de,db,keywords]) => ({id,category:'ip-tools' as const,name:{en,bn},description:{en:de,bn:db},keywords:[...keywords,'ip tools','আইপি টুলস'],status:'planned' as const})),
+  // prettier-ignore
+  ...([
     ['qr-code-generator','QR Code Generator','QR কোড জেনারেটর','Create QR codes for text, links and contact details.','টেক্সট, লিংক ও যোগাযোগের তথ্যের জন্য QR কোড তৈরি করুন।',['qr code','generator','কিউআর']],
     ['qr-scanner','QR Scanner','QR স্ক্যানার','Scan QR codes using a supported camera or image input.','সমর্থিত ক্যামেরা বা ছবি থেকে QR কোড স্ক্যান করুন।',['qr scanner','scan','স্ক্যান']],
     ['lorem-ipsum','Lorem Ipsum Generator','Lorem Ipsum জেনারেটর','Generate placeholder text for layouts and prototypes.','লেআউট ও প্রোটোটাইপের জন্য নমুনা লেখা তৈরি করুন।',['lorem ipsum','placeholder','নমুনা লেখা']],
@@ -523,5 +525,5 @@ export const tools: readonly Tool[] = [
     ['invisible-character','Invisible Character Generator','অদৃশ্য অক্ষর জেনারেটর','Create and inspect invisible Unicode characters with clear warnings.','সতর্কতাসহ অদৃশ্য Unicode অক্ষর তৈরি ও পরীক্ষা করুন।',['invisible character','unicode','অদৃশ্য']],
     ['internet-speed-test','Internet Speed Test','ইন্টারনেট স্পিড টেস্ট','Measure approximate download and upload speeds using an explicit test service.','নির্বাচিত টেস্ট সার্ভিস দিয়ে আনুমানিক ডাউনলোড ও আপলোড গতি মাপুন।',['internet speed','download','upload','গতি']],
     ['wifi-qr-scanner','WiFi QR Scanner','Wi-Fi QR স্ক্যানার','Read Wi-Fi network details encoded in a compatible QR code.','সামঞ্জস্যপূর্ণ QR কোডে থাকা Wi-Fi নেটওয়ার্কের তথ্য পড়ুন।',['wifi','qr scanner','ওয়াইফাই']],
-  ].map(([id,en,bn,de,db,keywords]) => ({id,category:'productivity' as const,name:{en,bn},description:{en:de,bn:db},keywords:[...keywords,'productivity tools','প্রোডাক্টিভিটি'],status:'planned' as const})),
+  ] as const).map(([id,en,bn,de,db,keywords]) => ({id,category:'productivity' as const,name:{en,bn},description:{en:de,bn:db},keywords:[...keywords,'productivity tools','প্রোডাক্টিভিটি'],status:'planned' as const})),
 ];
