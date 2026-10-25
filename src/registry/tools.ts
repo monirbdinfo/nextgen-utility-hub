@@ -7,6 +7,7 @@ const route = (id: string): string => `#/tool/${id}`;
  * logic, view, route and tests exist (enforced in tests/registry.test.ts).
  * Planned tools are roadmap items; see docs/PROJECT_ROADMAP.md.
  */
+// prettier-ignore
 export const tools: readonly Tool[] = [
   // ---------- General Utilities ----------
   {
