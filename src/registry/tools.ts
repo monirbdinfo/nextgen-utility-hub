@@ -480,7 +480,7 @@ export const tools: readonly Tool[] = [
     status: 'available',
     route: route('latency-test'),
     online: 'same-site',
-  },,
+  },
   // prettier-ignore
   ...([
     ['ping-ipv4','Ping IPv4 Address','IPv4 পিং','Check IPv4 reachability where supported.','সমর্থিত পরিবেশে IPv4 সংযোগ পরীক্ষা করুন।',['ping','ipv4','পিং']],
