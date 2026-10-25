@@ -46,7 +46,7 @@ test('search is keyboard operable end to end', async ({ page }) => {
   await page.keyboard.press('/');
   const search = page.getByRole('combobox', { name: 'Search tools' });
   await expect(search).toBeFocused();
-  await search.fill('dns');
+  await search.fill('dns lookup');
   await expect(page.getByRole('option', { name: 'DNS Lookup', exact: true })).toBeVisible();
   await page.keyboard.press('ArrowDown');
   await expect(page.getByRole('option').first()).toHaveAttribute('aria-selected', 'true');
