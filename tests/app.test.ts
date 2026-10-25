@@ -49,7 +49,6 @@ describe('homepage', () => {
       'Bangla Number & Text Toolkit',
       'Privacy-First File Tools',
       'Network & IT Diagnostic Toolkit',
-      'IP Tools',
       'Productivity Tools',
     ]);
   });
@@ -149,7 +148,7 @@ describe('routing', () => {
       'Bangla Number & Text Toolkit',
     );
     // The toolkit cards stay visible; the selected one is marked as the current page.
-    expect(root.querySelectorAll('.card')).toHaveLength(7);
+    expect(root.querySelectorAll('.card')).toHaveLength(6);
     expect(root.querySelector('.card-link[aria-current="page"]')?.textContent).toBe(
       'Bangla Number & Text Toolkit',
     );
@@ -180,7 +179,7 @@ describe('routing', () => {
     const root = setup('#/category/files');
     history.replaceState(null, '', '/#/');
     window.dispatchEvent(new HashChangeEvent('hashchange'));
-    expect(root.querySelectorAll('.card')).toHaveLength(7);
+    expect(root.querySelectorAll('.card')).toHaveLength(6);
     expect(root.querySelector('#category-heading')).toBeNull();
     expect(root.querySelector('.card-link[aria-current]')).toBeNull();
     expect(document.activeElement?.id).toBe('toolkits-title');
