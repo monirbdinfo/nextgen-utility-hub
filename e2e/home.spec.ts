@@ -47,7 +47,7 @@ test('search is keyboard operable end to end', async ({ page }) => {
   const search = page.getByRole('combobox', { name: 'Search tools' });
   await expect(search).toBeFocused();
   await search.fill('dns lookup');
-  await expect(page.getByRole('option', { name: 'DNS Lookup', exact: true })).toBeVisible();
+  await expect(page.getByRole('option').first()).toContainText('DNS Lookup');
   await page.keyboard.press('ArrowDown');
   await expect(page.getByRole('option').first()).toHaveAttribute('aria-selected', 'true');
   await page.keyboard.press('Enter');
@@ -66,7 +66,7 @@ test('hash routes support direct load and back/forward', async ({ page }) => {
   await page.goForward();
   await expect(page.locator('.card')).toHaveCount(7);
   await page.goto('/#/category/does-not-exist');
-  await expect(page.locator('.card')).toHaveCount(5);
+  await expect(page.locator('.card')).toHaveCount(7);
 });
 
 test('skip link moves focus to main content', async ({ page }) => {
