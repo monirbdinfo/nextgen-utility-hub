@@ -68,7 +68,7 @@ describe('planned tools', () => {
     expect(toolViews[PLANNED.id]).toBeUndefined();
     const root = setup(`#/tool/${PLANNED.id}`);
     expect(root.querySelector('#tool-title')).toBeNull();
-    expect(root.querySelectorAll('.card')).toHaveLength(7);
+    expect(root.querySelectorAll('.card')).toHaveLength(6);
   });
 
   it('are labelled Planned in search, and Enter goes to their toolkit', () => {
@@ -88,7 +88,7 @@ describe('planned tools', () => {
   it('are listed after available tools, without a link, as Coming soon', () => {
     const root = setup('#/category/network');
     const items = [...root.querySelectorAll('.tool')];
-    expect(items).toHaveLength(2);
+    expect(items).toHaveLength(27);
     const last = items.at(-1)!;
     expect(last.id).toBe(`tool-${PLANNED.id}`);
     expect(last.querySelector('.pill')?.textContent).toBe('Planned');
@@ -100,6 +100,6 @@ describe('planned tools', () => {
   it('are counted separately on the toolkit card', () => {
     const root = setup();
     const counts = [...root.querySelectorAll('.card-count')].map((c) => c.textContent);
-    expect(counts[4]).toBe('1 available · 1 planned');
+    expect(counts[4]).toBe('5 available · 22 planned');
   });
 });
