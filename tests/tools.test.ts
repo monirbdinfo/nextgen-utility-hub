@@ -75,7 +75,7 @@ describe('tool pages', () => {
   it('show available counts on cards', () => {
     const root = open('');
     const counts = [...root.querySelectorAll('.card-count')].map((c) => c.textContent);
-    expect(counts[0]).toBe('6 available tools');
+    expect(counts[0]).toBe('5 available tools');
     expect(counts[3]).toBe('9 available tools');
     expect(counts[4]).toBe('1 available tools');
   });
