@@ -430,8 +430,27 @@ Still planned, and why each is blocked:
 Each of these needs a separate decision on provider, data sent and privacy notice before
 it is built, in line with the rules for online tools in `docs/TOOLS.md`.
 
-The Productivity Tools entries on `main` are outside this milestone. They are tracked on
-their own branch and were not changed here.
+## Productivity Tools (status by tool)
+
+Available (fully offline, Bangla/English, tested): Lorem Ipsum Generator, Time Card
+Calculator, Credit Card Number Checker, Notepad Online, Small Text Generator, ROT13 Decoder /
+Encoder, Morse Code Translator, Runic Translator and Invisible Character Generator. Details
+and rules are in [TOOLS.md](TOOLS.md#productivity-tools-text-time-card-card-checker-notepad).
+
+Still planned:
+
+| Registry ID            | Tool                     | Status                                                                                                        |
+| ---------------------- | ------------------------ | ------------------------------------------------------------------------------------------------------------- |
+| `qr-code-generator`    | QR Code Generator        | Next. Must encode in the browser; sending the text to a QR web service would break the privacy promise.       |
+| `qr-scanner`           | QR Scanner               | Next. Uses the browser's `BarcodeDetector` where it exists; not available in every browser.                   |
+| `wifi-qr-scanner`      | WiFi QR Scanner          | Next, with the QR scanner (reads the `WIFI:` payload).                                                        |
+| `internet-speed-test`  | Internet Speed Test      | Next. Needs a test service, so it must say what it contacts and download its file only on request.            |
+| `bimi-checker`         | BIMI Checker & Generator | Next. A DNS TXT lookup through Cloudflare DNS, plus a record generator.                                       |
+| `reverse-image-search` | Reverse Image Search     | Next, as links to search sites. This site never uploads the image.                                            |
+| `bin-checker`          | BIN Checker              | Blocked: needs a BIN data provider, and none is approved.                                                     |
+| `username-checker`     | Name Checker             | Blocked: availability needs each platform's API; search links alone do not check anything.                    |
+| `domain-name-search`   | Domain Name Search       | Blocked: availability needs an RDAP or registrar provider, and none is approved.                              |
+| `image-to-text`        | Image to Text Converter  | Blocked: OCR needs an engine and language data (megabytes) that must be bundled or fetched; needs a decision. |
 
 ## Notes for later milestones
 

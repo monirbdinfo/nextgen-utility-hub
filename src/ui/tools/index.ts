@@ -25,6 +25,15 @@ import {
   localIpv6Generator,
 } from './networkIpv6';
 import { emailHeaderAnalyzer } from './emailHeaders';
+import { creditCardChecker, notepadOnline, timeCardCalculator } from './productivityMisc';
+import {
+  invisibleCharacter,
+  loremGenerator,
+  morseTranslator,
+  rot13Tool,
+  runicTranslator,
+  smallTextGenerator,
+} from './productivityText';
 import { numberToWordsTool } from './numberToWords';
 import { photoResizer } from './photoResizer';
 import { pdfCreate, pdfMergeSplit, pdfPageTools, pdfReduceSize } from './pdfTools';
@@ -74,6 +83,15 @@ export const toolViews: Readonly<Record<string, ToolView>> = {
   'email-header-analyzer': emailHeaderAnalyzer,
   'ip-to-hostname': ipToHostname,
   'domain-to-ip': domainToIp,
+  'lorem-ipsum': loremGenerator,
+  'time-card-calculator': timeCardCalculator,
+  'credit-card-checker': creditCardChecker,
+  'rot13-decoder': rot13Tool,
+  'morse-translator': morseTranslator,
+  'small-text-generator': smallTextGenerator,
+  'runic-translator': runicTranslator,
+  'invisible-character': invisibleCharacter,
+  'notepad-online': notepadOnline,
 };
 
 export type { ToolContext, ToolView } from './kit';
