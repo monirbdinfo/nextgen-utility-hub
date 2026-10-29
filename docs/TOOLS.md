@@ -737,6 +737,41 @@ standard (not Micro, Kanji or Structured Append) codes.
   whether the network is hidden. The password is hidden until “Show the password” is ticked, and
   can be copied only while shown.
 
+## Internet Speed Test and Reverse Image Search
+
+**Internet Speed Test** (online, Cloudflare). Before the button the page says what it contacts
+(`https://speed.cloudflare.com/__down`, the endpoint Cloudflare's own speed test uses), how much
+it downloads, and that Cloudflare receives the visitor's IP address and browser details. Nothing
+is requested until “Start test”. Requests go through `src/lib/net.ts`: no cookies, no referrer,
+no cache.
+
+- **Round trip:** one uncounted warm-up, then 5 empty downloads (`bytes=0`). The time to the
+  server's first answer is the round trip; the median and jitter (average change between
+  consecutive round trips) are shown. This is HTTPS request time, not ICMP ping.
+- **Download:** the quick plan downloads 2 × 100 kB and 4 × 1 MB (4.2 MB); the standard plan adds
+  3 × 10 MB (up to 34.2 MB). Each file is read as a stream and timed from the first answer to the
+  last byte; transfers under 10 ms are too quick to time and are not counted. The headline is the
+  90th percentile of the timed downloads, as Cloudflare reports it; the median is shown too.
+- **Data saving:** if any download in a size step takes 4 s or more, the test does not move on to
+  larger files.
+- **Limits:** upload speed is **not** measured. Results depend on Wi-Fi, other traffic, VPNs and
+  the browser; the page calls the result an estimate. A blocked request (firewall, blocker
+  extension, cross-origin rules) is reported as such. “Stop” keeps the downloads completed so far;
+  leaving the tool cancels the test.
+- **Verification:** CI never contacts Cloudflare. Unit tests use a fake clock and fetch; the
+  Playwright tests answer the endpoint with `page.route()`. Cloudflare's live CORS behaviour has
+  not been tested from this project's environment.
+
+**Reverse Image Search** (no network use by this site). The user enters the public `http(s)`
+address of a picture, and the page builds links that open Google Lens, Bing Visual Search, TinEye
+or Yandex Images with that address (`target="_blank"`, `rel="noopener noreferrer"`). Opening a
+link sends the address to that provider, which fetches the picture; the page says so. Addresses on
+this device or a private network (`localhost`, `.local`, single-label names, 10/8, 172.16/12,
+192.168/16, 127/8, 169.254/16, 100.64/10, `::1`, `fc00::/7`, `fe80::/10`) are refused because no
+provider could reach them, and `data:`, `file:` and `javascript:` addresses are refused. There is
+**no file picker**: the site never uploads pictures. For a picture on the device, the page links to
+each provider's own upload page so the picture goes only to the provider the user chooses.
+
 ## Image tools: browsers and EXIF orientation
 
 **Browsers actually tested.** The image tools are tested with Playwright in three

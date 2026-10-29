@@ -28,6 +28,8 @@ import { emailHeaderAnalyzer } from './emailHeaders';
 import { creditCardChecker, notepadOnline, timeCardCalculator } from './productivityMisc';
 import { qrCodeGenerator } from './qrGenerator';
 import { qrScanner, wifiQrScanner } from './qrScanner';
+import { reverseImageSearch } from './reverseImage';
+import { internetSpeedTest } from './speedTest';
 import {
   invisibleCharacter,
   loremGenerator,
@@ -97,6 +99,8 @@ export const toolViews: Readonly<Record<string, ToolView>> = {
   'qr-code-generator': qrCodeGenerator,
   'qr-scanner': qrScanner,
   'wifi-qr-scanner': wifiQrScanner,
+  'reverse-image-search': reverseImageSearch,
+  'internet-speed-test': internetSpeedTest,
 };
 
 export type { ToolContext, ToolView } from './kit';

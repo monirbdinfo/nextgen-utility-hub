@@ -439,18 +439,20 @@ and rules are in [TOOLS.md](TOOLS.md#productivity-tools-text-time-card-card-chec
 Also available: QR Code Generator, QR Scanner and WiFi QR Scanner
 ([TOOLS.md](TOOLS.md#qr-code-generator-qr-scanner-and-wifi-qr-scanner)). They add one runtime
 dependency, `jsqr`, loaded only when a scan starts.
+Also available: Internet Speed Test (online: downloads test data from Cloudflare only when asked;
+download and round trip only, no upload) and Reverse Image Search (links to search providers; this
+site never uploads the picture). See
+[TOOLS.md](TOOLS.md#internet-speed-test-and-reverse-image-search).
 
 Still planned:
 
-| Registry ID            | Tool                     | Status                                                                                                        |
-| ---------------------- | ------------------------ | ------------------------------------------------------------------------------------------------------------- |
-| `internet-speed-test`  | Internet Speed Test      | Next. Needs a test service, so it must say what it contacts and download its file only on request.            |
-| `bimi-checker`         | BIMI Checker & Generator | Next. A DNS TXT lookup through Cloudflare DNS, plus a record generator.                                       |
-| `reverse-image-search` | Reverse Image Search     | Next, as links to search sites. This site never uploads the image.                                            |
-| `bin-checker`          | BIN Checker              | Blocked: needs a BIN data provider, and none is approved.                                                     |
-| `username-checker`     | Name Checker             | Blocked: availability needs each platform's API; search links alone do not check anything.                    |
-| `domain-name-search`   | Domain Name Search       | Blocked: availability needs an RDAP or registrar provider, and none is approved.                              |
-| `image-to-text`        | Image to Text Converter  | Blocked: OCR needs an engine and language data (megabytes) that must be bundled or fetched; needs a decision. |
+| Registry ID          | Tool                     | Status                                                                                                        |
+| -------------------- | ------------------------ | ------------------------------------------------------------------------------------------------------------- |
+| `bimi-checker`       | BIMI Checker & Generator | Next. A DNS TXT lookup through Cloudflare DNS, plus a record generator.                                       |
+| `bin-checker`        | BIN Checker              | Blocked: needs a BIN data provider, and none is approved.                                                     |
+| `username-checker`   | Name Checker             | Blocked: availability needs each platform's API; search links alone do not check anything.                    |
+| `domain-name-search` | Domain Name Search       | Blocked: availability needs an RDAP or registrar provider, and none is approved.                              |
+| `image-to-text`      | Image to Text Converter  | Blocked: OCR needs an engine and language data (megabytes) that must be bundled or fetched; needs a decision. |
 
 ## Notes for later milestones
 

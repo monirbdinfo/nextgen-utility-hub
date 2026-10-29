@@ -16,6 +16,7 @@ const CROSS_BROWSER_SPECS = [
   'network-tools.spec.ts',
   'productivity.spec.ts',
   'qr.spec.ts',
+  'speed-reverse.spec.ts',
 ];
 
 export default defineConfig({
