@@ -1590,6 +1590,21 @@
   font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
 }
 
+.tool-stack {
+  display: grid;
+  gap: var(--space-5);
+  margin-top: var(--space-8);
+}
+
+.tool-stack .tool-layout {
+  margin-top: 0;
+}
+
+.tool-section-title {
+  margin: 0;
+  font-size: 1.15rem;
+}
+
 .tool-layout {
   display: grid;
   gap: var(--space-5);

@@ -633,6 +633,56 @@ tests) and check the request the page makes. If Cloudflare refuses a cross-origi
 from a browser, the tool shows the “blocked” message; it does not fall back to any other
 service or proxy. The latency check is tested against the real preview server.
 
+## Productivity tools (text, time card, card checker, notepad)
+
+All of these run in the browser and send nothing. The pure logic is in `src/calc/textTools.ts`,
+`cardCheck.ts` and `timeCard.ts`; the views share one form helper (`src/ui/tools/toolForm.ts`).
+The text tools update as you type; the others use their button. Bangla digits are accepted
+where numbers are typed.
+
+- **Lorem Ipsum Generator:** paragraphs (1–50), sentences (1–200) or words (1–5,000). It uses a
+  fixed seed, so the same settings always give the same text. The classic opening “Lorem ipsum
+  dolor sit amet, consectetur adipiscing elit” is optional.
+- **ROT13 Decoder / Encoder:** rotates A–Z and a–z by 13; the option also rotates digits by 5
+  (ROT5). Applying it twice restores the text. It is not encryption. Bangla and other
+  characters are unchanged.
+- **Morse Code Translator:** the international table (ITU-R M.1677-1): A–Z, 0–9 and
+  `. , ? ' ! / ( ) & : ; = + - _ " $ @`. Letters are separated by a space and words by `/`.
+  Decoding also accepts `·` and `−`. Characters or codes with no equivalent are skipped and
+  named; the tool never guesses. Bangla is not supported.
+- **Small Text Generator:** maps characters to Unicode superscript, subscript or small capitals.
+  Lookup ignores letter case. Some letters have no form in a style (for example superscript q,
+  subscript b); they stay as typed and are listed. These are text characters, not formatting:
+  screen readers and search handle them poorly, and a few fonts show boxes.
+- **Runic Translator:** a decorative letter-by-letter transliteration into Elder Futhark.
+  `th` becomes ᚦ and `ng` becomes ᛜ; `q` becomes ᚲᚹ and `x` becomes ᚲᛊ. The full table is shown on
+  the page. It is not a translation.
+- **Invisible Character Generator:** creates up to 1,000 of one chosen character from a list of
+  12 (zero-width space, non-joiner, joiner, word joiner, BOM, no-break and narrow no-break
+  space, soft hyphen, the two direction marks, Hangul filler and Braille blank). A second
+  section lists those characters in pasted text, with counts and the position of the first,
+  and offers the text without them. The page warns against using them to impersonate or evade
+  moderation.
+- **Time Card Calculator:** 24-hour clock-in and clock-out, unpaid break in minutes, number of
+  days (1–366) and an optional hourly rate (up to 2 decimals). A clock-out earlier than the
+  clock-in means the shift ends the next day. **Equal times are refused** because they cannot
+  tell “no time” from “24 hours”. The break must be shorter than the shift. Decimal hours are
+  minutes ÷ 60 rounded to 2 places (8 h 30 min = 8.50); pay uses the exact minutes, then
+  rounds to 2 places.
+- **Credit Card Number Checker:** strips spaces and hyphens, requires 12–19 digits, and applies
+  the Luhn mod-10 checksum. The network is guessed from the leading digits (Visa 4; Mastercard
+  51–55 and 2221–2720; American Express 34 and 37; Discover 6011, 644–649 and 65; Diners Club
+  300–305, 36, 38 and 39; JCB 3528–3589; UnionPay 62) and the length is compared with what
+  that network issues. This only shows a number is well-formed. It does not show a card
+  exists, is active or has funds, and the page says so.
+- **Notepad Online:** a note kept in this page's memory only. It survives a language switch
+  but not leaving or reloading the page. Counts use the same rules as the Word & Character
+  Counter. “Download .txt” saves `note.txt` using a Blob; nothing is stored or sent.
+
+Known-answer unit tests are in `tests/calc/textTools.test.ts`, `cardCheck.test.ts` and
+`timeCard.test.ts` (including the standard card test numbers, every Mastercard 2-series edge
+and the Morse round trip of every supported character).
+
 ## Image tools: browsers and EXIF orientation
 
 **Browsers actually tested.** The image tools are tested with Playwright in three

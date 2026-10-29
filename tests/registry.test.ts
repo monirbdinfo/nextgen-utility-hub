@@ -92,6 +92,15 @@ describe('registry integrity', () => {
       'ip-subnet-calculator',
       'ipv6-to-ipv4',
       'domain-to-ip',
+      'lorem-ipsum',
+      'time-card-calculator',
+      'credit-card-checker',
+      'notepad-online',
+      'small-text-generator',
+      'rot13-decoder',
+      'morse-translator',
+      'runic-translator',
+      'invisible-character',
     ]);
   });
 

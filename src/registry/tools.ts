@@ -647,6 +647,114 @@ export const tools: readonly Tool[] = [
     // prettier-ignore
     ['my-isp','What Is My ISP','আমার ISP কী','Look up the internet service provider associated with a public IP.','পাবলিক আইপির সঙ্গে যুক্ত ইন্টারনেট সেবাদাতা দেখুন।',['isp','provider','আইএসপি']],
   ] as const).map(([id,en,bn,de,db,keywords]) => ({id,category:'network' as const,name:{en,bn},description:{en:de,bn:db},keywords:[...keywords,'ip tools','আইপি টুলস'],status:'planned' as const})),
+  {
+    id: 'lorem-ipsum',
+    category: 'productivity',
+    name: { en: 'Lorem Ipsum Generator', bn: 'Lorem Ipsum জেনারেটর' },
+    description: {
+      en: 'Generate placeholder text for layouts and prototypes.',
+      bn: 'লেআউট ও প্রোটোটাইপের জন্য নমুনা লেখা তৈরি করুন।',
+    },
+    keywords: ['lorem ipsum', 'placeholder', 'নমুনা লেখা'],
+    status: 'available',
+    route: route('lorem-ipsum'),
+  },
+  {
+    id: 'time-card-calculator',
+    category: 'productivity',
+    name: { en: 'Time Card Calculator', bn: 'কাজের সময় ক্যালকুলেটর' },
+    description: {
+      en: 'Calculate work duration from clock-in and clock-out times.',
+      bn: 'কাজে প্রবেশ ও বের হওয়ার সময় থেকে কর্মঘণ্টা হিসাব করুন।',
+    },
+    keywords: ['time card', 'work hours', 'কর্মঘণ্টা'],
+    status: 'available',
+    route: route('time-card-calculator'),
+  },
+  {
+    id: 'credit-card-checker',
+    category: 'productivity',
+    name: { en: 'Credit Card Number Checker', bn: 'কার্ড নম্বর যাচাই' },
+    description: {
+      en: 'Validate card-number format with the Luhn checksum; no payment is made.',
+      bn: 'Luhn checksum দিয়ে কার্ড নম্বরের ফরম্যাট যাচাই করুন; কোনো পেমেন্ট হয় না।',
+    },
+    keywords: ['credit card', 'luhn', 'কার্ড'],
+    status: 'available',
+    route: route('credit-card-checker'),
+  },
+  {
+    id: 'notepad-online',
+    category: 'productivity',
+    name: { en: 'Notepad Online', bn: 'অনলাইন নোটপ্যাড' },
+    description: {
+      en: 'Write temporary notes in the browser.',
+      bn: 'ব্রাউজারে অস্থায়ী নোট লিখুন।',
+    },
+    keywords: ['notepad', 'notes', 'নোট'],
+    status: 'available',
+    route: route('notepad-online'),
+  },
+  {
+    id: 'small-text-generator',
+    category: 'productivity',
+    name: { en: 'Small Text Generator', bn: 'ছোট টেক্সট জেনারেটর' },
+    description: {
+      en: 'Convert compatible characters to small Unicode text styles.',
+      bn: 'সমর্থিত অক্ষর ছোট Unicode টেক্সট স্টাইলে রূপান্তর করুন।',
+    },
+    keywords: ['small text', 'unicode', 'ছোট লেখা'],
+    status: 'available',
+    route: route('small-text-generator'),
+  },
+  {
+    id: 'rot13-decoder',
+    category: 'productivity',
+    name: { en: 'ROT13 Decoder / Encoder', bn: 'ROT13 এনকোডার / ডিকোডার' },
+    description: {
+      en: 'Encode or decode text using ROT13.',
+      bn: 'ROT13 দিয়ে টেক্সট এনকোড বা ডিকোড করুন।',
+    },
+    keywords: ['rot13', 'encode', 'decode', 'এনকোড'],
+    status: 'available',
+    route: route('rot13-decoder'),
+  },
+  {
+    id: 'morse-translator',
+    category: 'productivity',
+    name: { en: 'Morse Code Translator', bn: 'মোর্স কোড ট্রান্সলেটর' },
+    description: {
+      en: 'Convert supported text to Morse code and back.',
+      bn: 'সমর্থিত টেক্সট মোর্স কোডে ও মোর্স কোড থেকে টেক্সটে রূপান্তর করুন।',
+    },
+    keywords: ['morse', 'translator', 'মোর্স'],
+    status: 'available',
+    route: route('morse-translator'),
+  },
+  {
+    id: 'runic-translator',
+    category: 'productivity',
+    name: { en: 'Runic Translator', bn: 'রুনিক ট্রান্সলেটর' },
+    description: {
+      en: 'Convert text to a decorative runic character mapping.',
+      bn: 'টেক্সটকে অলংকারমূলক রুনিক অক্ষরে রূপান্তর করুন।',
+    },
+    keywords: ['runic', 'translator', 'রুনিক'],
+    status: 'available',
+    route: route('runic-translator'),
+  },
+  {
+    id: 'invisible-character',
+    category: 'productivity',
+    name: { en: 'Invisible Character Generator', bn: 'অদৃশ্য অক্ষর জেনারেটর' },
+    description: {
+      en: 'Create and inspect invisible Unicode characters with clear warnings.',
+      bn: 'সতর্কতাসহ অদৃশ্য Unicode অক্ষর তৈরি ও পরীক্ষা করুন।',
+    },
+    keywords: ['invisible character', 'unicode', 'অদৃশ্য'],
+    status: 'available',
+    route: route('invisible-character'),
+  },
   // prettier-ignore
   ...([
     // prettier-ignore
@@ -654,35 +762,17 @@ export const tools: readonly Tool[] = [
     // prettier-ignore
     ['qr-scanner','QR Scanner','QR স্ক্যানার','Scan QR codes using a supported camera or image input.','সমর্থিত ক্যামেরা বা ছবি থেকে QR কোড স্ক্যান করুন।',['qr scanner','scan','স্ক্যান']],
     // prettier-ignore
-    ['lorem-ipsum','Lorem Ipsum Generator','Lorem Ipsum জেনারেটর','Generate placeholder text for layouts and prototypes.','লেআউট ও প্রোটোটাইপের জন্য নমুনা লেখা তৈরি করুন।',['lorem ipsum','placeholder','নমুনা লেখা']],
-    // prettier-ignore
-    ['time-card-calculator','Time Card Calculator','কাজের সময় ক্যালকুলেটর','Calculate work duration from clock-in and clock-out times.','কাজে প্রবেশ ও বের হওয়ার সময় থেকে কর্মঘণ্টা হিসাব করুন।',['time card','work hours','কর্মঘণ্টা']],
-    // prettier-ignore
     ['bin-checker','BIN Checker','BIN চেকার','Check a bank identification number using a supported data source.','সমর্থিত ডেটা সোর্স দিয়ে ব্যাংক শনাক্তকরণ নম্বর পরীক্ষা করুন।',['bin','bank identification','বিন']],
-    // prettier-ignore
-    ['credit-card-checker','Credit Card Number Checker','কার্ড নম্বর যাচাই','Validate card-number format with the Luhn checksum; no payment is made.','Luhn checksum দিয়ে কার্ড নম্বরের ফরম্যাট যাচাই করুন; কোনো পেমেন্ট হয় না।',['credit card','luhn','কার্ড']],
     // prettier-ignore
     ['reverse-image-search','Reverse Image Search','রিভার্স ইমেজ সার্চ','Find external reverse-image search options for an image.','ছবির জন্য বাহ্যিক রিভার্স ইমেজ সার্চ অপশন দেখুন।',['reverse image','search','ছবি']],
     // prettier-ignore
     ['username-checker','Name Checker','ইউজারনেম চেকার','Check username availability on supported services.','সমর্থিত সার্ভিসে ইউজারনেম পাওয়া যায় কি না দেখুন।',['username','social media','ইউজারনেম']],
     // prettier-ignore
-    ['notepad-online','Notepad Online','অনলাইন নোটপ্যাড','Write temporary notes in the browser.','ব্রাউজারে অস্থায়ী নোট লিখুন।',['notepad','notes','নোট']],
-    // prettier-ignore
-    ['small-text-generator','Small Text Generator','ছোট টেক্সট জেনারেটর','Convert compatible characters to small Unicode text styles.','সমর্থিত অক্ষর ছোট Unicode টেক্সট স্টাইলে রূপান্তর করুন।',['small text','unicode','ছোট লেখা']],
-    // prettier-ignore
     ['domain-name-search','Domain Name Search','ডোমেইন নাম সার্চ','Check domain availability through a supported lookup provider.','সমর্থিত লুকআপ প্রোভাইডার দিয়ে ডোমেইন প্রাপ্যতা দেখুন।',['domain search','availability','ডোমেইন']],
-    // prettier-ignore
-    ['rot13-decoder','ROT13 Decoder / Encoder','ROT13 এনকোডার / ডিকোডার','Encode or decode text using ROT13.','ROT13 দিয়ে টেক্সট এনকোড বা ডিকোড করুন।',['rot13','encode','decode','এনকোড']],
-    // prettier-ignore
-    ['morse-translator','Morse Code Translator','মোর্স কোড ট্রান্সলেটর','Convert supported text to Morse code and back.','সমর্থিত টেক্সট মোর্স কোডে ও মোর্স কোড থেকে টেক্সটে রূপান্তর করুন।',['morse','translator','মোর্স']],
     // prettier-ignore
     ['bimi-checker','BIMI Checker & Generator','BIMI চেকার ও জেনারেটর','Inspect BIMI DNS records and related configuration.','BIMI DNS রেকর্ড ও সংশ্লিষ্ট কনফিগারেশন পরীক্ষা করুন।',['bimi','dns','generator','বিমি']],
     // prettier-ignore
     ['image-to-text','Image to Text Converter','ছবি থেকে টেক্সট','Extract text from images using an available OCR engine.','উপলব্ধ OCR ইঞ্জিন দিয়ে ছবি থেকে লেখা বের করুন।',['ocr','image to text','ছবি']],
-    // prettier-ignore
-    ['runic-translator','Runic Translator','রুনিক ট্রান্সলেটর','Convert text to a decorative runic character mapping.','টেক্সটকে অলংকারমূলক রুনিক অক্ষরে রূপান্তর করুন।',['runic','translator','রুনিক']],
-    // prettier-ignore
-    ['invisible-character','Invisible Character Generator','অদৃশ্য অক্ষর জেনারেটর','Create and inspect invisible Unicode characters with clear warnings.','সতর্কতাসহ অদৃশ্য Unicode অক্ষর তৈরি ও পরীক্ষা করুন।',['invisible character','unicode','অদৃশ্য']],
     // prettier-ignore
     ['internet-speed-test','Internet Speed Test','ইন্টারনেট স্পিড টেস্ট','Measure approximate download and upload speeds using an explicit test service.','নির্বাচিত টেস্ট সার্ভিস দিয়ে আনুমানিক ডাউনলোড ও আপলোড গতি মাপুন।',['internet speed','download','upload','গতি']],
     // prettier-ignore
