@@ -12,7 +12,19 @@ import { imageResizer } from './imageResizer';
 import { applicationChecklist, coverLetterTemplates, cvTemplates } from './jobApplication';
 import type { ToolView } from './kit';
 import { cidrCalculator, subnetCalculator } from './networkCalculators';
-import { dnsLookup, ipLookup, latencyTest } from './networkOnline';
+import { dnsLookup, domainToIp, ipLookup, ipToHostname, latencyTest } from './networkOnline';
+import {
+  ipSubnetCalculator,
+  ipToDecimal,
+  ipv4ToIpv6,
+  ipv6CidrRange,
+  ipv6Compression,
+  ipv6Expand,
+  ipv6RangeCidr,
+  ipv6ToIpv4,
+  localIpv6Generator,
+} from './networkIpv6';
+import { emailHeaderAnalyzer } from './emailHeaders';
 import { numberToWordsTool } from './numberToWords';
 import { photoResizer } from './photoResizer';
 import { pdfCreate, pdfMergeSplit, pdfPageTools, pdfReduceSize } from './pdfTools';
@@ -50,6 +62,18 @@ export const toolViews: Readonly<Record<string, ToolView>> = {
   'my-ip-info': ipLookup,
   'dns-lookup': dnsLookup,
   'latency-test': latencyTest,
+  'ip-to-decimal': ipToDecimal,
+  'ipv4-to-ipv6': ipv4ToIpv6,
+  'ipv6-to-ipv4': ipv6ToIpv4,
+  'ipv6-compression': ipv6Compression,
+  'ipv6-expand': ipv6Expand,
+  'ipv6-cidr-range': ipv6CidrRange,
+  'ipv6-range-cidr': ipv6RangeCidr,
+  'ip-subnet-calculator': ipSubnetCalculator,
+  'local-ipv6-generator': localIpv6Generator,
+  'email-header-analyzer': emailHeaderAnalyzer,
+  'ip-to-hostname': ipToHostname,
+  'domain-to-ip': domainToIp,
 };
 
 export type { ToolContext, ToolView } from './kit';

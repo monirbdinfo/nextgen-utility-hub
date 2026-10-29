@@ -6,21 +6,21 @@ This roadmap follows the real implementation. A tool is only marked **Available*
 
 ## Status overview
 
-| Milestone | Scope                                                                  | Status                                         |
-| --------- | ---------------------------------------------------------------------- | ---------------------------------------------- |
-| 1         | Vite + TypeScript foundation, homepage, registry, i18n, CI             | Done (PR #1)                                   |
-| 2         | GitHub Pages deployment workflow                                       | Done (PR #2), site deployed                    |
-| 3         | Date/age, date difference, EMI, digits, number/Taka words, date text   | Done (PR #3, merged `9d0ed68`), site deployed  |
-| 4         | Unicode text cleaning and normalization                                | Done (PR #3, merged `9d0ed68`), site deployed  |
-| 5         | Image resize, crop, compression, conversion, photo/signature resizer   | Done (presets deferred: no verified source)    |
-| 6         | PDF creation, merge, split, page tools, size reduction                 | Planned                                        |
-| 7         | CV and cover-letter templates with print/PDF export                    | Planned                                        |
-| 8         | Subnet/CIDR/IP-range calculators, IP/DNS lookup, latency check         | Done (online tools use Cloudflare / same site) |
-| 9         | Bandwidth/data usage, integration, accessibility and regression review | Planned                                        |
+| Milestone | Scope                                                                  | Status                                        |
+| --------- | ---------------------------------------------------------------------- | --------------------------------------------- |
+| 1         | Vite + TypeScript foundation, homepage, registry, i18n, CI             | Done (PR #1)                                  |
+| 2         | GitHub Pages deployment workflow                                       | Done (PR #2), site deployed                   |
+| 3         | Date/age, date difference, EMI, digits, number/Taka words, date text   | Done (PR #3, merged `9d0ed68`), site deployed |
+| 4         | Unicode text cleaning and normalization                                | Done (PR #3, merged `9d0ed68`), site deployed |
+| 5         | Image resize, crop, compression, conversion, photo/signature resizer   | Done (presets deferred: no verified source)   |
+| 6         | PDF creation, merge, split, page tools, size reduction                 | Planned                                       |
+| 7         | CV and cover-letter templates with print/PDF export                    | Planned                                       |
+| 8         | Network toolkit: calculators, IP/DNS tools, IPv6, email headers        | 17 of 26 available; 9 blocked (see below)     |
+| 9         | Bandwidth/data usage, integration, accessibility and regression review | Planned                                       |
 
 ## Tool catalog by milestone
 
-28 registry entries; all 28 available after the online Network tools.
+Network toolkit: 26 entries, 17 available, 9 planned. The 9 planned ones are listed under Milestone 8 below.
 
 | Milestone | Category | Registry ID              | Tool                               | Status    |
 | --------- | -------- | ------------------------ | ---------------------------------- | --------- |
@@ -406,6 +406,33 @@ scan (not a project dependency, not run in CI) found no violations on the empty,
 error states and the category page, in light and dark themes, English and Bangla, at 360 and
 1280 px. Exact test counts and CI results are in the pull request.
 
+## Milestone 8 follow-up: IP and IPv6 tools (status by tool)
+
+Built in this milestone (available): IP to Decimal, IPv4 to IPv6, IPv6 to IPv4, IPv6
+Compression, IPv6 Expand, IPv6 CIDR to Range, IPv6 Range to CIDR, IP Subnet Calculator
+(IPv4 and IPv6), Local IPv6 Address Generator, Trace Email (Header Analyzer), IP to
+Hostname Lookup and Domain to IP Lookup. The last two use Cloudflare DNS, like DNS Lookup.
+
+Still planned, and why each is blocked:
+
+| Registry ID          | Tool                       | Blocker                                                                                   |
+| -------------------- | -------------------------- | ----------------------------------------------------------------------------------------- |
+| `ping-ipv4`          | Ping IPv4 Address          | Browsers cannot send ICMP echo. A ping needs a server, which this project does not run.   |
+| `ping-ipv6`          | Ping IPv6 Address          | Same as above.                                                                            |
+| `traceroute`         | Traceroute                 | Browsers cannot send the probes a traceroute uses. Same server requirement.               |
+| `ip-location-lookup` | IP Location Lookup         | Needs a geolocation provider. None is approved; Cloudflare does not offer one for this.   |
+| `ip-blacklist-check` | IP Blacklist Check         | Reputation lists (DNSBLs) often refuse public resolvers. Needs a provider decision first. |
+| `ip-whois`           | IP WHOIS Lookup            | Needs an RDAP or WHOIS provider. None is approved.                                        |
+| `ipv6-whois`         | IPv6 WHOIS Lookup          | Same as IP WHOIS.                                                                         |
+| `ipv6-compatibility` | IPv6 Compatibility Checker | Needs a test endpoint that answers from IPv6 and allows browser requests. Not yet chosen. |
+| `my-isp`             | What Is My ISP             | Needs an ASN or ISP dataset. None is approved.                                            |
+
+Each of these needs a separate decision on provider, data sent and privacy notice before
+it is built, in line with the rules for online tools in `docs/TOOLS.md`.
+
+The Productivity Tools entries on `main` are outside this milestone. They are tracked on
+their own branch and were not changed here.
+
 ## Notes for later milestones
 
 - **Milestone 6 (PDF)** will need `pdf-lib`; add it to `docs/LICENSES.md` with verified
@@ -417,7 +444,7 @@ error states and the category page, in light and dark themes, English and Bangla
   `https://cloudflare-dns.com/dns-query` JSON API) for IP and DNS, and the site's own
   server for latency. Each tool shows what is sent and to whom before its button, sends
   nothing until pressed, and is labelled "Uses the internet when you ask". Details and
-  limits: [TOOLS.md](TOOLS.md#online-network-tools-ip-lookup-dns-lookup-latency-check).
+  limits: [TOOLS.md](TOOLS.md#online-network-tools-ip-lookup-ip-to-hostname-dns-lookup-domain-to-ip-latency-check).
   Browsers cannot send ICMP, so the latency check is an HTTPS round-trip measurement and is
   labelled as such. No port or network scanning is implemented.
 

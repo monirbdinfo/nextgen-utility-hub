@@ -13,6 +13,7 @@ const CROSS_BROWSER_SPECS = [
   'general.spec.ts',
   'network.spec.ts',
   'network-online.spec.ts',
+  'network-tools.spec.ts',
 ];
 
 export default defineConfig({
