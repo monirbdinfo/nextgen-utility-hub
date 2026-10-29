@@ -104,6 +104,8 @@ describe('registry integrity', () => {
       'qr-code-generator',
       'qr-scanner',
       'wifi-qr-scanner',
+      'reverse-image-search',
+      'internet-speed-test',
     ]);
   });
 

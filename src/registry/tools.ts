@@ -791,12 +791,35 @@ export const tools: readonly Tool[] = [
     status: 'available',
     route: route('wifi-qr-scanner'),
   },
+  {
+    id: 'reverse-image-search',
+    category: 'productivity',
+    name: { en: 'Reverse Image Search', bn: 'রিভার্স ইমেজ সার্চ' },
+    description: {
+      en: 'Open Google Lens, Bing, TinEye or Yandex with a picture’s web address. This site never uploads your picture.',
+      bn: 'ছবির ওয়েব ঠিকানা দিয়ে Google Lens, Bing, TinEye বা Yandex খুলুন। এই সাইট কখনো আপনার ছবি আপলোড করে না।',
+    },
+    keywords: ['reverse image', 'search', 'google lens', 'tineye', 'ছবি'],
+    status: 'available',
+    route: route('reverse-image-search'),
+  },
+  {
+    id: 'internet-speed-test',
+    category: 'productivity',
+    name: { en: 'Internet Speed Test', bn: 'ইন্টারনেট স্পিড টেস্ট' },
+    description: {
+      en: 'Estimate your download speed and round-trip time with Cloudflare’s speed test service. Downloads test data only when you press Start.',
+      bn: 'Cloudflare-এর স্পিড টেস্ট সার্ভিস দিয়ে আপনার ডাউনলোড গতি ও রাউন্ড-ট্রিপ সময় আনুমানিকভাবে মাপুন। শুরু চাপলেই কেবল টেস্ট ডেটা ডাউনলোড হয়।',
+    },
+    keywords: ['internet speed', 'speed test', 'download', 'mbps', 'গতি'],
+    status: 'available',
+    route: route('internet-speed-test'),
+    online: 'cloudflare',
+  },
   // prettier-ignore
   ...([
     // prettier-ignore
     ['bin-checker','BIN Checker','BIN চেকার','Check a bank identification number using a supported data source.','সমর্থিত ডেটা সোর্স দিয়ে ব্যাংক শনাক্তকরণ নম্বর পরীক্ষা করুন।',['bin','bank identification','বিন']],
-    // prettier-ignore
-    ['reverse-image-search','Reverse Image Search','রিভার্স ইমেজ সার্চ','Find external reverse-image search options for an image.','ছবির জন্য বাহ্যিক রিভার্স ইমেজ সার্চ অপশন দেখুন।',['reverse image','search','ছবি']],
     // prettier-ignore
     ['username-checker','Name Checker','ইউজারনেম চেকার','Check username availability on supported services.','সমর্থিত সার্ভিসে ইউজারনেম পাওয়া যায় কি না দেখুন।',['username','social media','ইউজারনেম']],
     // prettier-ignore
@@ -805,7 +828,5 @@ export const tools: readonly Tool[] = [
     ['bimi-checker','BIMI Checker & Generator','BIMI চেকার ও জেনারেটর','Inspect BIMI DNS records and related configuration.','BIMI DNS রেকর্ড ও সংশ্লিষ্ট কনফিগারেশন পরীক্ষা করুন।',['bimi','dns','generator','বিমি']],
     // prettier-ignore
     ['image-to-text','Image to Text Converter','ছবি থেকে টেক্সট','Extract text from images using an available OCR engine.','উপলব্ধ OCR ইঞ্জিন দিয়ে ছবি থেকে লেখা বের করুন।',['ocr','image to text','ছবি']],
-    // prettier-ignore
-    ['internet-speed-test','Internet Speed Test','ইন্টারনেট স্পিড টেস্ট','Measure approximate download and upload speeds using an explicit test service.','নির্বাচিত টেস্ট সার্ভিস দিয়ে আনুমানিক ডাউনলোড ও আপলোড গতি মাপুন।',['internet speed','download','upload','গতি']],
   ] as const).map(([id,en,bn,de,db,keywords]) => ({id,category:'productivity' as const,name:{en,bn},description:{en:de,bn:db},keywords:[...keywords,'productivity tools','প্রোডাক্টিভিটি'],status:'planned' as const})),
 ];

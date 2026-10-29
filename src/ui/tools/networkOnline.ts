@@ -339,7 +339,7 @@ function privacyNotice(L: L, paragraphs: string[], withPolicy: boolean): HTMLEle
 }
 
 /** Progress (polite) and error (assertive) messages for a request. */
-function statusArea(): {
+export function statusArea(): {
   el: HTMLElement;
   progress(text: string): void;
   error(text: string): void;
@@ -370,7 +370,7 @@ function statusArea(): {
 const local = (ctx: ToolContext, s: string): string => (ctx.lang === 'bn' ? toBanglaDigits(s) : s);
 
 /** Abort in-flight requests when the user leaves the tool or switches language. */
-function abortOnCleanup(ctx: ToolContext): () => AbortController {
+export function abortOnCleanup(ctx: ToolContext): () => AbortController {
   let ctrl: AbortController | null = null;
   ctx.onCleanup(() => ctrl?.abort());
   return () => {
@@ -380,7 +380,7 @@ function abortOnCleanup(ctx: ToolContext): () => AbortController {
   };
 }
 
-function busy(form: HTMLFormElement, on: boolean): void {
+export function busy(form: HTMLFormElement, on: boolean): void {
   const submit = form.querySelector<HTMLButtonElement>('button[type="submit"]');
   if (submit) submit.disabled = on;
   form.setAttribute('aria-busy', String(on));
