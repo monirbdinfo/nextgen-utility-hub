@@ -755,12 +755,44 @@ export const tools: readonly Tool[] = [
     status: 'available',
     route: route('invisible-character'),
   },
+  {
+    id: 'qr-code-generator',
+    category: 'productivity',
+    name: { en: 'QR Code Generator', bn: 'QR কোড জেনারেটর' },
+    description: {
+      en: 'Create QR codes for text, links, Wi-Fi networks and contact details, drawn in your browser. Nothing is sent anywhere.',
+      bn: 'টেক্সট, লিংক, ওয়াই-ফাই নেটওয়ার্ক ও যোগাযোগের তথ্যের QR কোড আপনার ব্রাউজারেই তৈরি করুন। কিছুই কোথাও পাঠানো হয় না।',
+    },
+    keywords: ['qr code', 'generator', 'কিউআর'],
+    status: 'available',
+    route: route('qr-code-generator'),
+  },
+  {
+    id: 'qr-scanner',
+    category: 'productivity',
+    name: { en: 'QR Scanner', bn: 'QR স্ক্যানার' },
+    description: {
+      en: 'Scan QR codes using a supported camera or image input.',
+      bn: 'সমর্থিত ক্যামেরা বা ছবি থেকে QR কোড স্ক্যান করুন।',
+    },
+    keywords: ['qr scanner', 'scan', 'স্ক্যান'],
+    status: 'available',
+    route: route('qr-scanner'),
+  },
+  {
+    id: 'wifi-qr-scanner',
+    category: 'productivity',
+    name: { en: 'WiFi QR Scanner', bn: 'Wi-Fi QR স্ক্যানার' },
+    description: {
+      en: 'Read Wi-Fi network details encoded in a compatible QR code.',
+      bn: 'সামঞ্জস্যপূর্ণ QR কোডে থাকা Wi-Fi নেটওয়ার্কের তথ্য পড়ুন।',
+    },
+    keywords: ['wifi', 'qr scanner', 'ওয়াইফাই'],
+    status: 'available',
+    route: route('wifi-qr-scanner'),
+  },
   // prettier-ignore
   ...([
-    // prettier-ignore
-    ['qr-code-generator','QR Code Generator','QR কোড জেনারেটর','Create QR codes for text, links and contact details.','টেক্সট, লিংক ও যোগাযোগের তথ্যের জন্য QR কোড তৈরি করুন।',['qr code','generator','কিউআর']],
-    // prettier-ignore
-    ['qr-scanner','QR Scanner','QR স্ক্যানার','Scan QR codes using a supported camera or image input.','সমর্থিত ক্যামেরা বা ছবি থেকে QR কোড স্ক্যান করুন।',['qr scanner','scan','স্ক্যান']],
     // prettier-ignore
     ['bin-checker','BIN Checker','BIN চেকার','Check a bank identification number using a supported data source.','সমর্থিত ডেটা সোর্স দিয়ে ব্যাংক শনাক্তকরণ নম্বর পরীক্ষা করুন।',['bin','bank identification','বিন']],
     // prettier-ignore
@@ -775,7 +807,5 @@ export const tools: readonly Tool[] = [
     ['image-to-text','Image to Text Converter','ছবি থেকে টেক্সট','Extract text from images using an available OCR engine.','উপলব্ধ OCR ইঞ্জিন দিয়ে ছবি থেকে লেখা বের করুন।',['ocr','image to text','ছবি']],
     // prettier-ignore
     ['internet-speed-test','Internet Speed Test','ইন্টারনেট স্পিড টেস্ট','Measure approximate download and upload speeds using an explicit test service.','নির্বাচিত টেস্ট সার্ভিস দিয়ে আনুমানিক ডাউনলোড ও আপলোড গতি মাপুন।',['internet speed','download','upload','গতি']],
-    // prettier-ignore
-    ['wifi-qr-scanner','WiFi QR Scanner','Wi-Fi QR স্ক্যানার','Read Wi-Fi network details encoded in a compatible QR code.','সামঞ্জস্যপূর্ণ QR কোডে থাকা Wi-Fi নেটওয়ার্কের তথ্য পড়ুন।',['wifi','qr scanner','ওয়াইফাই']],
   ] as const).map(([id,en,bn,de,db,keywords]) => ({id,category:'productivity' as const,name:{en,bn},description:{en:de,bn:db},keywords:[...keywords,'productivity tools','প্রোডাক্টিভিটি'],status:'planned' as const})),
 ];

@@ -15,6 +15,7 @@ const CROSS_BROWSER_SPECS = [
   'network-online.spec.ts',
   'network-tools.spec.ts',
   'productivity.spec.ts',
+  'qr.spec.ts',
 ];
 
 export default defineConfig({
@@ -28,7 +29,7 @@ export default defineConfig({
     trace: 'retain-on-failure',
   },
   // Chromium runs every spec. Firefox and WebKit run the engine-neutral cross-browser,
-  // EXIF orientation, photo resizer, general utility, network and productivity specs.
+  // EXIF orientation, photo resizer, general utility, network, productivity and QR specs.
   // `npm run test:e2e` stays Chromium-only and `npm run test:e2e:cross` runs the other two.
   projects: [
     { name: 'chromium', use: { ...devices['Desktop Chrome'] } },

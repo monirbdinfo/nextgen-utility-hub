@@ -40,9 +40,9 @@ search, hash routing with deep links, typed central registry. Calculation conven
 
 Not available yet: recruiter-specific photo/signature presets (no verified official source
 yet), and nine Network tools that need a provider or a capability a browser does not have
-(ping, traceroute, IP location, blacklist, WHOIS, ISP and IPv6 compatibility). Ten
-Productivity tools are also still planned (QR tools, speed test, BIMI, reverse image search,
-BIN, name, domain and OCR tools). The roadmap gives the reason for each.
+(ping, traceroute, IP location, blacklist, WHOIS, ISP and IPv6 compatibility). Seven
+Productivity tools are also still planned (speed test, BIMI, reverse image search, BIN, name,
+domain and OCR tools). The roadmap gives the reason for each.
 
 Five Network tools use the internet, only when you press their button: IP Lookup, IP to
 Hostname and DNS Lookup contact Cloudflare, Domain to IP Lookup contacts Cloudflare, and the

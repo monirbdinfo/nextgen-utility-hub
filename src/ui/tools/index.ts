@@ -26,6 +26,8 @@ import {
 } from './networkIpv6';
 import { emailHeaderAnalyzer } from './emailHeaders';
 import { creditCardChecker, notepadOnline, timeCardCalculator } from './productivityMisc';
+import { qrCodeGenerator } from './qrGenerator';
+import { qrScanner, wifiQrScanner } from './qrScanner';
 import {
   invisibleCharacter,
   loremGenerator,
@@ -92,6 +94,9 @@ export const toolViews: Readonly<Record<string, ToolView>> = {
   'runic-translator': runicTranslator,
   'invisible-character': invisibleCharacter,
   'notepad-online': notepadOnline,
+  'qr-code-generator': qrCodeGenerator,
+  'qr-scanner': qrScanner,
+  'wifi-qr-scanner': wifiQrScanner,
 };
 
 export type { ToolContext, ToolView } from './kit';

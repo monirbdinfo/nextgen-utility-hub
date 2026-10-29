@@ -34,9 +34,12 @@ export interface FieldSpec {
   /** Native input type for `text` fields, such as `time`. */
   type?: string;
   rows?: number;
+  /** Show this field only while this returns true (for example, only for one chosen type). */
+  showWhen?: (values: Record<string, string>) => boolean;
 }
 
-export type Outcome = { rows: ResultRow[]; notes?: string[] } | { field: string; error: string };
+export type Outcome =
+  { rows: ResultRow[]; notes?: string[]; extra?: HTMLElement } | { field: string; error: string };
 
 export interface ToolFormOptions {
   /** Prefix for element ids (`<prefix>-<key>`); must be unique on the page. */
@@ -139,6 +142,17 @@ export function toolForm(ctx: ToolContext, opts: ToolFormOptions): HTMLElement {
   const fieldFor = (key: string): Field | undefined => byKey.get(key) ?? fields[0];
 
   const panel = resultPanel(ctx, opts.submit);
+  // Extra content under the result rows (such as a picture with its own buttons).
+  const slot = h('div', { class: 'result-extra' });
+  panel.el.querySelector('.result-body')?.after(slot);
+  const showResult = (out: { rows: ResultRow[]; notes?: string[]; extra?: HTMLElement }): void => {
+    panel.show(out.rows, out.notes ?? []);
+    slot.replaceChildren(...(out.extra ? [out.extra] : []));
+  };
+  const clearResult = (): void => {
+    panel.clear();
+    slot.replaceChildren();
+  };
   if (opts.resultLabel) {
     panel.el.setAttribute('aria-label', opts.resultLabel);
     const title = panel.el.querySelector('.result-title');
@@ -157,7 +171,8 @@ export function toolForm(ctx: ToolContext, opts: ToolFormOptions): HTMLElement {
         }
         fields.forEach((f) => f.setError(null));
         memo.__done = '';
-        panel.clear();
+        clearResult();
+        applyVisibility();
         (fields[0]?.control ?? controls[0]?.target)?.focus();
       },
     }),
@@ -172,24 +187,34 @@ export function toolForm(ctx: ToolContext, opts: ToolFormOptions): HTMLElement {
         const f = fieldFor(out.field);
         return f ? [[f, opts.errorText(out.error)]] : [];
       }
-      panel.show(out.rows, out.notes ?? []);
+      showResult(out);
       return null;
     },
     fields,
   );
+
+  function applyVisibility(): void {
+    const current = values();
+    for (const c of controls) c.el.hidden = c.spec.showWhen ? !c.spec.showWhen(current) : false;
+  }
+  applyVisibility();
+  for (const c of controls) {
+    c.target.addEventListener('input', applyVisibility);
+    c.target.addEventListener('change', applyVisibility);
+  }
 
   if (opts.live) {
     const update = (): void => {
       fields.forEach((f) => f.setError(null));
       const out = opts.compute(values());
       if ('error' in out) {
-        panel.clear();
+        clearResult();
         memo.__done = '';
         // An empty input is just "nothing to show yet"; anything else is worth saying.
         if (out.error !== 'empty') fieldFor(out.field)?.setError(opts.errorText(out.error));
         return;
       }
-      panel.show(out.rows, out.notes ?? []);
+      showResult(out);
       memo.__done = '1';
     };
     for (const c of controls) {
