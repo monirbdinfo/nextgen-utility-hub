@@ -1590,6 +1590,53 @@
   font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
 }
 
+.qr-preview {
+  display: grid;
+  gap: var(--space-3);
+  margin-top: var(--space-4);
+}
+
+/* The code is always black on white, whatever the theme: scanners need that contrast. */
+.qr-frame {
+  width: min(100%, 320px);
+  padding: var(--space-2);
+  background: #fff;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+}
+
+.qr-svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.qr-scan {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.qr-video {
+  width: min(100%, 420px);
+  max-height: 320px;
+  background: #000;
+  border-radius: var(--radius-md);
+}
+
+.qr-paste {
+  display: grid;
+  gap: var(--space-3);
+  margin-top: var(--space-4);
+}
+
+.result-extra:empty {
+  display: none;
+}
+
+.result-extra {
+  margin-top: var(--space-3);
+}
+
 .tool-stack {
   display: grid;
   gap: var(--space-5);

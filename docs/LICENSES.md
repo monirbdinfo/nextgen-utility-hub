@@ -11,9 +11,31 @@ substantial portions. The software is provided “as is”, without warranty.
 
 ## What ships to users
 
-The production build (`dist/`) contains only this project’s own TypeScript, CSS and HTML,
-plus the NextGen Tech BD logo. There are **no runtime dependencies**, no web fonts, no CDN
+The production build (`dist/`) contains this project’s own TypeScript, CSS and HTML, the
+NextGen Tech BD logo, and the runtime dependencies below. There are no web fonts, no CDN
 scripts and no third-party assets. Icons are hand-written SVG paths in `src/ui/icons.ts`.
+
+| Package   | Version | Licence    | Used for                                                         |
+| --------- | ------- | ---------- | ---------------------------------------------------------------- |
+| `pdf-lib` | 1.17.1  | MIT        | Creating, merging, splitting and editing PDFs in the browser     |
+| `jsqr`    | 1.4.0   | Apache-2.0 | Reading QR codes from the camera or a picture (loaded on demand) |
+
+`jsqr` has no dependencies. `pdf-lib` pulls in `@pdf-lib/standard-fonts` (MIT), `@pdf-lib/upng`
+(MIT), `pako` (MIT AND Zlib) and `tslib` (0BSD). Licences and versions were read from each
+installed package’s `package.json`. All are permissive; none is copyleft.
+
+**Notices.** These licences require their text to travel with the software, so
+[`public/THIRD-PARTY-NOTICES.txt`](../public/THIRD-PARTY-NOTICES.txt) is published with the site
+(at `THIRD-PARTY-NOTICES.txt` next to `index.html`). It is generated from the installed packages’
+own licence files and a unit test (`tests/licenses.test.ts`) fails if a runtime dependency is
+missing from it. When a runtime dependency is added or upgraded, regenerate the file and update
+the table above.
+
+**Why `jsqr`.** Scanning a QR code in Firefox and Safari is impossible without a decoder, because
+they lack the `BarcodeDetector` API; it also lets the scanner be tested in all three engines and
+lets the QR generator be verified by decoding its output. It is small (130 kB, 47 kB gzipped),
+dependency-free, permissively licensed, and is fetched only when someone starts a scan. Its last
+release was in 2020; it is stable but not actively developed.
 
 **Logo.** `src/assets/brand/nextgen-tech-bd-logo.png` (250 × 250, transparent PNG) was
 supplied by the project owner as the brand logo. `logo-mark.png` (the "NG" mark, 212 × 70)
@@ -49,5 +71,5 @@ node -e 'const p=require("./package.json");for(const n of Object.keys(p.devDepen
 ```
 
 `@playwright/test` is pinned to an exact version so its browser build matches the
-browsers available in CI and local tooling. Planned additions such as `pdf-lib` must be
-added to this file, with verified licence data, when they are introduced.
+browsers available in CI and local tooling. Any new dependency must be added to this file,
+with verified licence data, when it is introduced.

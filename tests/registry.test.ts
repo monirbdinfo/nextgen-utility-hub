@@ -101,6 +101,9 @@ describe('registry integrity', () => {
       'morse-translator',
       'runic-translator',
       'invisible-character',
+      'qr-code-generator',
+      'qr-scanner',
+      'wifi-qr-scanner',
     ]);
   });
 

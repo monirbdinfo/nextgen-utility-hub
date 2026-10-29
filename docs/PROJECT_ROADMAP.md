@@ -436,14 +436,14 @@ Available (fully offline, Bangla/English, tested): Lorem Ipsum Generator, Time C
 Calculator, Credit Card Number Checker, Notepad Online, Small Text Generator, ROT13 Decoder /
 Encoder, Morse Code Translator, Runic Translator and Invisible Character Generator. Details
 and rules are in [TOOLS.md](TOOLS.md#productivity-tools-text-time-card-card-checker-notepad).
+Also available: QR Code Generator, QR Scanner and WiFi QR Scanner
+([TOOLS.md](TOOLS.md#qr-code-generator-qr-scanner-and-wifi-qr-scanner)). They add one runtime
+dependency, `jsqr`, loaded only when a scan starts.
 
 Still planned:
 
 | Registry ID            | Tool                     | Status                                                                                                        |
 | ---------------------- | ------------------------ | ------------------------------------------------------------------------------------------------------------- |
-| `qr-code-generator`    | QR Code Generator        | Next. Must encode in the browser; sending the text to a QR web service would break the privacy promise.       |
-| `qr-scanner`           | QR Scanner               | Next. Uses the browser's `BarcodeDetector` where it exists; not available in every browser.                   |
-| `wifi-qr-scanner`      | WiFi QR Scanner          | Next, with the QR scanner (reads the `WIFI:` payload).                                                        |
 | `internet-speed-test`  | Internet Speed Test      | Next. Needs a test service, so it must say what it contacts and download its file only on request.            |
 | `bimi-checker`         | BIMI Checker & Generator | Next. A DNS TXT lookup through Cloudflare DNS, plus a record generator.                                       |
 | `reverse-image-search` | Reverse Image Search     | Next, as links to search sites. This site never uploads the image.                                            |

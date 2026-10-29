@@ -683,6 +683,60 @@ Known-answer unit tests are in `tests/calc/textTools.test.ts`, `cardCheck.test.t
 `timeCard.test.ts` (including the standard card test numbers, every Mastercard 2-series edge
 and the Morse round trip of every supported character).
 
+## QR Code Generator, QR Scanner and WiFi QR Scanner
+
+**Generator.** The QR symbol is drawn in the browser by `src/calc/qr.ts`; nothing is sent to a QR
+service. It encodes text as UTF-8 in byte mode (so Bangla and emoji work), in versions 1–40 at
+all four error-correction levels (L ≈ 7 %, M ≈ 15 %, Q ≈ 25 %, H ≈ 30 % of the symbol can be
+damaged). It picks the smallest version that fits and the mask with the lowest standard penalty
+score. Capacity in bytes: version 1 holds 17 / 14 / 11 / 7 (L / M / Q / H) and version 40 holds
+2,953 / 2,331 / 1,663 / 1,273. Longer text is refused with a message. The code is always black on
+white with a 4-module quiet zone, in dark mode too, because scanners need that contrast.
+Downloads: PNG (at least 600 px, drawn on a canvas) and SVG (a single path, no scripts).
+
+Content types:
+
+- **Text or link:** the text as typed.
+- **Wi-Fi network:** `WIFI:T:<WPA|WEP|nopass>;S:<name>;P:<password>;H:true;;`. The characters
+  `\ ; , : "` are escaped with a backslash. The name is at most 32 **bytes** (a Bangla letter
+  is 3). WPA passwords are 8–63 characters; WEP passwords are 5 or 13 characters, or 10 or 26
+  hex digits; an open network has no password field.
+- **Contact card:** vCard 3.0 with the fields that are filled in (name is required, plus at
+  least one other). Commas, semicolons, backslashes and line breaks are escaped. The phone
+  number allows digits, spaces, hyphens, brackets and a leading `+`; the website must start
+  with `http://` or `https://`. Long lines are not folded, which scanners accept.
+
+The picture's accessible name is only “QR code”. It never repeats the content, which could be a
+password. The page warns that anyone who scans a code can read it.
+
+**Verification.** `tests/calc/qr.test.ts` decodes the encoder's output with an independent decoder
+(jsQR) for every version at every level filled to capacity (160 symbols), with all 8 masks, and
+with Bangla, accented and emoji text. One combination, **version 23 at level L, cannot be read by
+jsQR at all** (it returns nothing for every mask, size and text length, and did the same for a
+second, independent encoder's version 23-L symbol), so the test asserts that this is the only
+failure. Because of that, version 23 at level L is verified only through its geometry (versions 22,
+24 and 25 at L, and 23 at M, Q and H, all decode) and not by decoding that symbol. The view tests
+also decode the picture that is actually on the page, so what is shown is what was typed.
+
+**Scanner.** Both scanners use [jsQR](https://github.com/cozmo/jsQR) (Apache-2.0), loaded as a
+separate 130 kB (47 kB gzipped) chunk only when a scan starts. It works in every browser; the
+`BarcodeDetector` API is not used because Firefox and Safari do not have it. The camera starts
+only after “Start camera”; frames are scaled to 640 px wide and checked about 8 times a second;
+nothing is recorded or uploaded. The camera stops when a code is found, when “Stop camera” is
+pressed, and when the user leaves the tool or switches language. A picture is read at up to
+1,600 px and, if nothing is found, again at up to 3,200 px, trying both normal and inverted
+codes. Limits: very blurry, small or damaged codes may not be read, and the generator makes only
+standard (not Micro, Kanji or Structured Append) codes.
+
+- **QR Scanner** shows the type of what it read (web link, Wi-Fi, contact card, email, phone,
+  text message, map location or text) and the content. It **never opens anything by itself**. For
+  a web link it shows a warning and a separate “Open link in a new tab” button
+  (`rel="noopener noreferrer"`). Only `http://` and `https://` links get that button.
+- **WiFi QR Scanner** reads a Wi-Fi code from the camera, a picture, or pasted text (for a code read
+  somewhere else) and shows the name, security (WPA/WPA2/WPA3, WEP or none), the password and
+  whether the network is hidden. The password is hidden until “Show the password” is ticked, and
+  can be copied only while shown.
+
 ## Image tools: browsers and EXIF orientation
 
 **Browsers actually tested.** The image tools are tested with Playwright in three
