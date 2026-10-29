@@ -481,6 +481,152 @@ export const tools: readonly Tool[] = [
     route: route('latency-test'),
     online: 'same-site',
   },
+  {
+    id: 'email-header-analyzer',
+    category: 'network',
+    name: { en: 'Trace Email (Header Analyzer)', bn: 'ইমেইল হেডার বিশ্লেষক' },
+    description: {
+      en: 'Inspect pasted email headers to understand sender routing.',
+      bn: 'প্রেরকের রাউটিং বুঝতে ইমেইল হেডার বিশ্লেষণ করুন।',
+    },
+    keywords: ['email header', 'trace email', 'ইমেইল'],
+    status: 'available',
+    route: route('email-header-analyzer'),
+  },
+  {
+    id: 'ip-to-decimal',
+    category: 'network',
+    name: { en: 'IP to Decimal', bn: 'আইপি থেকে ডেসিমাল' },
+    description: {
+      en: 'Convert IPv4 addresses to decimal notation.',
+      bn: 'IPv4 অ্যাড্রেস ডেসিমাল রূপে রূপান্তর করুন।',
+    },
+    keywords: ['ip decimal', 'ipv4', 'ডেসিমাল'],
+    status: 'available',
+    route: route('ip-to-decimal'),
+  },
+  {
+    id: 'ip-to-hostname',
+    category: 'network',
+    name: { en: 'IP to Hostname Lookup', bn: 'আইপি থেকে হোস্টনেম' },
+    description: {
+      en: 'Look up the hostname published for an IP address through Cloudflare DNS. Sends the address to Cloudflare when you press the button.',
+      bn: 'Cloudflare DNS দিয়ে IP অ্যাড্রেসের প্রকাশিত হোস্টনেম দেখুন। বোতাম চাপলে অ্যাড্রেসটি Cloudflare-এ পাঠানো হয়।',
+    },
+    keywords: ['hostname', 'reverse dns', 'হোস্টনেম'],
+    status: 'available',
+    route: route('ip-to-hostname'),
+    online: 'cloudflare',
+  },
+  {
+    id: 'ipv4-to-ipv6',
+    category: 'network',
+    name: { en: 'IPv4 to IPv6', bn: 'IPv4 থেকে IPv6' },
+    description: {
+      en: 'Explore supported IPv4-to-IPv6 address representations.',
+      bn: 'সমর্থিত IPv4 থেকে IPv6 অ্যাড্রেস রূপ দেখুন।',
+    },
+    keywords: ['ipv4', 'ipv6', 'convert', 'রূপান্তর'],
+    status: 'available',
+    route: route('ipv4-to-ipv6'),
+  },
+  {
+    id: 'local-ipv6-generator',
+    category: 'network',
+    name: { en: 'Local IPv6 Address Generator', bn: 'লোকাল IPv6 জেনারেটর' },
+    description: {
+      en: 'Generate a locally scoped IPv6 address.',
+      bn: 'লোকাল ব্যবহারের জন্য IPv6 অ্যাড্রেস তৈরি করুন।',
+    },
+    keywords: ['ipv6', 'local', 'generator', 'তৈরি'],
+    status: 'available',
+    route: route('local-ipv6-generator'),
+  },
+  {
+    id: 'ipv6-cidr-range',
+    category: 'network',
+    name: { en: 'IPv6 CIDR to Range', bn: 'IPv6 CIDR থেকে রেঞ্জ' },
+    description: {
+      en: 'Expand an IPv6 CIDR prefix into its address range.',
+      bn: 'IPv6 CIDR প্রিফিক্স থেকে অ্যাড্রেস রেঞ্জ বের করুন।',
+    },
+    keywords: ['ipv6', 'cidr', 'range', 'রেঞ্জ'],
+    status: 'available',
+    route: route('ipv6-cidr-range'),
+  },
+  {
+    id: 'ipv6-range-cidr',
+    category: 'network',
+    name: { en: 'IPv6 Range to CIDR', bn: 'IPv6 রেঞ্জ থেকে CIDR' },
+    description: {
+      en: 'Summarize an IPv6 address range into CIDR prefixes.',
+      bn: 'IPv6 অ্যাড্রেস রেঞ্জকে CIDR প্রিফিক্সে রূপান্তর করুন।',
+    },
+    keywords: ['ipv6', 'range', 'cidr', 'রেঞ্জ'],
+    status: 'available',
+    route: route('ipv6-range-cidr'),
+  },
+  {
+    id: 'ipv6-compression',
+    category: 'network',
+    name: { en: 'IPv6 Compression Tool', bn: 'IPv6 কম্প্রেশন টুল' },
+    description: {
+      en: 'Compress an IPv6 address using standard notation.',
+      bn: 'স্ট্যান্ডার্ড নিয়মে IPv6 অ্যাড্রেস সংক্ষিপ্ত করুন।',
+    },
+    keywords: ['ipv6', 'compress', 'কম্প্রেশন'],
+    status: 'available',
+    route: route('ipv6-compression'),
+  },
+  {
+    id: 'ipv6-expand',
+    category: 'network',
+    name: { en: 'IPv6 Expand', bn: 'IPv6 অ্যাড্রেস প্রসারণ' },
+    description: {
+      en: 'Expand a shortened IPv6 address.',
+      bn: 'সংক্ষিপ্ত IPv6 অ্যাড্রেস পূর্ণ রূপে দেখুন।',
+    },
+    keywords: ['ipv6', 'expand', 'প্রসারণ'],
+    status: 'available',
+    route: route('ipv6-expand'),
+  },
+  {
+    id: 'ip-subnet-calculator',
+    category: 'network',
+    name: { en: 'IP Subnet Calculator', bn: 'আইপি সাবনেট ক্যালকুলেটর' },
+    description: {
+      en: 'Calculate subnet details for supported IP address formats.',
+      bn: 'সমর্থিত আইপি ফরম্যাটের সাবনেট হিসাব করুন।',
+    },
+    keywords: ['subnet', 'ip', 'calculator', 'সাবনেট'],
+    status: 'available',
+    route: route('ip-subnet-calculator'),
+  },
+  {
+    id: 'ipv6-to-ipv4',
+    category: 'network',
+    name: { en: 'IPv6 to IPv4', bn: 'IPv6 থেকে IPv4' },
+    description: {
+      en: 'Explain IPv4-mapped IPv6 notation where applicable.',
+      bn: 'প্রযোজ্য ক্ষেত্রে IPv4-mapped IPv6 রূপ দেখুন।',
+    },
+    keywords: ['ipv6', 'ipv4', 'convert', 'রূপান্তর'],
+    status: 'available',
+    route: route('ipv6-to-ipv4'),
+  },
+  {
+    id: 'domain-to-ip',
+    category: 'network',
+    name: { en: 'Domain to IP Lookup', bn: 'ডোমেইন থেকে আইপি' },
+    description: {
+      en: 'Look up the IPv4 and IPv6 addresses of a domain through Cloudflare DNS. Sends the domain to Cloudflare when you press the button.',
+      bn: 'Cloudflare DNS দিয়ে ডোমেইনের IPv4 ও IPv6 অ্যাড্রেস দেখুন। বোতাম চাপলে ডোমেইনটি Cloudflare-এ পাঠানো হয়।',
+    },
+    keywords: ['domain', 'ip lookup', 'ডোমেইন'],
+    status: 'available',
+    route: route('domain-to-ip'),
+    online: 'cloudflare',
+  },
   // prettier-ignore
   ...([
     ['ping-ipv4','Ping IPv4 Address','IPv4 পিং','Check IPv4 reachability where supported.','সমর্থিত পরিবেশে IPv4 সংযোগ পরীক্ষা করুন।',['ping','ipv4','পিং']],
@@ -491,39 +637,15 @@ export const tools: readonly Tool[] = [
     // prettier-ignore
     ['ip-location-lookup','IP Location Lookup','আইপি লোকেশন লুকআপ','Look up approximate public IP geolocation.','পাবলিক আইপির আনুমানিক অবস্থান দেখুন।',['ip location','geolocation','আইপি']],
     // prettier-ignore
-    ['email-header-analyzer','Trace Email (Header Analyzer)','ইমেইল হেডার বিশ্লেষক','Inspect pasted email headers to understand sender routing.','প্রেরকের রাউটিং বুঝতে ইমেইল হেডার বিশ্লেষণ করুন।',['email header','trace email','ইমেইল']],
-    // prettier-ignore
     ['ip-blacklist-check','IP Blacklist Check','আইপি ব্ল্যাকলিস্ট চেক','Check public reputation sources where access is available.','সুযোগ থাকলে পাবলিক রেপুটেশন সোর্স পরীক্ষা করুন।',['blacklist','reputation','ব্ল্যাকলিস্ট']],
-    // prettier-ignore
-    ['ip-to-decimal','IP to Decimal','আইপি থেকে ডেসিমাল','Convert IPv4 addresses to decimal notation.','IPv4 অ্যাড্রেস ডেসিমাল রূপে রূপান্তর করুন।',['ip decimal','ipv4','ডেসিমাল']],
-    // prettier-ignore
-    ['ip-to-hostname','IP to Hostname Lookup','আইপি থেকে হোস্টনেম','Perform a public reverse DNS lookup.','পাবলিক রিভার্স DNS লুকআপ করুন।',['hostname','reverse dns','হোস্টনেম']],
     // prettier-ignore
     ['ip-whois','IP WHOIS Lookup','আইপি WHOIS লুকআপ','View IP allocation and registration information.','আইপি বরাদ্দ ও নিবন্ধনের তথ্য দেখুন।',['whois','ip registration','নিবন্ধন']],
     // prettier-ignore
     ['ipv6-whois','IPv6 WHOIS Lookup','IPv6 WHOIS লুকআপ','View IPv6 allocation and registration information.','IPv6 বরাদ্দ ও নিবন্ধনের তথ্য দেখুন।',['ipv6','whois','আইপি']],
     // prettier-ignore
-    ['ipv4-to-ipv6','IPv4 to IPv6','IPv4 থেকে IPv6','Explore supported IPv4-to-IPv6 address representations.','সমর্থিত IPv4 থেকে IPv6 অ্যাড্রেস রূপ দেখুন।',['ipv4','ipv6','convert','রূপান্তর']],
-    // prettier-ignore
-    ['local-ipv6-generator','Local IPv6 Address Generator','লোকাল IPv6 জেনারেটর','Generate a locally scoped IPv6 address.','লোকাল ব্যবহারের জন্য IPv6 অ্যাড্রেস তৈরি করুন।',['ipv6','local','generator','তৈরি']],
-    // prettier-ignore
-    ['ipv6-cidr-range','IPv6 CIDR to Range','IPv6 CIDR থেকে রেঞ্জ','Expand an IPv6 CIDR prefix into its address range.','IPv6 CIDR প্রিফিক্স থেকে অ্যাড্রেস রেঞ্জ বের করুন।',['ipv6','cidr','range','রেঞ্জ']],
-    // prettier-ignore
-    ['ipv6-range-cidr','IPv6 Range to CIDR','IPv6 রেঞ্জ থেকে CIDR','Summarize an IPv6 address range into CIDR prefixes.','IPv6 অ্যাড্রেস রেঞ্জকে CIDR প্রিফিক্সে রূপান্তর করুন।',['ipv6','range','cidr','রেঞ্জ']],
-    // prettier-ignore
-    ['ipv6-compression','IPv6 Compression Tool','IPv6 কম্প্রেশন টুল','Compress an IPv6 address using standard notation.','স্ট্যান্ডার্ড নিয়মে IPv6 অ্যাড্রেস সংক্ষিপ্ত করুন।',['ipv6','compress','কম্প্রেশন']],
-    // prettier-ignore
-    ['ipv6-expand','IPv6 Expand','IPv6 অ্যাড্রেস প্রসারণ','Expand a shortened IPv6 address.','সংক্ষিপ্ত IPv6 অ্যাড্রেস পূর্ণ রূপে দেখুন।',['ipv6','expand','প্রসারণ']],
-    // prettier-ignore
-    ['ip-subnet-calculator','IP Subnet Calculator','আইপি সাবনেট ক্যালকুলেটর','Calculate subnet details for supported IP address formats.','সমর্থিত আইপি ফরম্যাটের সাবনেট হিসাব করুন।',['subnet','ip','calculator','সাবনেট']],
-    // prettier-ignore
-    ['ipv6-to-ipv4','IPv6 to IPv4','IPv6 থেকে IPv4','Explain IPv4-mapped IPv6 notation where applicable.','প্রযোজ্য ক্ষেত্রে IPv4-mapped IPv6 রূপ দেখুন।',['ipv6','ipv4','convert','রূপান্তর']],
-    // prettier-ignore
     ['ipv6-compatibility','IPv6 Compatibility Checker','IPv6 সামঞ্জস্য পরীক্ষা','Check IPv6 support using a supported test endpoint.','সমর্থিত টেস্ট এন্ডপয়েন্ট দিয়ে IPv6 সাপোর্ট পরীক্ষা করুন।',['ipv6','compatibility','সামঞ্জস্য']],
     // prettier-ignore
     ['my-isp','What Is My ISP','আমার ISP কী','Look up the internet service provider associated with a public IP.','পাবলিক আইপির সঙ্গে যুক্ত ইন্টারনেট সেবাদাতা দেখুন।',['isp','provider','আইএসপি']],
-    // prettier-ignore
-    ['domain-to-ip','Domain to IP Lookup','ডোমেইন থেকে আইপি','Resolve a domain to its public DNS address records.','ডোমেইনের পাবলিক DNS অ্যাড্রেস রেকর্ড বের করুন।',['domain','ip lookup','ডোমেইন']],
   ] as const).map(([id,en,bn,de,db,keywords]) => ({id,category:'network' as const,name:{en,bn},description:{en:de,bn:db},keywords:[...keywords,'ip tools','আইপি টুলস'],status:'planned' as const})),
   // prettier-ignore
   ...([

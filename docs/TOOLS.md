@@ -523,7 +523,56 @@ Known-answer tests (`tests/calc/ipv4.test.ts`) cover /0, /1, /20, /24, /27, /30,
 the top of the address space, every prefix against a brute-force check, every mask from
 /0 to /32, and the 62-block worst case.
 
-## Online Network tools (IP Lookup, DNS Lookup, Latency check)
+## IP and IPv6 converters, ranges and generator
+
+All of these run in the browser and send nothing. Addresses are parsed by
+`src/calc/ipv4.ts` and `src/calc/ipv6.ts`; IPv6 arithmetic uses `BigInt`, because a
+128-bit address does not fit a JavaScript number.
+
+- **IP to Decimal** converts IPv4 ↔ decimal (0 to 4294967295), with hexadecimal and binary.
+- **IPv4 to IPv6** shows the IPv4-mapped (`::ffff:a.b.c.d`), IPv4-compatible (deprecated),
+  NAT64 well-known (`64:ff9b::/96`) and 6to4 (`2002::/16`) forms of an address.
+- **IPv6 to IPv4** finds an IPv4 address embedded in a mapped, compatible, NAT64 or 6to4
+  address. Otherwise it says no IPv4 address is embedded.
+- **IPv6 Compression** gives the RFC 5952 form: lower case, no leading zeros, the longest run
+  of two or more zero groups replaced by `::` (the first run when runs tie).
+- **IPv6 Expand** writes every group in four hex digits.
+- **IPv6 CIDR to Range** gives the first and last address and the total count of a block
+  (`/0` to `/128`). IPv6 has no broadcast, so every address in the block is usable.
+- **IPv6 Range to CIDR** returns the fewest blocks covering an inclusive range (at most 254
+  blocks for any IPv6 range).
+- **IP Subnet Calculator** takes `address/prefix` for IPv4 (same rules as the Subnet
+  Calculator) or IPv6, and reports the network, last address, count and address type.
+- **Local IPv6 Address Generator** makes a random unique-local address (RFC 4193): `fd` plus a
+  40-bit Global ID, a /48 site prefix, subnet ID 0 and a random 64-bit interface ID. The
+  random bytes come from `crypto.getRandomValues`. These addresses are for private networks
+  and are not routed on the internet.
+
+Input rules: IPv4 must have four decimal octets (0–255, no leading zeros). IPv6 may be full
+or compressed, may end in a dotted IPv4, and is refused if it has a zone identifier
+(`%eth0`), two `::`, or the wrong number of groups. Bangla digits are accepted everywhere.
+
+Known answers are in `tests/calc/ipv6.test.ts`, using the RFC 5952 and RFC 4291 examples
+plus the edge cases above.
+
+## Trace Email (Header Analyzer)
+
+Paste only the header block of a message (the lines above the first blank line). Everything
+is parsed in the browser:
+
+- **Summary:** From, sender domain, To, Subject, Date, Message-ID, Return-Path, Reply-To,
+  whether a DKIM signature is present, and the SPF, DKIM and DMARC results recorded in
+  `Authentication-Results` (or `Received-SPF`).
+- **Hops:** every `Received` line, oldest first, with from, by, protocol, the IP in brackets,
+  the time and the delay since the previous hop. A negative delay is flagged as clock skew.
+- **Warnings:** missing From, no Received lines, no recorded checks, SPF/DKIM/DMARC not
+  passing, Return-Path or Reply-To on a different domain, and clock skew.
+
+Limits: the analyser reads only what is pasted. It does not verify signatures or look up any
+server, and the results are what the receiving server recorded. Input is limited to 200,000
+characters. Headers often contain IP addresses; nothing is stored, and the page sends nothing.
+
+## Online Network tools (IP Lookup, IP to Hostname, DNS Lookup, Domain to IP, Latency check)
 
 These are the only tools that use the network, and only after the user presses their
 button. The tool page shows **“Uses the internet when you ask”** instead of “Runs in your
@@ -533,22 +582,30 @@ through `src/lib/net.ts`: `GET`, `credentials: 'omit'` (no cookies), `referrerPo
 is stored; the last answer is kept in memory only, so a language switch shows it again
 without a new request.
 
-| Tool       | Recipient                                          | What is sent                                                                                                               |
-| ---------- | -------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
-| IP Lookup  | Cloudflare, `https://1.1.1.1/cdn-cgi/trace`        | One request. Like any request, it carries the user’s IP address and user agent.                                            |
-| DNS Lookup | Cloudflare, `https://cloudflare-dns.com/dns-query` | The domain name and record type (`?name=…&type=…`, header `accept: application/dns-json`), plus IP address and user agent. |
-| Latency    | This site’s own server (`latency-probe.txt`)       | One warm-up and 5, 10 or 20 requests for a 3-byte file. No third party.                                                    |
+| Tool           | Recipient                                          | What is sent                                                                               |
+| -------------- | -------------------------------------------------- | ------------------------------------------------------------------------------------------ |
+| IP Lookup      | Cloudflare, `https://1.1.1.1/cdn-cgi/trace`        | One request. Like any request, it carries the user’s IP address and user agent.            |
+| IP to Hostname | Cloudflare, `https://cloudflare-dns.com/dns-query` | The IP address typed, as a reverse-DNS name (`…in-addr.arpa` or `…ip6.arpa`), type PTR.    |
+| DNS Lookup     | Cloudflare, `https://cloudflare-dns.com/dns-query` | The domain name and record type (`?name=…&type=…`, header `accept: application/dns-json`). |
+| Domain to IP   | Cloudflare, `https://cloudflare-dns.com/dns-query` | The domain name, twice: type A and type AAAA. Each request also carries IP and user agent. |
+| Latency        | This site’s own server (`latency-probe.txt`)       | One warm-up and 5, 10 or 20 requests for a 3-byte file. No third party.                    |
 
 **IP Lookup** parses the `key=value` text and shows only `ip`, the IP version, the country
 code (`loc`), the Cloudflare data centre (`colo`) and the HTTP/TLS versions; other fields
 are ignored and malformed values are dropped. 1.1.1.1 is an IPv4 address, so the result is
 the IPv4 address Cloudflare sees (a VPN, proxy or CGNAT address if one is in use).
 
+**IP to Hostname** builds the reverse name locally (the address's nibbles or octets, reversed),
+then asks for its PTR records. It accepts the same address forms as the calculators.
+
 **DNS Lookup** accepts A, AAAA, CNAME, MX, TXT, NS, SOA and CAA. The domain is validated
 first (labels of 1–63 characters, at most 253 in total, no IP addresses; a pasted URL is
 reduced to its host and internationalised names are converted to punycode), so an invalid
 entry is never sent. The JSON `Status` is shown by name (NOERROR, NXDOMAIN, SERVFAIL,
 REFUSED), the `AD` flag as “DNSSEC validated by Cloudflare”, and the answers as a table.
+
+**Domain to IP** uses the same validation and asks for A and AAAA records together. Its
+notice says the domain goes out twice.
 
 **Latency check** times `fetch` + reading the body with `performance.now()`, one request at
 a time 200 ms apart, each with a unique query string so no cache can answer. The warm-up
@@ -571,10 +628,10 @@ from Cloudflare’s documentation and public examples
 Cloudflare does not document the CORS headers or rate limits of either endpoint, and the
 development environment could not reach Cloudflare, so **live cross-origin behaviour has not
 been tested**. Automated tests answer both endpoints with mocks (`page.route` in
-`e2e/network-online.spec.ts`, a stubbed `fetch` in unit tests) and check the request the page
-makes. If Cloudflare refuses a cross-origin request from a browser, the tool shows the
-“blocked” message; it does not fall back to any other service or proxy. The latency check
-is tested against the real preview server.
+`e2e/network-online.spec.ts` and `e2e/network-tools.spec.ts`, a stubbed `fetch` in unit
+tests) and check the request the page makes. If Cloudflare refuses a cross-origin request
+from a browser, the tool shows the “blocked” message; it does not fall back to any other
+service or proxy. The latency check is tested against the real preview server.
 
 ## Image tools: browsers and EXIF orientation
 

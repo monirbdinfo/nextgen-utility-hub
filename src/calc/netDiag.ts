@@ -1,3 +1,5 @@
+import { formatIPv4, parseIPv4 } from './ipv4';
+import { formatIPv6Full, parseIPv6 } from './ipv6';
 import { fail, ok, type Result } from './result';
 
 /**
@@ -68,7 +70,23 @@ export function normaliseDomain(text: string): Result<string, DomainError> {
   return ok(ascii);
 }
 
-export function dohUrl(name: string, type: RecordType): string {
+/**
+ * The reverse-DNS name for an address: 4.3.2.1.in-addr.arpa, or one nibble per label under
+ * ip6.arpa (RFC 1035, RFC 3596). Accepts the same forms as the calculators.
+ */
+export function reverseName(text: string): Result<string, string> {
+  if (text.includes(':')) {
+    const a = parseIPv6(text);
+    if (!a.ok) return fail(a.error);
+    const hex = formatIPv6Full(a.value).replace(/:/g, '');
+    return ok(`${hex.split('').reverse().join('.')}.ip6.arpa`);
+  }
+  const b = parseIPv4(text);
+  if (!b.ok) return fail(b.error);
+  return ok(`${formatIPv4(b.value).split('.').reverse().join('.')}.in-addr.arpa`);
+}
+
+export function dohUrl(name: string, type: RecordType | 'PTR'): string {
   const u = new URL(DOH_ENDPOINT);
   u.searchParams.set('name', name);
   u.searchParams.set('type', type);

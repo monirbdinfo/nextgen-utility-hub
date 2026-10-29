@@ -80,6 +80,18 @@ describe('registry integrity', () => {
       'my-ip-info',
       'dns-lookup',
       'latency-test',
+      'email-header-analyzer',
+      'ip-to-decimal',
+      'ip-to-hostname',
+      'ipv4-to-ipv6',
+      'local-ipv6-generator',
+      'ipv6-cidr-range',
+      'ipv6-range-cidr',
+      'ipv6-compression',
+      'ipv6-expand',
+      'ip-subnet-calculator',
+      'ipv6-to-ipv4',
+      'domain-to-ip',
     ]);
   });
 

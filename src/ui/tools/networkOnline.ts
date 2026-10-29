@@ -6,6 +6,7 @@ import {
   parseDohJson,
   parseTrace,
   RECORD_TYPES,
+  reverseName,
   summariseLatency,
   TRACE_ENDPOINT,
   type DnsResult,
@@ -132,6 +133,48 @@ const S = defineStrings({
       'The service answered with an error (HTTP {status}). If many requests were sent quickly it may be limiting them; wait a moment and try again.',
     err_parse: 'The answer was not in the expected format, so it is not shown.',
     err_aborted: 'The request was cancelled.',
+    // Reverse DNS (IP to Hostname)
+    rdnsIn: 'IP address',
+    rdnsHint: 'For example 8.8.8.8 or 2001:4860:4860::8888.',
+    rdnsNotice1:
+      'When you press “Look up”, your browser sends the IP address you typed to Cloudflare’s public DNS resolver ({endpoint}), as a reverse-DNS (PTR) question over HTTPS.',
+    rdnsNotice2:
+      'Cloudflare also receives your own IP address and basic browser details. Only look up addresses you are allowed to look up. This site does not receive or store the query or the answer.',
+    rdnsResult: 'Hostname (PTR)',
+    rdnsNone: 'No hostname is published for this address.',
+    rdnsN1:
+      'Many addresses have no reverse name; the owner of the address block decides whether to publish one. A name is what the address owner says it is, so it does not prove who is behind the address.',
+    rdnsN2:
+      'Only reverse DNS is queried. Results can be cached for the TTL shown and can differ on your own network.',
+    rdnsQueried: 'Address queried',
+    // Domain to IP
+    d2iIn: 'Domain name',
+    d2iHint: 'For example example.com. Internationalised names are converted to ASCII.',
+    d2iNotice1:
+      'When you press “Look up”, your browser sends the domain name to Cloudflare’s public DNS resolver ({endpoint}) twice over HTTPS: once for IPv4 (A) and once for IPv6 (AAAA) addresses.',
+    d2iNotice2:
+      'Cloudflare also receives your IP address and basic browser details. This site does not receive or store the query or the answer.',
+    d2iV4: 'IPv4 addresses (A)',
+    d2iV6: 'IPv6 addresses (AAAA)',
+    d2iNone: 'No A or AAAA addresses were returned for this name.',
+    d2iQueried: 'Domain queried',
+    d2iN1:
+      'Addresses come from Cloudflare’s resolver. Content networks often return different addresses to different places, so your network may see other ones.',
+    d2iN2: 'Only address records are shown. Use DNS Lookup for other record types.',
+    'e_domain-empty': 'Enter a domain name.',
+    'e_domain-invalid': 'Enter a valid domain name such as example.com.',
+    'e_domain-too-long': 'A domain name can be at most 253 characters.',
+    'e_domain-ip': 'Enter a domain name, not an IP address.',
+    e_empty: 'Enter an IP address.',
+    e_format: 'Use an IPv4 address such as 192.0.2.1 or an IPv6 address such as 2001:db8::1.',
+    'e_octet-range': 'Each number in an IPv4 address must be 0 to 255.',
+    'e_leading-zero': 'Remove leading zeros (write 10.1.0.1, not 10.01.0.1).',
+    'e_group-range': 'Each IPv6 group is one to four hex digits (0 to ffff).',
+    'e_double-compression': 'Use :: only once in an IPv6 address.',
+    'e_too-many-groups': 'An IPv6 address has at most eight groups.',
+    'e_too-few-groups': 'An IPv6 address without :: needs exactly eight groups.',
+    'e_ipv4-part': 'The dotted IPv4 part must be the last part of the IPv6 address and be valid.',
+    e_zone: 'Zone identifiers such as %eth0 are not supported.',
   },
   bn: {
     noticeTitle: 'এই টুল ব্যবহারের আগে',
@@ -224,6 +267,46 @@ const S = defineStrings({
       'সার্ভিসটি ত্রুটিসহ উত্তর দিয়েছে (HTTP {status})। দ্রুত অনেক রিকোয়েস্ট পাঠালে এটি সীমিত করতে পারে; একটু অপেক্ষা করে আবার চেষ্টা করুন।',
     err_parse: 'উত্তরটি প্রত্যাশিত ফরম্যাটে ছিল না, তাই দেখানো হচ্ছে না।',
     err_aborted: 'রিকোয়েস্টটি বাতিল করা হয়েছে।',
+    rdnsIn: 'IP অ্যাড্রেস',
+    rdnsHint: 'যেমন 8.8.8.8 বা 2001:4860:4860::8888।',
+    rdnsNotice1:
+      '“খুঁজুন” চাপলে আপনার ব্রাউজার যে IP অ্যাড্রেস লিখেছেন তা Cloudflare-এর পাবলিক ডিএনএস রিজলভার ({endpoint})-এ রিভার্স-DNS (PTR) প্রশ্ন হিসেবে HTTPS-এর মাধ্যমে পাঠায়।',
+    rdnsNotice2:
+      'Cloudflare আপনার নিজের IP অ্যাড্রেস ও ব্রাউজারের সাধারণ তথ্যও পায়। শুধু যে অ্যাড্রেস খোঁজার অনুমতি আছে তা খুঁজুন। এই সাইট প্রশ্ন বা উত্তর গ্রহণ বা সংরক্ষণ করে না।',
+    rdnsResult: 'হোস্টনেম (PTR)',
+    rdnsNone: 'এই অ্যাড্রেসের জন্য কোনো হোস্টনেম প্রকাশিত নেই।',
+    rdnsN1:
+      'অনেক অ্যাড্রেসের রিভার্স নাম নেই; নাম প্রকাশ করবে কি না তা অ্যাড্রেস ব্লকের মালিক ঠিক করেন। নাম মালিকের ঘোষণা, তাই এটি অ্যাড্রেসের পেছনের মানুষকে প্রমাণ করে না।',
+    rdnsN2:
+      'শুধু রিভার্স DNS খোঁজা হয়। ফল দেখানো TTL পর্যন্ত ক্যাশ থাকতে পারে এবং আপনার নিজের নেটওয়ার্কে ভিন্ন হতে পারে।',
+    rdnsQueried: 'যে অ্যাড্রেস খোঁজা হয়েছে',
+    d2iIn: 'ডোমেইন নাম',
+    d2iHint: 'যেমন example.com। আন্তর্জাতিক নাম ASCII-তে রূপান্তর হয়।',
+    d2iNotice1:
+      '“খুঁজুন” চাপলে আপনার ব্রাউজার ডোমেইন নাম Cloudflare-এর পাবলিক ডিএনএস রিজলভার ({endpoint})-এ HTTPS-এর মাধ্যমে দুবার পাঠায়: একবার IPv4 (A) ও একবার IPv6 (AAAA) অ্যাড্রেসের জন্য।',
+    d2iNotice2:
+      'Cloudflare আপনার IP অ্যাড্রেস ও ব্রাউজারের সাধারণ তথ্যও পায়। এই সাইট প্রশ্ন বা উত্তর গ্রহণ বা সংরক্ষণ করে না।',
+    d2iV4: 'IPv4 অ্যাড্রেস (A)',
+    d2iV6: 'IPv6 অ্যাড্রেস (AAAA)',
+    d2iNone: 'এই নামের জন্য কোনো A বা AAAA অ্যাড্রেস পাওয়া যায়নি।',
+    d2iQueried: 'যে ডোমেইন খোঁজা হয়েছে',
+    d2iN1:
+      'অ্যাড্রেস Cloudflare-এর রিজলভার থেকে আসে। কনটেন্ট নেটওয়ার্ক প্রায়ই বিভিন্ন জায়গায় ভিন্ন অ্যাড্রেস দেয়, তাই আপনার নেটওয়ার্কে অন্য অ্যাড্রেস দেখা যেতে পারে।',
+    d2iN2: 'শুধু অ্যাড্রেস রেকর্ড দেখানো হয়। অন্য ধরনের রেকর্ডের জন্য DNS Lookup ব্যবহার করুন।',
+    'e_domain-empty': 'একটি ডোমেইন নাম লিখুন।',
+    'e_domain-invalid': 'example.com-এর মতো একটি বৈধ ডোমেইন নাম লিখুন।',
+    'e_domain-too-long': 'ডোমেইন নাম সর্বোচ্চ ২৫৩ অক্ষরের হতে পারে।',
+    'e_domain-ip': 'আইপি অ্যাড্রেস নয়, ডোমেইন নাম লিখুন।',
+    e_empty: 'একটি IP অ্যাড্রেস লিখুন।',
+    e_format: 'IPv4 (যেমন 192.0.2.1) বা IPv6 (যেমন 2001:db8::1) অ্যাড্রেস লিখুন।',
+    'e_octet-range': 'IPv4 অ্যাড্রেসের প্রতিটি সংখ্যা ০ থেকে ২৫৫-এর মধ্যে হতে হবে।',
+    'e_leading-zero': 'শুরুর শূন্য বাদ দিন (10.01.0.1 নয়, 10.1.0.1 লিখুন)।',
+    'e_group-range': 'প্রতিটি IPv6 গ্রুপ এক থেকে চার অক্ষরের হেক্স (0 থেকে ffff)।',
+    'e_double-compression': 'একটি IPv6 অ্যাড্রেসে :: একবারই ব্যবহার করুন।',
+    'e_too-many-groups': 'একটি IPv6 অ্যাড্রেসে সর্বোচ্চ আটটি গ্রুপ থাকতে পারে।',
+    'e_too-few-groups': ':: ছাড়া IPv6 অ্যাড্রেসে ঠিক আটটি গ্রুপ লাগে।',
+    'e_ipv4-part': 'ডটযুক্ত IPv4 অংশটি IPv6 অ্যাড্রেসের শেষে হতে হবে এবং বৈধ হতে হবে।',
+    e_zone: '%eth0-এর মতো জোন আইডেন্টিফায়ার সমর্থিত নয়।',
   },
 });
 
@@ -407,7 +490,13 @@ export const dnsLookup: ToolView = (ctx) => {
   bindMemo(type.control, ctx.memo, 'type', 'A');
 
   const status = statusArea();
-  const tableWrap = h('div', { class: 'dns-table-wrap', hidden: '' });
+  const tableWrap = h('div', {
+    class: 'dns-table-wrap',
+    hidden: '',
+    role: 'region',
+    tabindex: '0',
+    'aria-label': L('tableCaption'),
+  });
   const panel = resultPanel(ctx, L('dnsButton'));
   panel.el.querySelector('.result-body')?.after(tableWrap);
   const next = abortOnCleanup(ctx);
@@ -726,4 +815,238 @@ export const latencyTest: ToolView = (ctx) => {
       L('notesTitle'),
     ),
   );
+};
+
+// ---------- Shared DNS-over-HTTPS query (Cloudflare) ----------
+
+type Key = Parameters<L>[0];
+
+/** One DoH JSON question. Any unexpected body is a parse failure, never shown. */
+async function dohJson(
+  name: string,
+  type: RecordType | 'PTR',
+  signal: AbortSignal,
+): Promise<DnsResult> {
+  const res = await request(dohUrl(name, type), {
+    timeoutMs: LOOKUP_TIMEOUT_MS,
+    headers: { accept: 'application/dns-json' },
+    signal,
+  });
+  let body: unknown;
+  try {
+    body = await res.json();
+  } catch {
+    throw new NetFailure('parse');
+  }
+  const parsed = parseDohJson(body);
+  if (!parsed.ok) throw new NetFailure('parse');
+  return parsed.value;
+}
+
+// ---------- IP to Hostname (reverse DNS, PTR) ----------
+
+interface RdnsSession {
+  address: string;
+  names: string[];
+  status: string;
+}
+
+export const ipToHostname: ToolView = (ctx) => {
+  const L = S(ctx.lang);
+  const ip = field(
+    L('rdnsIn'),
+    textInput({ id: 'rdns-ip', inputmode: 'decimal', autocapitalize: 'off', required: '' }),
+    { hint: L('rdnsHint') },
+  );
+  bindMemo(ip.control, ctx.memo, 'ip');
+
+  const status = statusArea();
+  const panel = resultPanel(ctx, L('dnsButton'));
+  const next = abortOnCleanup(ctx);
+
+  const render = ({ address, names, status: code }: RdnsSession): void => {
+    panel.show(
+      [
+        { label: L('rdnsQueried'), value: address, lang: 'en' },
+        {
+          label: L('rdnsResult'),
+          value: names.length ? names.join('\n') : L('rdnsNone'),
+          lang: 'en',
+          primary: true,
+          copy: names.length > 0,
+        },
+        { label: L('status'), value: code, lang: 'en' },
+      ],
+      [L('rdnsN1'), L('rdnsN2')],
+    );
+  };
+
+  const form = h('form', { class: 'tool-form', 'aria-label': L('dnsButton') });
+  form.noValidate = true;
+  form.append(
+    privacyNotice(L, [L('rdnsNotice1', { endpoint: DOH_ENDPOINT }), L('rdnsNotice2')], true),
+    h('div', { class: 'field-grid' }, ip.el),
+    formActions(ctx, {
+      submitLabel: L('dnsButton'),
+      panel,
+      onReset() {
+        next().abort();
+        ip.control.value = '';
+        ip.setError(null);
+        Object.assign(ctx.memo, { ip: '', __done: '' });
+        ctx.session.delete('rdns');
+        busy(form, false);
+        status.clear();
+        panel.clear();
+        ip.control.focus();
+      },
+    }),
+    status.el,
+  );
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    ip.setError(null);
+    const address = ip.control.value.trim();
+    const rn = reverseName(address);
+    if (!rn.ok) {
+      ip.setError(L(`e_${rn.error}` as Key));
+      ip.control.focus();
+      return;
+    }
+    const ctrl = next();
+    busy(form, true);
+    status.progress(L('dnsLooking'));
+    try {
+      const body = await dohJson(rn.value, 'PTR', ctrl.signal);
+      const names = body.answers
+        .filter((a) => a.type === 'PTR')
+        .map((a) => a.data.replace(/\.$/, ''));
+      const session: RdnsSession = { address, names, status: body.statusName };
+      ctx.session.set('rdns', session);
+      render(session);
+      status.progress(L('dnsDone', { n: names.length }));
+    } catch (err) {
+      if (ctrl.signal.aborted) return;
+      panel.clear();
+      status.error(errorText(L, err, LOOKUP_TIMEOUT_MS));
+    } finally {
+      if (!ctrl.signal.aborted) busy(form, false);
+    }
+  });
+
+  const last = ctx.session.get('rdns') as RdnsSession | undefined;
+  if (last) render(last);
+
+  return h('div', { class: 'tool-layout' }, form, panel.el);
+};
+
+// ---------- Domain to IP (A and AAAA) ----------
+
+interface D2iSession {
+  domain: string;
+  v4: string[];
+  v6: string[];
+  status: string;
+}
+
+export const domainToIp: ToolView = (ctx) => {
+  const L = S(ctx.lang);
+  const domain = field(
+    L('d2iIn'),
+    textInput({ id: 'd2i-domain', inputmode: 'url', required: '', autocapitalize: 'off' }),
+    { hint: L('d2iHint') },
+  );
+  bindMemo(domain.control, ctx.memo, 'domain');
+
+  const status = statusArea();
+  const panel = resultPanel(ctx, L('dnsButton'));
+  const next = abortOnCleanup(ctx);
+
+  const render = ({ domain: name, v4, v6, status: code }: D2iSession): void => {
+    const none = !v4.length && !v6.length;
+    panel.show(
+      [
+        { label: L('d2iQueried'), value: name, lang: 'en', primary: true, copy: true },
+        {
+          label: L('d2iV4'),
+          value: v4.length ? v4.join('\n') : '—',
+          lang: 'en',
+          copy: v4.length > 0,
+        },
+        {
+          label: L('d2iV6'),
+          value: v6.length ? v6.join('\n') : '—',
+          lang: 'en',
+          copy: v6.length > 0,
+        },
+        { label: L('status'), value: code, lang: 'en' },
+      ],
+      [...(none ? [L('d2iNone')] : []), L('d2iN1'), L('d2iN2')],
+    );
+  };
+
+  const form = h('form', { class: 'tool-form', 'aria-label': L('dnsButton') });
+  form.noValidate = true;
+  form.append(
+    privacyNotice(L, [L('d2iNotice1', { endpoint: DOH_ENDPOINT }), L('d2iNotice2')], true),
+    h('div', { class: 'field-grid' }, domain.el),
+    formActions(ctx, {
+      submitLabel: L('dnsButton'),
+      panel,
+      onReset() {
+        next().abort();
+        domain.control.value = '';
+        domain.setError(null);
+        Object.assign(ctx.memo, { domain: '', __done: '' });
+        ctx.session.delete('d2i');
+        busy(form, false);
+        status.clear();
+        panel.clear();
+        domain.control.focus();
+      },
+    }),
+    status.el,
+  );
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    domain.setError(null);
+    const name = normaliseDomain(domain.control.value);
+    if (!name.ok) {
+      domain.setError(L(`e_${name.error}` as Key));
+      domain.control.focus();
+      return;
+    }
+    const ctrl = next();
+    busy(form, true);
+    status.progress(L('dnsLooking'));
+    try {
+      const [a, aaaa] = await Promise.all([
+        dohJson(name.value, 'A', ctrl.signal),
+        dohJson(name.value, 'AAAA', ctrl.signal),
+      ]);
+      const session: D2iSession = {
+        domain: name.value,
+        v4: a.answers.filter((x) => x.type === 'A').map((x) => x.data),
+        v6: aaaa.answers.filter((x) => x.type === 'AAAA').map((x) => x.data),
+        status:
+          a.statusName === aaaa.statusName ? a.statusName : `${a.statusName} / ${aaaa.statusName}`,
+      };
+      ctx.session.set('d2i', session);
+      render(session);
+      status.progress(L('dnsDone', { n: session.v4.length + session.v6.length }));
+    } catch (err) {
+      if (ctrl.signal.aborted) return;
+      panel.clear();
+      status.error(errorText(L, err, LOOKUP_TIMEOUT_MS));
+    } finally {
+      if (!ctrl.signal.aborted) busy(form, false);
+    }
+  });
+
+  const last = ctx.session.get('d2i') as D2iSession | undefined;
+  if (last) render(last);
+
+  return h('div', { class: 'tool-layout' }, form, panel.el);
 };
