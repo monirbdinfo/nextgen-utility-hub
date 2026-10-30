@@ -24,6 +24,7 @@ import {
   ipv6ToIpv4,
   localIpv6Generator,
 } from './networkIpv6';
+import { bimiChecker } from './bimiChecker';
 import { emailHeaderAnalyzer } from './emailHeaders';
 import { nameChecker } from './nameChecker';
 import { creditCardChecker, notepadOnline, timeCardCalculator } from './productivityMisc';
@@ -102,6 +103,7 @@ export const toolViews: Readonly<Record<string, ToolView>> = {
   'wifi-qr-scanner': wifiQrScanner,
   'reverse-image-search': reverseImageSearch,
   'internet-speed-test': internetSpeedTest,
+  'bimi-checker': bimiChecker,
   'username-checker': nameChecker,
 };
 

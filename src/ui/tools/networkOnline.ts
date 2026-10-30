@@ -822,7 +822,7 @@ export const latencyTest: ToolView = (ctx) => {
 type Key = Parameters<L>[0];
 
 /** One DoH JSON question. Any unexpected body is a parse failure, never shown. */
-async function dohJson(
+export async function dohJson(
   name: string,
   type: RecordType | 'PTR',
   signal: AbortSignal,

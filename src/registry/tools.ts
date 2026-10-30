@@ -817,6 +817,19 @@ export const tools: readonly Tool[] = [
     online: 'cloudflare',
   },
   {
+    id: 'bimi-checker',
+    category: 'productivity',
+    name: { en: 'BIMI Checker & Generator', bn: 'BIMI চেকার ও জেনারেটর' },
+    description: {
+      en: 'Check a domain’s BIMI and DMARC records through Cloudflare DNS when you ask, or create a BIMI record in your browser.',
+      bn: 'চাইলে Cloudflare DNS দিয়ে ডোমেইনের BIMI ও DMARC রেকর্ড পরীক্ষা করুন, অথবা ব্রাউজারেই BIMI রেকর্ড তৈরি করুন।',
+    },
+    keywords: ['bimi', 'dmarc', 'email logo', 'dns', 'generator', 'বিমি'],
+    status: 'available',
+    route: route('bimi-checker'),
+    online: 'cloudflare',
+  },
+  {
     id: 'username-checker',
     category: 'productivity',
     name: { en: 'Name Checker', bn: 'ইউজারনেম চেকার' },
@@ -834,8 +847,6 @@ export const tools: readonly Tool[] = [
     ['bin-checker','BIN Checker','BIN চেকার','Check a bank identification number using a supported data source.','সমর্থিত ডেটা সোর্স দিয়ে ব্যাংক শনাক্তকরণ নম্বর পরীক্ষা করুন।',['bin','bank identification','বিন']],
     // prettier-ignore
     ['domain-name-search','Domain Name Search','ডোমেইন নাম সার্চ','Check domain availability through a supported lookup provider.','সমর্থিত লুকআপ প্রোভাইডার দিয়ে ডোমেইন প্রাপ্যতা দেখুন।',['domain search','availability','ডোমেইন']],
-    // prettier-ignore
-    ['bimi-checker','BIMI Checker & Generator','BIMI চেকার ও জেনারেটর','Inspect BIMI DNS records and related configuration.','BIMI DNS রেকর্ড ও সংশ্লিষ্ট কনফিগারেশন পরীক্ষা করুন।',['bimi','dns','generator','বিমি']],
     // prettier-ignore
     ['image-to-text','Image to Text Converter','ছবি থেকে টেক্সট','Extract text from images using an available OCR engine.','উপলব্ধ OCR ইঞ্জিন দিয়ে ছবি থেকে লেখা বের করুন।',['ocr','image to text','ছবি']],
   ] as const).map(([id,en,bn,de,db,keywords]) => ({id,category:'productivity' as const,name:{en,bn},description:{en:de,bn:db},keywords:[...keywords,'productivity tools','প্রোডাক্টিভিটি'],status:'planned' as const})),
