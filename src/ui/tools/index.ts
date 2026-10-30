@@ -25,6 +25,7 @@ import {
   localIpv6Generator,
 } from './networkIpv6';
 import { emailHeaderAnalyzer } from './emailHeaders';
+import { nameChecker } from './nameChecker';
 import { creditCardChecker, notepadOnline, timeCardCalculator } from './productivityMisc';
 import { qrCodeGenerator } from './qrGenerator';
 import { qrScanner, wifiQrScanner } from './qrScanner';
@@ -101,6 +102,7 @@ export const toolViews: Readonly<Record<string, ToolView>> = {
   'wifi-qr-scanner': wifiQrScanner,
   'reverse-image-search': reverseImageSearch,
   'internet-speed-test': internetSpeedTest,
+  'username-checker': nameChecker,
 };
 
 export type { ToolContext, ToolView } from './kit';

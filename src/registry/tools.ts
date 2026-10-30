@@ -816,12 +816,22 @@ export const tools: readonly Tool[] = [
     route: route('internet-speed-test'),
     online: 'cloudflare',
   },
+  {
+    id: 'username-checker',
+    category: 'productivity',
+    name: { en: 'Name Checker', bn: 'ইউজারনেম চেকার' },
+    description: {
+      en: 'Check whether a username fits the format rules of GitHub, X, Instagram, TikTok, YouTube and more. Runs in your browser; it does not check availability.',
+      bn: 'GitHub, X, Instagram, TikTok, YouTube ইত্যাদির ফরম্যাট নিয়মে একটি ইউজারনেম মেলে কি না দেখুন। ব্রাউজারেই চলে; নামটি খালি আছে কি না দেখে না।',
+    },
+    keywords: ['username', 'handle', 'social media', 'name rules', 'ইউজারনেম'],
+    status: 'available',
+    route: route('username-checker'),
+  },
   // prettier-ignore
   ...([
     // prettier-ignore
     ['bin-checker','BIN Checker','BIN চেকার','Check a bank identification number using a supported data source.','সমর্থিত ডেটা সোর্স দিয়ে ব্যাংক শনাক্তকরণ নম্বর পরীক্ষা করুন।',['bin','bank identification','বিন']],
-    // prettier-ignore
-    ['username-checker','Name Checker','ইউজারনেম চেকার','Check username availability on supported services.','সমর্থিত সার্ভিসে ইউজারনেম পাওয়া যায় কি না দেখুন।',['username','social media','ইউজারনেম']],
     // prettier-ignore
     ['domain-name-search','Domain Name Search','ডোমেইন নাম সার্চ','Check domain availability through a supported lookup provider.','সমর্থিত লুকআপ প্রোভাইডার দিয়ে ডোমেইন প্রাপ্যতা দেখুন।',['domain search','availability','ডোমেইন']],
     // prettier-ignore

@@ -443,6 +443,8 @@ Also available: Internet Speed Test (online: downloads test data from Cloudflare
 download and round trip only, no upload) and Reverse Image Search (links to search providers; this
 site never uploads the picture). See
 [TOOLS.md](TOOLS.md#internet-speed-test-and-reverse-image-search).
+Also available: Name Checker (username format rules for 8 platforms, offline; it does not check
+availability). See [TOOLS.md](TOOLS.md#name-checker).
 
 Still planned:
 
@@ -450,7 +452,6 @@ Still planned:
 | -------------------- | ------------------------ | ------------------------------------------------------------------------------------------------------------- |
 | `bimi-checker`       | BIMI Checker & Generator | Next. A DNS TXT lookup through Cloudflare DNS, plus a record generator.                                       |
 | `bin-checker`        | BIN Checker              | Blocked: needs a BIN data provider, and none is approved.                                                     |
-| `username-checker`   | Name Checker             | Blocked: availability needs each platform's API; search links alone do not check anything.                    |
 | `domain-name-search` | Domain Name Search       | Blocked: availability needs an RDAP or registrar provider, and none is approved.                              |
 | `image-to-text`      | Image to Text Converter  | Blocked: OCR needs an engine and language data (megabytes) that must be bundled or fetched; needs a decision. |
 

@@ -737,6 +737,28 @@ standard (not Micro, Kanji or Structured Append) codes.
   whether the network is hidden. The password is hidden until “Show the password” is ticked, and
   can be copied only while shown.
 
+## Name Checker
+
+Checks whether a username fits each platform's **format** rules, live, entirely in the browser
+(no request to any platform). It does **not** check whether a name is free and is not an official
+verification; the page says so. A leading `@` is ignored; spaces and input over 100 characters
+are refused. Rules (`src/calc/nameRules.ts`):
+
+| Platform       | Length | Characters                           | Other rules                                   | Source             |
+| -------------- | ------ | ------------------------------------ | --------------------------------------------- | ------------------ |
+| GitHub         | 1–39   | A–Z, 0–9, `-`                        | no `-` at start/end, no `--`                  | reported \*        |
+| X (Twitter)    | 5–15   | A–Z, 0–9, `_`                        | may not contain “twitter” or “admin”          | X help pages       |
+| Instagram      | 1–30   | A–Z, 0–9, `.`, `_`                   | no `.` at start/end, no `..`                  | reported \*        |
+| TikTok         | 2–24   | A–Z, 0–9, `.`, `_`                   | may not end with `.`                          | reported \*        |
+| YouTube handle | 3–30   | letters/digits of any script, `._-·` | no separator at start/end                     | YouTube help pages |
+| Facebook       | 5+     | A–Z, 0–9, `.`                        | may not end in a domain extension (`.com`, …) | reported \*        |
+| Telegram       | 5–32   | A–Z, 0–9, `_`                        | starts with a letter, may not end with `_`    | reported \*        |
+| Reddit         | 3–20   | A–Z, 0–9, `_`, `-`                   |                                               | reported \*        |
+
+\* Widely documented but not found in the platform's own help pages; marked with \* on the page.
+YouTube's shorter limits for Han/Hangul (1–10) and some other scripts (2–20) are not modelled. All
+platforms also refuse taken, reserved or policy-breaking names, and they change their rules.
+
 ## Internet Speed Test and Reverse Image Search
 
 **Internet Speed Test** (online, Cloudflare). Before the button the page says what it contacts
