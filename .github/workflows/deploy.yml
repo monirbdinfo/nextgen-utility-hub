@@ -21,7 +21,9 @@ jobs:
     name: Verify and build
     # Guard manual runs too: workflow_dispatch can be started from any branch.
     if: github.ref == 'refs/heads/main'
-    runs-on: ubuntu-latest
+    # Pinned: ubuntu-latest now resolves to Ubuntu 26.04, which Playwright 1.56.1 cannot
+    # install browsers on. Matches the Playwright jobs in ci.yml.
+    runs-on: ubuntu-24.04
     permissions:
       contents: read
       pages: read # configure-pages reads the repository's Pages settings
