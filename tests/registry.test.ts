@@ -106,6 +106,7 @@ describe('registry integrity', () => {
       'wifi-qr-scanner',
       'reverse-image-search',
       'internet-speed-test',
+      'image-to-text',
     ]);
   });
 

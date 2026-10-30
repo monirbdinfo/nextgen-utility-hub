@@ -2442,3 +2442,26 @@ a.btn {
 .photo-plan:empty {
   display: none;
 }
+
+/* Image to Text */
+.tool-stack-inner {
+  display: grid;
+  gap: var(--space-5);
+  align-content: start;
+}
+
+.ocr-progress {
+  width: 100%;
+  height: 0.75rem;
+  margin-top: var(--space-3);
+  accent-color: var(--color-primary);
+}
+
+.ocr-text {
+  min-height: 14rem;
+  width: 100%;
+}
+
+.ocr-warning {
+  font-weight: 600;
+}
