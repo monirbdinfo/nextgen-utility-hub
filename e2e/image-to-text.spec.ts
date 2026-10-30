@@ -16,7 +16,11 @@ async function extract(page: Page, file: string, language?: string): Promise<voi
 test.describe('Image to Text', () => {
   test.setTimeout(OCR_TIMEOUT * 2);
 
-  test('reads English text, loading everything from this site only', async ({ page, baseURL }) => {
+  test('reads English text, loading everything from this site only', async ({
+    page,
+    baseURL,
+    browserName,
+  }) => {
     const origin = new URL(baseURL!).origin;
     const problems = watchProblems(page, origin);
     const requests: string[] = [];
@@ -36,7 +40,11 @@ test.describe('Image to Text', () => {
     expect(requests.filter((p) => p.endsWith('.traineddata.gz'))).toEqual([
       '/ocr/lang/eng.traineddata.gz',
     ]);
-    expect(requests.filter((p) => p.includes('/ocr/core/'))).toHaveLength(1);
+    // The engine is loaded by the worker with importScripts(); only Chromium reports that request
+    // to Playwright, so the exact count is checked there.
+    const core = requests.filter((p) => p.includes('/ocr/core/'));
+    if (browserName === 'chromium') expect(core).toHaveLength(1);
+    else expect(core.length).toBeLessThanOrEqual(1);
     expect(problems).toEqual([]);
 
     // The text can be edited and downloaded.
