@@ -737,6 +737,36 @@ standard (not Micro, Kanji or Structured Append) codes.
   whether the network is hidden. The password is hidden until “Show the password” is ticked, and
   can be copied only while shown.
 
+## BIMI Checker & Generator
+
+**Checker** (online, Cloudflare). Before the button the page says that two DNS questions go to
+Cloudflare's public resolver (`https://cloudflare-dns.com/dns-query`, the same DoH JSON API as DNS
+Lookup): TXT at `<selector>._bimi.<domain>` and TXT at `_dmarc.<domain>`. Nothing is sent until
+“Check BIMI”. The logo and certificate files are **not** downloaded or checked.
+
+Record rules applied (`src/calc/bimi.ts`):
+
+- The record must start with `v=BIMI1` exactly; tags are `tag=value` separated by `;`; a tag may
+  appear only once. `l=` must be present (it may be empty). Unknown tags are a warning; `lps=` and
+  `avp=` (newer optional tags in the BIMI draft) are accepted.
+- `l=` must be an `https://` address and should end in `.svg` (SVG Tiny PS); a comma list is a
+  warning. `a=` (the mark certificate) must be `https://` and should end in `.pem`. No `a=` (or the
+  old `a=self`) is a warning: Gmail and Apple Mail show logos only with a Verified (or, for Gmail,
+  Common) Mark Certificate.
+- `v=BIMI1; l=; a=;` is a **declination** record (the domain asks for no logo).
+- More than one `v=BIMI1` TXT record at the name is reported as an error.
+- **DMARC:** the policy must be `p=quarantine` or `p=reject`, `pct=100` (the default) and not
+  `sp=none`. The check reads `_dmarc.<domain>` only; for a subdomain without its own record the
+  parent domain's policy may apply, and the page says so rather than guessing the organisational
+  domain.
+
+The result is a format check of the published records, **not** an official certification; each
+mail service decides whether to show a logo.
+
+**Generator** (offline). Domain, logo address (`https`, `.svg`), optional certificate address
+(`https`, `.pem`) and selector (default `default`) produce the record name
+(`default._bimi.example.com`) and value (`v=BIMI1; l=…; a=…;`). Nothing is sent.
+
 ## Internet Speed Test and Reverse Image Search
 
 **Internet Speed Test** (online, Cloudflare). Before the button the page says what it contacts
