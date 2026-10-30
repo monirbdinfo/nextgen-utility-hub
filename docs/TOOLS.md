@@ -633,6 +633,56 @@ tests) and check the request the page makes. If Cloudflare refuses a cross-origi
 from a browser, the tool shows the “blocked” message; it does not fall back to any other
 service or proxy. The latency check is tested against the real preview server.
 
+## IPv6 Compatibility Checker
+
+Online (Cloudflare DNS-over-HTTPS, the same `dohJson` helper as DNS Lookup). Before the button the
+page says that up to 14 DNS questions about the entered domain go to
+`https://cloudflare-dns.com/dns-query`. The tool keeps three questions apart:
+
+1. **DNS (checked).** A and AAAA for the domain and for `www.` (unless the domain already starts
+   with `www.`), its NS and MX records, then AAAA for up to 4 name servers and 4 mail servers (MX
+   by preference). The verdict (`src/calc/ipv6Compat.ts`) is _ready_ when the website (or www),
+   at least one name server and, if the domain has mail servers, at least one mail server publish
+   IPv6 addresses; _not ready_ when none do; _partial_ otherwise; _unknown_ for a domain with no
+   addresses or NXDOMAIN. A null MX (`0 .`) counts as no mail servers.
+2. **The visitor's IPv6 connectivity: not tested.** No IPv6-only test endpoint has been verified
+   for browser use (CORS and certificate) from this project's environment, so the page says
+   “Not tested” rather than guess.
+3. **Whether the site answers over IPv6: not tested.** A web page cannot choose IPv6 for a request.
+
+An AAAA record is never presented as proof of IPv6 connectivity.
+
+## IP WHOIS and IPv6 WHOIS (RDAP)
+
+Online (`online: 'rdap'`). One shared service, `src/lib/rdap.ts`, serves both tools; the
+parsing and matching are in `src/calc/rdap.ts`.
+
+- **Discovery:** the IANA RDAP bootstrap file (`https://data.iana.org/rdap/ipv4.json` or
+  `ipv6.json`, RFC 9224) is downloaded once per page visit and kept in memory only. The most
+  specific prefix containing the address picks the registry; its https URL is used.
+- **Lookup:** `GET <registry>/ip/<address>` with `Accept: application/rdap+json`, through
+  `src/lib/net.ts` (no cookies, no referrer, no cache, 10 s timeout). Redirects between registries
+  are followed by the browser; the page shows the URL that answered and the one first asked.
+- **Validation:** the address is checked before any request. IPv4 tool: IPv4 only; IPv6 tool:
+  IPv6 only. Private, loopback, link-local, documentation, IPv4-mapped and other special-purpose
+  addresses are refused because no registry holds records for them.
+- **Shown:** registered range, CIDR (`cidr0` extension), name, handle, allocation type, country,
+  status, registrant and other contacts (from jCard: name, organisation, e-mail, phone, address),
+  registration and last-changed dates, parent network, remarks, source URL and lookup time (UTC).
+  Anything the registry did not send is shown as “Not published by the registry”. Text is kept
+  to one line and 300 characters per field; at most 20 entities and 5 remarks are read.
+- **Errors:** not found (404), rate limited (429), other HTTP errors, timeout, blocked/CORS,
+  offline, no registry for the address, unreadable bootstrap file, and answers that are not
+  valid RDAP “ip network” objects.
+- **Meaning:** the result is the registry's allocation record, which says who holds the block. It
+  is not necessarily the ISP or the person using the address; the page says so.
+- **Privacy:** the visitor's own address is never looked up automatically. The bootstrap request
+  contains no address; the registry receives the entered address, plus (as with any request) the
+  visitor's IP and browser details. Nothing is stored or logged by this site.
+- **Verification:** unit and browser tests use recorded-shape fixtures and mocked responses. The
+  live IANA and registry services, including their CORS headers, were **not** reachable from the
+  development environment and are not verified.
+
 ## Productivity tools (text, time card, card checker, notepad)
 
 All of these run in the browser and send nothing. The pure logic is in `src/calc/textTools.ts`,
@@ -805,7 +855,9 @@ about 3.9 MB, English data 2.9 MB, Bangla data 1.4 MB, loaded only when “Extra
   1,000 px are doubled, which helps recognition.
 - **Languages:** English, Bangla, or both (slower). The default follows the interface language.
 - **Output:** editable text, the mean word confidence (a warning under 60 %), Copy and Download
-  (`extracted-text.txt`). Progress shows engine loading, language loading and recognition.
+  (`extracted-text.txt`). **Clear text** removes the text, confidence and download but keeps the
+  picture open; **Reset** (on the picture card) also closes the picture. Both are disabled while
+  text is being extracted. Progress shows engine loading, language loading and recognition.
 - **Errors:** engine could not load, the picture could not be read, no text found (with advice),
   and Stop (the worker is terminated at once; leaving the tool also stops it).
 - **Limits:** printed text works best; handwriting, decorative fonts, tilted or dark photos give

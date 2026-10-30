@@ -15,13 +15,13 @@ The production build (`dist/`) contains this project’s own TypeScript, CSS and
 NextGen Tech BD logo, and the runtime dependencies below. There are no web fonts, no CDN
 scripts and no third-party assets. Icons are hand-written SVG paths in `src/ui/icons.ts`.
 
-| Package                  | Version | Licence                | Used for                                                         |
-| ------------------------ | ------- | ---------------------- | ---------------------------------------------------------------- |
-| `pdf-lib`                | 1.17.1  | MIT                    | Creating, merging, splitting and editing PDFs in the browser     |
-| `jsqr`                   | 1.4.0   | Apache-2.0             | Reading QR codes from the camera or a picture (loaded on demand) |
-| `tesseract.js`           | 7.0.0   | Apache-2.0             | Image to Text: OCR in a Web Worker (loaded on demand)            |
-| `@tesseract.js-data/eng` | 1.0.0   | MIT (data: Apache-2.0) | English OCR language data, served from this site                 |
-| `@tesseract.js-data/ben` | 1.0.0   | MIT (data: Apache-2.0) | Bangla OCR language data, served from this site                  |
+| Package                  | Version | Licence                | Used for                                                                        |
+| ------------------------ | ------- | ---------------------- | ------------------------------------------------------------------------------- |
+| `pdf-lib`                | 1.17.1  | MIT                    | Creating, merging, splitting and editing PDFs in the browser (loaded on demand) |
+| `jsqr`                   | 1.4.0   | Apache-2.0             | Reading QR codes from the camera or a picture (loaded on demand)                |
+| `tesseract.js`           | 7.0.0   | Apache-2.0             | Image to Text: OCR in a Web Worker (loaded on demand)                           |
+| `@tesseract.js-data/eng` | 1.0.0   | MIT (data: Apache-2.0) | English OCR language data, served from this site                                |
+| `@tesseract.js-data/ben` | 1.0.0   | MIT (data: Apache-2.0) | Bangla OCR language data, served from this site                                 |
 
 `jsqr` has no dependencies. `pdf-lib` pulls in `@pdf-lib/standard-fonts` (MIT), `@pdf-lib/upng`
 (MIT), `pako` (MIT AND Zlib) and `tslib` (0BSD). Licences and versions were read from each

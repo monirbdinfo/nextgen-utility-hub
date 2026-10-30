@@ -133,6 +133,73 @@ describe('Image to Text', () => {
     expect($<HTMLButtonElement>(root, '#ocr-start').disabled).toBe(false);
   });
 
+  it('Clear text removes only the result and keeps the picture open', async () => {
+    recognise.mockResolvedValue({ text: 'Hello world', confidence: 31 });
+    const root = open();
+    choose(root);
+    await vi.waitFor(() => expect($<HTMLElement>(root, 'form.image-controls').hidden).toBe(false));
+    start(root);
+    await vi.waitFor(() =>
+      expect($<HTMLTextAreaElement>(root, '#ocr-text').value).toBe('Hello world'),
+    );
+    $<HTMLButtonElement>(root, '#ocr-clear').click();
+    const result = $<HTMLElement>(root, '[aria-labelledby="ocr-result-title"]');
+    expect(result.hidden).toBe(true);
+    expect($<HTMLTextAreaElement>(root, '#ocr-text').value).toBe('');
+    expect($<HTMLElement>(root, '.ocr-warning').hidden).toBe(true);
+    expect($<HTMLAnchorElement>(root, '#ocr-download').hasAttribute('href')).toBe(false);
+    expect($<HTMLElement>(root, '.net-status').textContent).toBe(
+      'Text cleared. The picture is still open.',
+    );
+    // The picture and the controls stay, so the text can be extracted again.
+    expect($<HTMLElement>(root, '.image-card').hidden).toBe(false);
+    expect($<HTMLElement>(root, 'form.image-controls').hidden).toBe(false);
+    expect(document.activeElement?.id).toBe('ocr-start');
+    start(root);
+    await vi.waitFor(() => expect(result.hidden).toBe(false));
+  });
+
+  it('Reset closes the picture and clears the result', async () => {
+    recognise.mockResolvedValue({ text: 'Hello', confidence: 90 });
+    const root = open();
+    choose(root);
+    await vi.waitFor(() => expect($<HTMLElement>(root, 'form.image-controls').hidden).toBe(false));
+    start(root);
+    await vi.waitFor(() => expect($<HTMLTextAreaElement>(root, '#ocr-text').value).toBe('Hello'));
+    const reset = [...root.querySelectorAll<HTMLButtonElement>('.image-card button')].find((b) =>
+      b.textContent?.includes('Reset'),
+    )!;
+    reset.click();
+    expect($<HTMLElement>(root, '.image-card').hidden).toBe(true);
+    expect($<HTMLElement>(root, 'form.image-controls').hidden).toBe(true);
+    expect($<HTMLElement>(root, '[aria-labelledby="ocr-result-title"]').hidden).toBe(true);
+    expect($<HTMLTextAreaElement>(root, '#ocr-text').value).toBe('');
+  });
+
+  it('cannot clear or reset while text is being extracted', async () => {
+    recognise.mockResolvedValueOnce({ text: 'First', confidence: 90 });
+    const root = open();
+    choose(root);
+    await vi.waitFor(() => expect($<HTMLElement>(root, 'form.image-controls').hidden).toBe(false));
+    start(root);
+    await vi.waitFor(() => expect($<HTMLTextAreaElement>(root, '#ocr-text').value).toBe('First'));
+    recognise.mockImplementationOnce(
+      (_c: unknown, _l: unknown, _p: unknown, signal: AbortSignal) =>
+        new Promise((_r, reject) =>
+          signal.addEventListener('abort', () => reject(new OcrError('aborted'))),
+        ),
+    );
+    start(root);
+    await vi.waitFor(() => expect($<HTMLButtonElement>(root, '#ocr-clear').disabled).toBe(true));
+    const cardButtons = [...root.querySelectorAll<HTMLButtonElement>('.image-card button')];
+    expect(cardButtons.every((b) => b.disabled)).toBe(true);
+    $<HTMLButtonElement>(root, '#ocr-clear').click();
+    expect($<HTMLTextAreaElement>(root, '#ocr-text').value).toBe('First');
+    $<HTMLButtonElement>(root, '#ocr-stop').click();
+    await vi.waitFor(() => expect($<HTMLButtonElement>(root, '#ocr-clear').disabled).toBe(false));
+    expect($<HTMLTextAreaElement>(root, '#ocr-text').value).toBe('First');
+  });
+
   it('defaults to Bangla in the Bangla interface', async () => {
     localStorage.setItem(LANG_KEY, 'bn');
     const root = open();

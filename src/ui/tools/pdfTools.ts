@@ -1,4 +1,3 @@
-import { PDFDocument, StandardFonts, degrees, rgb } from 'pdf-lib';
 import { h } from '../../lib/dom';
 import type { ToolContext, ToolView } from './kit';
 
@@ -249,6 +248,8 @@ function tool(ctx: ToolContext, mode: Mode): HTMLElement {
     status.textContent = s.working;
     results.hidden = true;
     try {
+      // Loaded on first use only; a failed load is reported like any other failure below.
+      const { PDFDocument, StandardFonts, degrees, rgb } = await import('../../lib/pdfLib');
       let output: Uint8Array;
       let filename = 'nextgen-document.pdf';
       if (mode === 'create') {

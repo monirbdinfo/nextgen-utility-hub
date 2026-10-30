@@ -74,6 +74,8 @@ export const messages = {
       'This tool contacts Cloudflare only when you press its button; the notice above says exactly what is sent. This site itself receives and stores nothing.',
     'toolPrivacyOnline_same-site':
       'This tool sends small requests to the server that hosts this site only when you press Start. No third party is contacted and nothing is stored.',
+    toolPrivacyOnline_rdap:
+      'This tool contacts IANA and the internet registry responsible for the address only when you press its button; the notice above says exactly what is sent. This site itself receives and stores nothing.',
     moreInToolkit: 'More in {category}',
     calculate: 'Calculate',
     reset: 'Reset',
@@ -165,6 +167,8 @@ export const messages = {
       'বোতাম চাপলেই কেবল এই টুল Cloudflare-এ যোগাযোগ করে; ঠিক কী পাঠানো হয় তা ওপরের নোটিশে লেখা আছে। এই সাইট নিজে কিছুই গ্রহণ বা সংরক্ষণ করে না।',
     'toolPrivacyOnline_same-site':
       'শুরু চাপলেই কেবল এই টুল এই সাইটের সার্ভারে ছোট কিছু রিকোয়েস্ট পাঠায়। অন্য কোনো তৃতীয় পক্ষের সঙ্গে যোগাযোগ হয় না এবং কিছুই সংরক্ষণ করা হয় না।',
+    toolPrivacyOnline_rdap:
+      'বোতাম চাপলেই কেবল এই টুল IANA ও অ্যাড্রেসটির দায়িত্বপ্রাপ্ত ইন্টারনেট রেজিস্ট্রিতে যোগাযোগ করে; ঠিক কী পাঠানো হয় তা ওপরের নোটিশে লেখা আছে। এই সাইট নিজে কিছুই গ্রহণ বা সংরক্ষণ করে না।',
     moreInToolkit: '{category}-এ আরও',
     calculate: 'হিসাব করুন',
     reset: 'রিসেট',

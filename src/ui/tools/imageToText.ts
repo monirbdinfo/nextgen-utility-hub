@@ -40,6 +40,8 @@ const S = defineStrings({
     lowConfidence:
       'Confidence is low; check the text carefully. A sharper, straighter picture with more contrast usually helps.',
     copy: 'Copy text',
+    clearText: 'Clear text',
+    cleared: 'Text cleared. The picture is still open.',
     copied: 'Copied.',
     copyFailed: 'Copy failed. Select the text and copy it yourself.',
     download: 'Download .txt',
@@ -80,6 +82,8 @@ const S = defineStrings({
     lowConfidence:
       'নির্ভরযোগ্যতা কম; লেখাটি ভালো করে মিলিয়ে নিন। আরও স্পষ্ট, সোজা ও বেশি কনট্রাস্টের ছবি সাধারণত সাহায্য করে।',
     copy: 'লেখা কপি করুন',
+    clearText: 'লেখা মুছুন',
+    cleared: 'লেখা মুছে ফেলা হয়েছে। ছবিটি এখনও খোলা আছে।',
     copied: 'কপি হয়েছে।',
     copyFailed: 'কপি করা যায়নি। লেখাটি নির্বাচন করে নিজে কপি করুন।',
     download: '.txt ডাউনলোড',
@@ -206,6 +210,13 @@ export const imageToText: ToolView = (ctx) => {
     icon('download', 18),
     L('download'),
   );
+  // Clears only the extracted text; Reset (on the picture card) also closes the picture.
+  const clearBtn = h(
+    'button',
+    { type: 'button', class: 'btn', id: 'ocr-clear' },
+    icon('reset', 18),
+    L('clearText'),
+  );
   const copyStatus = h('p', { class: 'copy-status', role: 'status' });
   const resultSection = h(
     'section',
@@ -215,7 +226,7 @@ export const imageToText: ToolView = (ctx) => {
     textarea,
     meta,
     warning,
-    h('div', { class: 'form-actions' }, copyBtn, downloadLink),
+    h('div', { class: 'form-actions' }, copyBtn, downloadLink, clearBtn),
     copyStatus,
   );
 
@@ -239,6 +250,8 @@ export const imageToText: ToolView = (ctx) => {
   function clearResult(): void {
     resultSection.hidden = true;
     textarea.value = '';
+    meta.textContent = '';
+    warning.hidden = true;
     copyStatus.textContent = '';
     status.textContent = '';
     alertBox.hidden = true;
@@ -259,6 +272,7 @@ export const imageToText: ToolView = (ctx) => {
     startBtn.disabled = on;
     stopBtn.hidden = !on;
     language.control.disabled = on;
+    clearBtn.disabled = on; // never clear a result while a new one is being made
     progress.hidden = !on;
     input.setBusy(on);
     form.setAttribute('aria-busy', String(on));
@@ -306,6 +320,12 @@ export const imageToText: ToolView = (ctx) => {
     }
   });
   stopBtn.addEventListener('click', () => controller?.abort());
+  clearBtn.addEventListener('click', () => {
+    if (controller) return;
+    clearResult();
+    status.textContent = L('cleared');
+    startBtn.focus();
+  });
   textarea.addEventListener('input', refreshDownload);
   copyBtn.addEventListener('click', async () => {
     copyStatus.textContent = (await copyText(textarea.value)) ? L('copied') : L('copyFailed');

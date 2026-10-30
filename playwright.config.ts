@@ -17,6 +17,8 @@ const CROSS_BROWSER_SPECS = [
   'productivity.spec.ts',
   'qr.spec.ts',
   'speed-reverse.spec.ts',
+  'pdf.spec.ts',
+  'network-rdap.spec.ts',
   'bimi.spec.ts',
   'name-checker.spec.ts',
   'image-to-text.spec.ts',
