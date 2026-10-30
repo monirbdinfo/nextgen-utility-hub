@@ -841,13 +841,23 @@ export const tools: readonly Tool[] = [
     status: 'available',
     route: route('username-checker'),
   },
+  {
+    id: 'image-to-text',
+    category: 'productivity',
+    name: { en: 'Image to Text Converter', bn: 'ছবি থেকে টেক্সট' },
+    description: {
+      en: 'Extract English or Bangla text from a picture with OCR that runs in your browser. Your picture is never uploaded.',
+      bn: 'ব্রাউজারেই চলা OCR দিয়ে ছবি থেকে ইংরেজি বা বাংলা লেখা বের করুন। আপনার ছবি কখনো আপলোড হয় না।',
+    },
+    keywords: ['ocr', 'image to text', 'extract text', 'tesseract', 'ছবি', 'লেখা'],
+    status: 'available',
+    route: route('image-to-text'),
+  },
   // prettier-ignore
   ...([
     // prettier-ignore
     ['bin-checker','BIN Checker','BIN চেকার','Check a bank identification number using a supported data source.','সমর্থিত ডেটা সোর্স দিয়ে ব্যাংক শনাক্তকরণ নম্বর পরীক্ষা করুন।',['bin','bank identification','বিন']],
     // prettier-ignore
     ['domain-name-search','Domain Name Search','ডোমেইন নাম সার্চ','Check domain availability through a supported lookup provider.','সমর্থিত লুকআপ প্রোভাইডার দিয়ে ডোমেইন প্রাপ্যতা দেখুন।',['domain search','availability','ডোমেইন']],
-    // prettier-ignore
-    ['image-to-text','Image to Text Converter','ছবি থেকে টেক্সট','Extract text from images using an available OCR engine.','উপলব্ধ OCR ইঞ্জিন দিয়ে ছবি থেকে লেখা বের করুন।',['ocr','image to text','ছবি']],
   ] as const).map(([id,en,bn,de,db,keywords]) => ({id,category:'productivity' as const,name:{en,bn},description:{en:de,bn:db},keywords:[...keywords,'productivity tools','প্রোডাক্টিভিটি'],status:'planned' as const})),
 ];

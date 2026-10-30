@@ -26,6 +26,7 @@ import {
 } from './networkIpv6';
 import { bimiChecker } from './bimiChecker';
 import { emailHeaderAnalyzer } from './emailHeaders';
+import { imageToText } from './imageToText';
 import { nameChecker } from './nameChecker';
 import { creditCardChecker, notepadOnline, timeCardCalculator } from './productivityMisc';
 import { qrCodeGenerator } from './qrGenerator';
@@ -105,6 +106,7 @@ export const toolViews: Readonly<Record<string, ToolView>> = {
   'internet-speed-test': internetSpeedTest,
   'bimi-checker': bimiChecker,
   'username-checker': nameChecker,
+  'image-to-text': imageToText,
 };
 
 export type { ToolContext, ToolView } from './kit';

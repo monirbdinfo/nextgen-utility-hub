@@ -789,6 +789,32 @@ are refused. Rules (`src/calc/nameRules.ts`):
 YouTube's shorter limits for Han/Hangul (1–10) and some other scripts (2–20) are not modelled. All
 platforms also refuse taken, reserved or policy-breaking names, and they change their rules.
 
+## Image to Text Converter
+
+OCR with [Tesseract.js](https://github.com/naptha/tesseract.js) 7.0.0, run in a Web Worker in the
+browser. **The picture never leaves the device.** The worker script, the engine (WebAssembly,
+LSTM-only build; the worker picks the relaxed-SIMD, SIMD or plain build the browser supports) and
+the language data are served by this site from `ocr/` (copied from `node_modules` at build time by
+`build/ocr-assets.mjs`); no CDN is contacted and nothing is cached in IndexedDB
+(`cacheMethod: 'none'`). The page says this before the first run, with the download sizes: engine
+about 3.9 MB, English data 2.9 MB, Bangla data 1.4 MB, loaded only when “Extract text” is pressed.
+
+- **Input:** the shared image picker (JPEG, PNG, WebP, GIF, BMP…, same size limits as the image
+  tools). The picture is drawn on a white canvas so EXIF orientation is applied and transparency
+  reads as paper; pictures over 3,000 px on the longest side are scaled down and pictures under
+  1,000 px are doubled, which helps recognition.
+- **Languages:** English, Bangla, or both (slower). The default follows the interface language.
+- **Output:** editable text, the mean word confidence (a warning under 60 %), Copy and Download
+  (`extracted-text.txt`). Progress shows engine loading, language loading and recognition.
+- **Errors:** engine could not load, the picture could not be read, no text found (with advice),
+  and Stop (the worker is terminated at once; leaving the tool also stops it).
+- **Limits:** printed text works best; handwriting, decorative fonts, tilted or dark photos give
+  poor results, and Bangla conjuncts and look-alike characters need checking. Only English and
+  Bangla data are shipped.
+- **Verification:** the Playwright tests run the real engine on generated pictures of English and
+  Bangla text in Chromium (and in Firefox and WebKit in CI), and check that every request stays on
+  this site, also under the GitHub Pages sub-path.
+
 ## Internet Speed Test and Reverse Image Search
 
 **Internet Speed Test** (online, Cloudflare). Before the button the page says what it contacts

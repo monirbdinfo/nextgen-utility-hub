@@ -447,14 +447,15 @@ Also available: BIMI Checker & Generator (checks BIMI and DMARC through Cloudfla
 the generator is offline). See [TOOLS.md](TOOLS.md#bimi-checker--generator).
 Also available: Name Checker (username format rules for 8 platforms, offline; it does not check
 availability). See [TOOLS.md](TOOLS.md#name-checker).
+Also available: Image to Text Converter (Tesseract.js OCR in the browser, English and Bangla, engine
+and data served from this site). See [TOOLS.md](TOOLS.md#image-to-text-converter).
 
 Still planned:
 
-| Registry ID          | Tool                    | Status                                                                                                        |
-| -------------------- | ----------------------- | ------------------------------------------------------------------------------------------------------------- |
-| `bin-checker`        | BIN Checker             | Blocked: needs a BIN data provider, and none is approved.                                                     |
-| `domain-name-search` | Domain Name Search      | Blocked: availability needs an RDAP or registrar provider, and none is approved.                              |
-| `image-to-text`      | Image to Text Converter | Blocked: OCR needs an engine and language data (megabytes) that must be bundled or fetched; needs a decision. |
+| Registry ID          | Tool               | Status                                                                           |
+| -------------------- | ------------------ | -------------------------------------------------------------------------------- |
+| `bin-checker`        | BIN Checker        | Blocked: needs a BIN data provider, and none is approved.                        |
+| `domain-name-search` | Domain Name Search | Blocked: availability needs an RDAP or registrar provider, and none is approved. |
 
 ## Notes for later milestones
 

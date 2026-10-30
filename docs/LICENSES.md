@@ -15,14 +15,26 @@ The production build (`dist/`) contains this project’s own TypeScript, CSS and
 NextGen Tech BD logo, and the runtime dependencies below. There are no web fonts, no CDN
 scripts and no third-party assets. Icons are hand-written SVG paths in `src/ui/icons.ts`.
 
-| Package   | Version | Licence    | Used for                                                         |
-| --------- | ------- | ---------- | ---------------------------------------------------------------- |
-| `pdf-lib` | 1.17.1  | MIT        | Creating, merging, splitting and editing PDFs in the browser     |
-| `jsqr`    | 1.4.0   | Apache-2.0 | Reading QR codes from the camera or a picture (loaded on demand) |
+| Package                  | Version | Licence                | Used for                                                         |
+| ------------------------ | ------- | ---------------------- | ---------------------------------------------------------------- |
+| `pdf-lib`                | 1.17.1  | MIT                    | Creating, merging, splitting and editing PDFs in the browser     |
+| `jsqr`                   | 1.4.0   | Apache-2.0             | Reading QR codes from the camera or a picture (loaded on demand) |
+| `tesseract.js`           | 7.0.0   | Apache-2.0             | Image to Text: OCR in a Web Worker (loaded on demand)            |
+| `@tesseract.js-data/eng` | 1.0.0   | MIT (data: Apache-2.0) | English OCR language data, served from this site                 |
+| `@tesseract.js-data/ben` | 1.0.0   | MIT (data: Apache-2.0) | Bangla OCR language data, served from this site                  |
 
 `jsqr` has no dependencies. `pdf-lib` pulls in `@pdf-lib/standard-fonts` (MIT), `@pdf-lib/upng`
 (MIT), `pako` (MIT AND Zlib) and `tslib` (0BSD). Licences and versions were read from each
 installed package’s `package.json`. All are permissive; none is copyleft.
+
+`tesseract.js` pulls in `tesseract.js-core` (Apache-2.0: the Tesseract engine compiled to
+WebAssembly together with the Leptonica image library, which has a BSD-2-Clause-style licence) and,
+inside its prebuilt scripts, `regenerator-runtime` (MIT), `zlib.js` (MIT), `buffer` (MIT) and
+`ieee754` (BSD-3-Clause). Only the prebuilt files are shipped: `dist/tesseract.esm.min.js` (63 kB,
+bundled as its own chunk), `dist/worker.min.js` and the three LSTM-only engine builds (about
+3.9 MB each; a browser downloads one). The language packages declare MIT but contain no licence
+file; their data comes from the Tesseract project's `tessdata_best` (Apache-2.0). None of these
+files are committed: `build/ocr-assets.mjs` copies them from `node_modules` into `dist/ocr/`.
 
 **Notices.** These licences require their text to travel with the software, so
 [`public/THIRD-PARTY-NOTICES.txt`](../public/THIRD-PARTY-NOTICES.txt) is published with the site
@@ -36,6 +48,12 @@ they lack the `BarcodeDetector` API; it also lets the scanner be tested in all t
 lets the QR generator be verified by decoding its output. It is small (130 kB, 47 kB gzipped),
 dependency-free, permissively licensed, and is fetched only when someone starts a scan. Its last
 release was in 2020; it is stable but not actively developed.
+
+**Why `tesseract.js`.** Approved by the owner for Image to Text. It is the established open-source
+OCR engine for browsers, supports Bangla, and runs entirely on the device. Its defaults would load
+the worker, engine and language data from the jsDelivr CDN and cache data in IndexedDB; this site
+overrides both (`workerPath`, `corePath`, `langPath` point at its own `ocr/` folder;
+`cacheMethod: 'none'`), and the Playwright tests fail on any request to another origin.
 
 **Logo.** `src/assets/brand/nextgen-tech-bd-logo.png` (250 × 250, transparent PNG) was
 supplied by the project owner as the brand logo. `logo-mark.png` (the "NG" mark, 212 × 70)
