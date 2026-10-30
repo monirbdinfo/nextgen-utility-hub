@@ -1,3 +1,4 @@
+import { wrapLines } from '../../calc/pdfText';
 import { h } from '../../lib/dom';
 import type { ToolContext, ToolView } from './kit';
 
@@ -28,6 +29,8 @@ const copy = {
     noFile: 'Choose at least one file first.',
     invalidRange: 'Enter a valid page range within the document.',
     error: 'Could not process this file. It may be encrypted, damaged, or unsupported.',
+    charset:
+      'The text contains characters (such as Bangla) that the built-in PDF font cannot show, so no PDF was made. Remove them, or use the browser’s Print → Save as PDF instead.',
     privacy: 'Privacy: files are processed in this browser only. Nothing is uploaded.',
     sizeBefore: 'Original size',
     sizeAfter: 'Output size',
@@ -60,6 +63,8 @@ const copy = {
     noFile: 'প্রথমে অন্তত একটি ফাইল বাছাই করুন।',
     invalidRange: 'ডকুমেন্টের মধ্যে সঠিক পেজ রেঞ্জ দিন।',
     error: 'ফাইল প্রসেস করা যায়নি। ফাইলটি এনক্রিপ্টেড, ক্ষতিগ্রস্ত বা অসমর্থিত হতে পারে।',
+    charset:
+      'লেখায় এমন অক্ষর (যেমন বাংলা) আছে যা বিল্ট-ইন PDF ফন্ট দেখাতে পারে না, তাই PDF তৈরি হয়নি। সেগুলো বাদ দিন, অথবা ব্রাউজারের Print → Save as PDF ব্যবহার করুন।',
     privacy: 'গোপনীয়তা: ফাইল শুধু এই ব্রাউজারেই প্রসেস হয়। কোথাও আপলোড হয় না।',
     sizeBefore: 'মূল সাইজ',
     sizeAfter: 'আউটপুট সাইজ',
@@ -114,6 +119,7 @@ function tool(ctx: ToolContext, mode: Mode): HTMLElement {
   const heading = h('h2', {}, title);
   const privacy = h('p', { class: 'field-hint', role: 'note' }, s.privacy);
   const fileInput = h('input', {
+    id: `pdf-${mode}-files`,
     class: 'input',
     type: 'file',
     accept: mode === 'create' ? 'image/*,.txt,.md' : 'application/pdf,.pdf',
@@ -122,10 +128,11 @@ function tool(ctx: ToolContext, mode: Mode): HTMLElement {
   const fileField = h(
     'div',
     { class: 'field' },
-    h('label', { class: 'field-label' }, s.files),
+    h('label', { class: 'field-label', for: `pdf-${mode}-files` }, s.files),
     fileInput,
   );
   const textArea = h('textarea', {
+    id: `pdf-${mode}-text`,
     class: 'input',
     rows: '8',
     placeholder: s.text,
@@ -133,22 +140,23 @@ function tool(ctx: ToolContext, mode: Mode): HTMLElement {
   const textField = h(
     'div',
     { class: 'field' },
-    h('label', { class: 'field-label' }, s.text),
+    h('label', { class: 'field-label', for: `pdf-${mode}-text` }, s.text),
     textArea,
   );
   const actionSelect = h(
     'select',
-    { class: 'input' },
+    { id: `pdf-${mode}-operation`, class: 'input' },
     h('option', { value: 'merge' }, s.mergeAction),
     h('option', { value: 'split' }, s.splitAction),
   ) as HTMLSelectElement;
   const actionField = h(
     'div',
     { class: 'field' },
-    h('label', { class: 'field-label' }, s.operation),
+    h('label', { class: 'field-label', for: `pdf-${mode}-operation` }, s.operation),
     actionSelect,
   );
   const rangeInput = h('input', {
+    id: `pdf-${mode}-range`,
     class: 'input',
     type: 'text',
     placeholder: s.range,
@@ -156,10 +164,11 @@ function tool(ctx: ToolContext, mode: Mode): HTMLElement {
   const rangeField = h(
     'div',
     { class: 'field' },
-    h('label', { class: 'field-label' }, s.range),
+    h('label', { class: 'field-label', for: `pdf-${mode}-range` }, s.range),
     rangeInput,
   );
   const orderInput = h('input', {
+    id: `pdf-${mode}-order`,
     class: 'input',
     type: 'text',
     placeholder: s.order,
@@ -167,12 +176,12 @@ function tool(ctx: ToolContext, mode: Mode): HTMLElement {
   const orderField = h(
     'div',
     { class: 'field' },
-    h('label', { class: 'field-label' }, s.order),
+    h('label', { class: 'field-label', for: `pdf-${mode}-order` }, s.order),
     orderInput,
   );
   const rotateSelect = h(
     'select',
-    { class: 'input' },
+    { id: `pdf-${mode}-rotate`, class: 'input' },
     h('option', { value: '90' }, '90°'),
     h('option', { value: '180' }, '180°'),
     h('option', { value: '270' }, '270°'),
@@ -180,10 +189,11 @@ function tool(ctx: ToolContext, mode: Mode): HTMLElement {
   const rotateField = h(
     'div',
     { class: 'field' },
-    h('label', { class: 'field-label' }, s.rotate),
+    h('label', { class: 'field-label', for: `pdf-${mode}-rotate` }, s.rotate),
     rotateSelect,
   );
   const removeInput = h('input', {
+    id: `pdf-${mode}-remove`,
     class: 'input',
     type: 'text',
     placeholder: s.remove,
@@ -191,7 +201,7 @@ function tool(ctx: ToolContext, mode: Mode): HTMLElement {
   const removeField = h(
     'div',
     { class: 'field' },
-    h('label', { class: 'field-label' }, s.remove),
+    h('label', { class: 'field-label', for: `pdf-${mode}-remove` }, s.remove),
     removeInput,
   );
   const button = h(
@@ -256,23 +266,28 @@ function tool(ctx: ToolContext, mode: Mode): HTMLElement {
         const pdf = await PDFDocument.create();
         if (textArea.value.trim()) {
           const font = await pdf.embedFont(StandardFonts.Helvetica);
-          const page = pdf.addPage();
-          const lines = textArea.value.split(/\r?\n/);
+          const size = 11;
+          const lineHeight = 16;
+          const margin = 48;
+          let page = pdf.addPage();
+          let lines: string[];
+          try {
+            lines = wrapLines(textArea.value, page.getWidth() - margin * 2, (t) =>
+              font.widthOfTextAtSize(t, size),
+            );
+          } catch {
+            // The standard PDF font can only encode Latin (WinAnsi) characters.
+            throw new Error('charset');
+          }
           let y = page.getHeight() - 52;
           for (const line of lines) {
-            page.drawText(line.slice(0, 160), {
-              x: 48,
-              y,
-              size: 11,
-              font,
-              color: rgb(0.12, 0.16, 0.22),
-              maxWidth: page.getWidth() - 96,
-            });
-            y -= 16;
-            if (y < 48) {
+            if (y < margin) {
+              page = pdf.addPage();
               y = page.getHeight() - 52;
-              pdf.addPage();
             }
+            if (line)
+              page.drawText(line, { x: margin, y, size, font, color: rgb(0.12, 0.16, 0.22) });
+            y -= lineHeight;
           }
         }
         for (const file of files) {
@@ -377,8 +392,9 @@ function tool(ctx: ToolContext, mode: Mode): HTMLElement {
       savePdf(output, filename);
       status.textContent = s.done;
     } catch (error) {
+      const message = error instanceof Error ? error.message : '';
       status.textContent =
-        error instanceof Error && error.message === 'range' ? s.invalidRange : s.error;
+        message === 'range' ? s.invalidRange : message === 'charset' ? s.charset : s.error;
     } finally {
       busy = false;
       button.disabled = false;

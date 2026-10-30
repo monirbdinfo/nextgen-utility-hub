@@ -1,15 +1,27 @@
 import { describe, expect, it } from 'vitest';
 import {
+  domainEventDate,
   eventDate,
+  findDomainService,
   findService,
   holder,
   parseBootstrap,
+  parseDnsBootstrap,
   parseIpInput,
+  parseRdapDomain,
   parseRdapNetwork,
+  rdapDomainUrl,
   rdapIpUrl,
   type ParsedIp,
 } from '../../src/calc/rdap';
-import { APNIC_V6, ARIN_V4, BOOTSTRAP_V4, BOOTSTRAP_V6 } from '../fixtures/rdap';
+import {
+  APNIC_V6,
+  ARIN_V4,
+  BOOTSTRAP_DNS,
+  BOOTSTRAP_V4,
+  BOOTSTRAP_V6,
+  VERISIGN_DOMAIN,
+} from '../fixtures/rdap';
 
 const ip = (text: string, v: 4 | 6): ParsedIp => {
   const r = parseIpInput(text, v);
@@ -192,5 +204,40 @@ describe('parseRdapNetwork', () => {
     expect(r.value.status).toEqual(['ok']);
     expect(r.value.remarks[0]!.length).toBe(300);
     expect(r.value.entities).toHaveLength(20);
+  });
+});
+
+describe('domain RDAP', () => {
+  it('reads the DNS bootstrap by TLD, https only', () => {
+    const r = parseDnsBootstrap(BOOTSTRAP_DNS);
+    if (!r.ok) throw new Error('parse');
+    expect(r.value.get('com')).toBe('https://rdap.verisign.com/com/v1/');
+    expect(r.value.get('uk')).toBe('https://rdap.nominet.uk/uk/');
+    expect(findDomainService(r.value, 'example.com')).toBe('https://rdap.verisign.com/com/v1/');
+    expect(findDomainService(r.value, 'example.co.uk')).toBe('https://rdap.nominet.uk/uk/');
+    expect(findDomainService(r.value, 'example.com.bd')).toBeNull();
+    expect(parseDnsBootstrap({ services: [] }).ok).toBe(false);
+    expect(rdapDomainUrl('https://rdap.verisign.com/com/v1/', 'example.com')).toBe(
+      'https://rdap.verisign.com/com/v1/domain/example.com',
+    );
+  });
+
+  it('reads a domain answer without inventing fields', () => {
+    const d = parseRdapDomain(VERISIGN_DOMAIN);
+    if (!d.ok) throw new Error('parse');
+    expect(d.value.name).toBe('example.com');
+    expect(d.value.registrar).toBe('Example Registrar, Inc.');
+    expect(d.value.nameservers).toEqual(['a.iana-servers.net', 'b.iana-servers.net']);
+    expect(d.value.dnssec).toBe(true);
+    expect(domainEventDate(d.value, 'expiration')).toBe('2027-08-13T04:00:00Z');
+    const bare = parseRdapDomain({ objectClassName: 'domain' });
+    if (!bare.ok) throw new Error('parse');
+    expect(bare.value).toMatchObject({
+      registrar: null,
+      dnssec: null,
+      nameservers: [],
+      status: [],
+    });
+    expect(parseRdapDomain(ARIN_V4)).toEqual({ ok: false, error: 'not-domain' });
   });
 });

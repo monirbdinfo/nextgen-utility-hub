@@ -1590,6 +1590,71 @@
   font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
 }
 
+/* Globalping ping / traceroute: one block per probe below the summary. */
+.gp-results {
+  display: grid;
+  gap: var(--space-4);
+  margin-top: var(--space-4);
+}
+
+.gp-results:empty {
+  display: none;
+}
+
+.gp-probe {
+  padding: var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+}
+
+.gp-probe-title {
+  margin: 0 0 var(--space-2);
+  font-size: 1rem;
+}
+
+.gp-facts {
+  display: grid;
+  grid-template-columns: minmax(8rem, max-content) 1fr;
+  gap: var(--space-1) var(--space-3);
+  margin: 0;
+  font-size: 0.92rem;
+}
+
+.gp-facts dt {
+  color: var(--color-muted);
+}
+
+.gp-facts dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.gp-raw {
+  margin-top: var(--space-3);
+}
+
+.gp-raw pre {
+  max-height: 20rem;
+  margin: var(--space-2) 0 0;
+  padding: var(--space-3);
+  overflow: auto;
+  font-size: 0.82rem;
+  white-space: pre;
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+}
+
+@media (max-width: 30rem) {
+  .gp-facts {
+    grid-template-columns: 1fr;
+  }
+
+  .gp-facts dd {
+    margin-bottom: var(--space-2);
+  }
+}
+
 .qr-preview {
   display: grid;
   gap: var(--space-3);

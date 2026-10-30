@@ -683,6 +683,132 @@ parsing and matching are in `src/calc/rdap.ts`.
   live IANA and registry services, including their CORS headers, were **not** reachable from the
   development environment and are not verified.
 
+## PDF tools
+
+Create PDF, PDF Merge & Split, PDF Page Tools and Reduce PDF Size (`src/ui/tools/pdfTools.ts`)
+run in the browser with `pdf-lib`, which is loaded only when a PDF action runs. Files are never
+uploaded.
+
+- **Create PDF:** text is laid out on A4-size pages in the built-in Helvetica font (11 pt,
+  16 pt line spacing, 48 pt margins), wrapped at word boundaries (`src/calc/pdfText.ts`); a word
+  longer than a line is broken rather than cut off, and text continues onto new pages. PNG and
+  JPEG images are embedded directly; other image types are converted to PNG through a canvas.
+  The built-in font can only show Latin (WinAnsi) characters: text with Bangla or other scripts
+  is refused with a message suggesting the browser's Print → Save as PDF.
+- **Merge & Split:** merges the chosen PDFs in order, or extracts a page range (e.g. `1-3,5`).
+- **Page Tools:** new page order, rotation of all pages, and removal of a page range (the last
+  page is never removed).
+- **Reduce PDF Size:** rewrites the PDF with object streams and reports the size before and
+  after. It cannot recompress embedded images, so the output may not be smaller; the page says so.
+- Encrypted or damaged files give an error instead of a result. Every control has a label.
+
+## CV / Resume Templates, Cover Letter Templates and Application Checklist
+
+Job Application Toolkit (`src/ui/tools/jobApplication.ts`). The CV and cover letter are built
+from the form into a preview that can be copied or printed / saved as PDF with the browser's own
+print dialog (so Bangla text works). Entries are kept in memory for the page visit only, never
+stored or sent. The checklist is a fixed list of common application steps to tick off, with
+progress, copy and print; ticks are also kept in memory only.
+
+## Ping and Traceroute (Globalping)
+
+Online (`online: 'globalping'`). Ping IPv4 Address, Ping IPv6 Address and Traceroute share one
+view factory (`src/ui/tools/globalpingTools.ts`), one request module (`src/lib/globalping.ts`)
+and one parser (`src/calc/globalping.ts`).
+
+- **Why a provider:** browsers cannot send ICMP echo or traceroute probes. The tools ask
+  [Globalping](https://globalping.io), a free public measurement network, to run the test from
+  its probes (servers run by volunteers and companies). The page says clearly, before and after
+  the test, that results come from those probes and not from the visitor's device or network.
+- **API (from Globalping's published OpenAPI description):** `POST
+https://api.globalping.io/v1/measurements` with `{ type, target, locations: [{ magic, limit }],
+measurementOptions }`, then `GET /v1/measurements/{id}` every 500 ms (the interval the API asks
+  for) until `status` is no longer `in-progress`. The page gives up after 60 s. No API key and no
+  cookies are sent; requests go through `src/lib/net.ts` (no referrer, no cache, 10 s timeout).
+- **Options:** probe location (anywhere, Bangladesh, Asia, Europe, North America), 1, 3 or 5
+  probes, and 3, 5 or 10 packets for ping. `ipVersion` is sent only for host names, as the API
+  requires; Traceroute uses IPv4.
+- **Validation:** the target must be a public IP address of the tool's family or a host name.
+  Private, loopback, link-local, documentation and other special addresses, and `localhost`, are
+  refused before anything is sent.
+- **Shown:** a summary (probes finished/failed, target, location, measurement ID), then for each
+  probe: location, network and ASN, status, resolved address, and for ping min/avg/max round trip
+  and packet loss; for traceroute a hop table (silent hops as “* (no answer)”). The probe's raw
+  output is available in a collapsed block. Text is capped (20,000 characters of raw output, 64
+  hops) and always inserted as text, never as HTML.
+- **Errors:** rate limited (429; about 250 tests per hour per IP without an account), no probes in
+  the location (422), target refused (400), timeout, blocked/CORS, offline, unreadable answer and
+  “did not finish in 60 s”. A failure is never shown as a result.
+- **Privacy:** the target and options are sent to Globalping, which also receives the visitor's IP
+  and browser details, keeps the measurement and may show it publicly by its ID. The notice says
+  so before anything is sent.
+- **Verification:** unit, jsdom and browser tests use fixtures shaped like the published API and
+  mocked responses. The live API, including whether it sends the CORS headers a web page needs,
+  was **not** reachable from the development environment and is not verified.
+
+## What Is My ISP, IP Location Lookup and IP Blacklist Check
+
+Online through Cloudflare DNS (`online: 'cloudflare'`). Views in `src/ui/tools/ipIntelTools.ts`,
+requests in `src/lib/ipIntel.ts`, parsing in `src/calc/cymru.ts` and `src/calc/dnsbl.ts`.
+
+- **Team Cymru IP-to-ASN (ISP and IP Location):** a DNS TXT question for the reversed address
+  under `origin.asn.cymru.com` (IPv4) or the 32 reversed nibbles under `origin6.asn.cymru.com`
+  (IPv6) answers `ASN | prefix | country | registry | allocated`; a second TXT question for
+  `AS<n>.asn.cymru.com` gives the network's name. Both are asked through Cloudflare's DoH JSON
+  API, so Team Cymru sees Cloudflare's resolver, not the visitor. The most specific prefix wins
+  when several are returned; fields that do not have the documented shape are refused.
+- **What Is My ISP:** first `https://1.1.1.1/cdn-cgi/trace` for the visitor's public IPv4
+  address, then the Team Cymru questions. The result is the network (AS) that announces the
+  address: normally the ISP, but a VPN, proxy, company network or carrier's upstream otherwise;
+  the page says so.
+- **IP Location Lookup:** shows the network, prefix, registry and **the country the address
+  block is registered in**. It is not a physical location; no city, coordinates or map are shown,
+  and the page says why. No route or no answer (e.g. SERVFAIL) is reported as such.
+- **IP Blacklist Check:** IPv4 only. One DNS A question per list for
+  `<reversed address>.<zone>` (RFC 5782), for exactly these five lists: Spamhaus ZEN
+  (`zen.spamhaus.org`), SpamCop (`bl.spamcop.net`), PSBL (`psbl.surriel.com`), DroneBL
+  (`dnsbl.dronebl.org`) and Mailspike (`bl.mailspike.net`). NXDOMAIN or no A record is “not
+  listed”; `127.0.0.2`–`127.0.x.x` (not `127.0.0.1`) is “listed” with the codes; `127.255.255.x`
+  (Spamhaus's answer to public resolvers and its error codes) is “could not check: refused”;
+  any other answer, a resolver failure or a network error is “could not check”. The summary
+  counts only lists that answered and says how many could not be checked; the page states that
+  only these lists were queried.
+- **Verification:** mocked in unit, jsdom and browser tests. The answer formats follow Team
+  Cymru's and Spamhaus's published documentation; the live services (and whether each list
+  answers queries from Cloudflare's resolver) were **not** reachable from the development
+  environment and are not verified.
+
+## BIN Checker
+
+Offline (`src/ui/tools/binChecker.ts`, logic in `src/calc/cardCheck.ts`). Accepts only the
+first 6 to 8 digits of a card (`parseBin`; spaces, hyphens and Bangla digits are accepted); the
+input is limited to 11 characters and anything longer than 8 digits is refused with a warning
+not to enter a full card number. The network comes from the same published IIN ranges as the
+Credit Card Number Checker (`networkForPrefix`). Issuing bank, country and card type are shown
+as “Not available: no approved BIN data source”: they need a licensed BIN database, which is
+not used, so nothing is guessed. Nothing is sent or stored.
+
+## Domain Name Search (RDAP)
+
+Online (`online: 'rdap'`; view `src/ui/tools/domainSearch.ts`, service `lookupDomainRdap` in
+`src/lib/rdap.ts`, parsing in `src/calc/rdap.ts`).
+
+- **Discovery:** IANA's DNS bootstrap file (`https://data.iana.org/rdap/dns.json`, RFC 9224),
+  kept in memory for the visit. The longest matching suffix (normally the TLD) picks the
+  registry's https RDAP URL.
+- **Lookup:** `GET <registry>/domain/<name>` with `Accept: application/rdap+json`.
+- **Results:** an RDAP domain object means **registered** (registrar, registration, expiry and
+  last-changed dates, registry status, name servers, DNSSEC, source URL). A 404 from the
+  registry means **not found in the registry: probably available**, with a note that some names
+  are reserved or premium and only a registrar can confirm. For a name with more than two labels
+  (e.g. `www.example.com`) a 404 is reported as “not a registered domain on its own”. A TLD
+  with no RDAP service in the bootstrap (for example Bangladesh's `.bd`) is **unknown**; DNS is
+  never used to decide availability. Other HTTP errors are errors, not “available”.
+- **Validation:** the name is normalised like DNS Lookup (scheme and path removed, IDN to
+  ASCII); IP addresses and names with `_` are refused.
+- **Verification:** mocked fixtures in unit, jsdom and browser tests; live registries and their
+  CORS behaviour are **not** verified from the development environment.
+
 ## Productivity tools (text, time card, card checker, notepad)
 
 All of these run in the browser and send nothing. The pure logic is in `src/calc/textTools.ts`,

@@ -63,6 +63,33 @@ export function luhn(digits: string): boolean {
   return sum % 10 === 0;
 }
 
+/**
+ * The network whose published IIN range covers these leading digits (at least 6), and the card
+ * lengths it issues. Used by the BIN Checker, which never sees a full card number.
+ */
+export function networkForPrefix(
+  digits: string,
+): { network: CardNetwork; lengths: number[] } | null {
+  const rule = RULES.find((r) => r.test(digits));
+  return rule ? { network: rule.network, lengths: rule.lengths } : null;
+}
+
+export type BinError = 'empty' | 'characters' | 'too-short' | 'too-long';
+
+/**
+ * A BIN/IIN is the first 6 or 8 digits of a card number. Only 6 to 8 digits are accepted, so a
+ * full card number can never be entered here. Spaces and hyphens are ignored.
+ */
+export function parseBin(text: string): Result<string, BinError> {
+  const raw = toEnglishDigits(text).trim();
+  if (!raw) return fail('empty');
+  if (!/^[\d\s-]+$/.test(raw)) return fail('characters');
+  const digits = raw.replace(/[\s-]/g, '');
+  if (digits.length < 6) return fail('too-short');
+  if (digits.length > 8) return fail('too-long');
+  return ok(digits);
+}
+
 export function checkCard(text: string): Result<CardCheck, CardError> {
   const raw = toEnglishDigits(text).trim();
   if (!raw) return fail('empty');

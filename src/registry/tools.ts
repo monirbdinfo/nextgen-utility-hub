@@ -666,20 +666,84 @@ export const tools: readonly Tool[] = [
     route: route('ipv6-whois'),
     online: 'rdap',
   },
-  // prettier-ignore
-  ...([
-    ['ping-ipv4','Ping IPv4 Address','IPv4 পিং','Check IPv4 reachability where supported.','সমর্থিত পরিবেশে IPv4 সংযোগ পরীক্ষা করুন।',['ping','ipv4','পিং']],
-    // prettier-ignore
-    ['ping-ipv6','Ping IPv6 Address','IPv6 পিং','Check IPv6 reachability where supported.','সমর্থিত পরিবেশে IPv6 সংযোগ পরীক্ষা করুন।',['ping','ipv6','পিং']],
-    // prettier-ignore
-    ['traceroute','Traceroute','ট্রেসরুট','Inspect the network path where a supported diagnostic service is available.','সমর্থিত ডায়াগনস্টিক সার্ভিস থাকলে নেটওয়ার্ক পথ দেখুন।',['traceroute','route','ট্রেসরুট']],
-    // prettier-ignore
-    ['ip-location-lookup','IP Location Lookup','আইপি লোকেশন লুকআপ','Look up approximate public IP geolocation.','পাবলিক আইপির আনুমানিক অবস্থান দেখুন।',['ip location','geolocation','আইপি']],
-    // prettier-ignore
-    ['ip-blacklist-check','IP Blacklist Check','আইপি ব্ল্যাকলিস্ট চেক','Check public reputation sources where access is available.','সুযোগ থাকলে পাবলিক রেপুটেশন সোর্স পরীক্ষা করুন।',['blacklist','reputation','ব্ল্যাকলিস্ট']],
-    // prettier-ignore
-    ['my-isp','What Is My ISP','আমার ISP কী','Look up the internet service provider associated with a public IP.','পাবলিক আইপির সঙ্গে যুক্ত ইন্টারনেট সেবাদাতা দেখুন।',['isp','provider','আইএসপি']],
-  ] as const).map(([id,en,bn,de,db,keywords]) => ({id,category:'network' as const,name:{en,bn},description:{en:de,bn:db},keywords:[...keywords,'ip tools','আইপি টুলস'],status:'planned' as const})),
+  {
+    id: 'ping-ipv4',
+    category: 'network',
+    name: { en: 'Ping IPv4 Address', bn: 'IPv4 পিং' },
+    description: {
+      en: 'Ping an IPv4 address or host from Globalping’s probes around the world (browsers cannot send ping). Sends the target only when you press the button.',
+      bn: 'বিশ্বজুড়ে Globalping-এর প্রোব থেকে একটি IPv4 অ্যাড্রেস বা হোস্ট পিং করুন (ব্রাউজার পিং পাঠাতে পারে না)। বোতাম চাপলেই কেবল টার্গেট পাঠানো হয়।',
+    },
+    keywords: ['ping', 'ipv4', 'icmp', 'globalping', 'পিং'],
+    status: 'available',
+    route: route('ping-ipv4'),
+    online: 'globalping',
+  },
+  {
+    id: 'ping-ipv6',
+    category: 'network',
+    name: { en: 'Ping IPv6 Address', bn: 'IPv6 পিং' },
+    description: {
+      en: 'Ping an IPv6 address or host from Globalping’s probes around the world (browsers cannot send ping). Sends the target only when you press the button.',
+      bn: 'বিশ্বজুড়ে Globalping-এর প্রোব থেকে একটি IPv6 অ্যাড্রেস বা হোস্ট পিং করুন (ব্রাউজার পিং পাঠাতে পারে না)। বোতাম চাপলেই কেবল টার্গেট পাঠানো হয়।',
+    },
+    keywords: ['ping', 'ipv6', 'icmp', 'globalping', 'পিং'],
+    status: 'available',
+    route: route('ping-ipv6'),
+    online: 'globalping',
+  },
+  {
+    id: 'traceroute',
+    category: 'network',
+    name: { en: 'Traceroute', bn: 'ট্রেসরুট' },
+    description: {
+      en: 'See the network path to an IPv4 address or host, traced from Globalping’s probes (not from your device). Sends the target only when you press the button.',
+      bn: 'Globalping-এর প্রোব থেকে (আপনার ডিভাইস থেকে নয়) একটি IPv4 অ্যাড্রেস বা হোস্টের নেটওয়ার্ক পথ দেখুন। বোতাম চাপলেই কেবল টার্গেট পাঠানো হয়।',
+    },
+    keywords: ['traceroute', 'tracert', 'route', 'hops', 'ট্রেসরুট'],
+    status: 'available',
+    route: route('traceroute'),
+    online: 'globalping',
+  },
+  {
+    id: 'ip-location-lookup',
+    category: 'network',
+    name: { en: 'IP Location Lookup', bn: 'আইপি লোকেশন লুকআপ' },
+    description: {
+      en: 'See which network announces a public IP address and the country its address block is registered in (not a physical location). Uses Team Cymru data through Cloudflare DNS.',
+      bn: 'দেখুন কোন নেটওয়ার্ক একটি পাবলিক আইপি অ্যাড্রেস ঘোষণা করে এবং তার অ্যাড্রেস ব্লক কোন দেশে নিবন্ধিত (বাস্তব অবস্থান নয়)। Cloudflare DNS-এর মাধ্যমে Team Cymru-র ডেটা ব্যবহার করে।',
+    },
+    keywords: ['ip location', 'geolocation', 'asn', 'country', 'আইপি'],
+    status: 'available',
+    route: route('ip-location-lookup'),
+    online: 'cloudflare',
+  },
+  {
+    id: 'ip-blacklist-check',
+    category: 'network',
+    name: { en: 'IP Blacklist Check', bn: 'আইপি ব্ল্যাকলিস্ট চেক' },
+    description: {
+      en: 'Check a public IPv4 address against five named DNS blocklists (not every blocklist). Sends the address only when you press the button.',
+      bn: 'একটি পাবলিক IPv4 অ্যাড্রেস নির্দিষ্ট পাঁচটি DNS ব্লকলিস্টে যাচাই করুন (সব ব্লকলিস্ট নয়)। বোতাম চাপলেই কেবল অ্যাড্রেস পাঠানো হয়।',
+    },
+    keywords: ['blacklist', 'blocklist', 'dnsbl', 'spam', 'reputation', 'ব্ল্যাকলিস্ট'],
+    status: 'available',
+    route: route('ip-blacklist-check'),
+    online: 'cloudflare',
+  },
+  {
+    id: 'my-isp',
+    category: 'network',
+    name: { en: 'What Is My ISP', bn: 'আমার ISP কী' },
+    description: {
+      en: 'See which network (usually your ISP) announces your public IPv4 address, from Team Cymru data through Cloudflare. Contacts Cloudflare only when you press the button.',
+      bn: 'দেখুন কোন নেটওয়ার্ক (সাধারণত আপনার ISP) আপনার পাবলিক IPv4 অ্যাড্রেস ঘোষণা করে, Cloudflare-এর মাধ্যমে Team Cymru-র ডেটা থেকে। বোতাম চাপলেই কেবল Cloudflare-এ যোগাযোগ করে।',
+    },
+    keywords: ['isp', 'provider', 'asn', 'internet provider', 'আইএসপি'],
+    status: 'available',
+    route: route('my-isp'),
+    online: 'cloudflare',
+  },
   {
     id: 'lorem-ipsum',
     category: 'productivity',
@@ -886,11 +950,29 @@ export const tools: readonly Tool[] = [
     status: 'available',
     route: route('image-to-text'),
   },
-  // prettier-ignore
-  ...([
-    // prettier-ignore
-    ['bin-checker','BIN Checker','BIN চেকার','Check a bank identification number using a supported data source.','সমর্থিত ডেটা সোর্স দিয়ে ব্যাংক শনাক্তকরণ নম্বর পরীক্ষা করুন।',['bin','bank identification','বিন']],
-    // prettier-ignore
-    ['domain-name-search','Domain Name Search','ডোমেইন নাম সার্চ','Check domain availability through a supported lookup provider.','সমর্থিত লুকআপ প্রোভাইডার দিয়ে ডোমেইন প্রাপ্যতা দেখুন।',['domain search','availability','ডোমেইন']],
-  ] as const).map(([id,en,bn,de,db,keywords]) => ({id,category:'productivity' as const,name:{en,bn},description:{en:de,bn:db},keywords:[...keywords,'productivity tools','প্রোডাক্টিভিটি'],status:'planned' as const})),
+  {
+    id: 'bin-checker',
+    category: 'productivity',
+    name: { en: 'BIN Checker', bn: 'BIN চেকার' },
+    description: {
+      en: 'See which card network a BIN (the first 6 to 8 digits of a card) belongs to, from published ranges. Works offline; never asks for a full card number.',
+      bn: 'প্রকাশিত রেঞ্জ থেকে দেখুন একটি BIN (কার্ডের প্রথম ৬ থেকে ৮টি অঙ্ক) কোন কার্ড নেটওয়ার্কের। অফলাইনে কাজ করে; কখনো পূর্ণ কার্ড নম্বর চায় না।',
+    },
+    keywords: ['bin', 'iin', 'bank identification', 'card network', 'বিন'],
+    status: 'available',
+    route: route('bin-checker'),
+  },
+  {
+    id: 'domain-name-search',
+    category: 'productivity',
+    name: { en: 'Domain Name Search', bn: 'ডোমেইন নাম সার্চ' },
+    description: {
+      en: 'Check whether a domain name is registered by asking its registry over RDAP. Sends the name only when you press the button.',
+      bn: 'RDAP-এর মাধ্যমে রেজিস্ট্রিকে জিজ্ঞেস করে দেখুন একটি ডোমেইন নাম নিবন্ধিত কি না। বোতাম চাপলেই কেবল নাম পাঠানো হয়।',
+    },
+    keywords: ['domain search', 'availability', 'rdap', 'whois', 'ডোমেইন'],
+    status: 'available',
+    route: route('domain-name-search'),
+    online: 'rdap',
+  },
 ];

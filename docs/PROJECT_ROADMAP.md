@@ -13,14 +13,14 @@ This roadmap follows the real implementation. A tool is only marked **Available*
 | 3         | Date/age, date difference, EMI, digits, number/Taka words, date text   | Done (PR #3, merged `9d0ed68`), site deployed |
 | 4         | Unicode text cleaning and normalization                                | Done (PR #3, merged `9d0ed68`), site deployed |
 | 5         | Image resize, crop, compression, conversion, photo/signature resizer   | Done (presets deferred: no verified source)   |
-| 6         | PDF creation, merge, split, page tools, size reduction                 | Planned                                       |
-| 7         | CV and cover-letter templates with print/PDF export                    | Planned                                       |
-| 8         | Network toolkit: calculators, IP/DNS tools, IPv6, email headers        | 17 of 26 available; 9 blocked (see below)     |
-| 9         | Bandwidth/data usage, integration, accessibility and regression review | Planned                                       |
+| 6         | PDF creation, merge, split, page tools, size reduction                 | Done (pdf-lib, loaded on demand)              |
+| 7         | CV and cover-letter templates with print/PDF export                    | Done (browser print / Save as PDF)            |
+| 8         | Network toolkit: calculators, IP/DNS tools, IPv6, email headers        | 26 of 26 available (some limited, see below)  |
+| 9         | Bandwidth/data usage, integration, accessibility and regression review | Tools done; review is ongoing                 |
 
 ## Tool catalog by milestone
 
-Network toolkit: 26 entries, 17 available, 9 planned. The 9 planned ones are listed under Milestone 8 below.
+Network toolkit: 26 entries, all available. The limits of the provider-based ones are listed under Milestone 8 below.
 
 | Milestone | Category | Registry ID              | Tool                               | Status    |
 | --------- | -------- | ------------------------ | ---------------------------------- | --------- |
@@ -37,13 +37,13 @@ Network toolkit: 26 entries, 17 available, 9 planned. The 9 planned ones are lis
 | 5         | Files    | `image-resizer`          | Image Resizer                      | Available |
 | 5         | Files    | `image-cropper`          | Image Cropper                      | Available |
 | 5         | Files    | `job-photo-resizer`      | Photo & Signature Resizer          | Available |
-| 6         | Files    | `pdf-create`             | Create PDF                         | Planned   |
-| 6         | Files    | `pdf-merge`              | PDF Merge & Split                  | Planned   |
-| 6         | Files    | `pdf-tools`              | PDF Page Tools                     | Planned   |
-| 6         | Files    | `pdf-compress`           | Reduce PDF Size                    | Planned   |
-| 7         | Jobs     | `cv-templates`           | CV / Resume Templates              | Planned   |
-| 7         | Jobs     | `cover-letter-templates` | Cover Letter Templates             | Planned   |
-| 7         | Jobs     | `cv-checklist`           | Application Checklist              | Planned   |
+| 6         | Files    | `pdf-create`             | Create PDF                         | Available |
+| 6         | Files    | `pdf-merge`              | PDF Merge & Split                  | Available |
+| 6         | Files    | `pdf-tools`              | PDF Page Tools                     | Available |
+| 6         | Files    | `pdf-compress`           | Reduce PDF Size                    | Available |
+| 7         | Jobs     | `cv-templates`           | CV / Resume Templates              | Available |
+| 7         | Jobs     | `cover-letter-templates` | Cover Letter Templates             | Available |
+| 7         | Jobs     | `cv-checklist`           | Application Checklist              | Available |
 | 8         | Network  | `subnet-calculator`      | Subnet Calculator                  | Available |
 | 8         | Network  | `cidr-calculator`        | CIDR & IP Range Calculator         | Available |
 | 8         | Network  | `my-ip-info`             | IP Lookup                          | Available |
@@ -419,19 +419,19 @@ WHOIS Lookup (one shared RDAP service: IANA bootstrap, then the responsible regi
 registry). See [TOOLS.md](TOOLS.md#ipv6-compatibility-checker) and
 [TOOLS.md](TOOLS.md#ip-whois-and-ipv6-whois-rdap).
 
-Still planned, and why each is blocked:
+Added after a provider decision (available, each limited as stated on its page):
 
-| Registry ID          | Tool               | Blocker                                                                                   |
-| -------------------- | ------------------ | ----------------------------------------------------------------------------------------- |
-| `ping-ipv4`          | Ping IPv4 Address  | Browsers cannot send ICMP echo. A ping needs a server, which this project does not run.   |
-| `ping-ipv6`          | Ping IPv6 Address  | Same as above.                                                                            |
-| `traceroute`         | Traceroute         | Browsers cannot send the probes a traceroute uses. Same server requirement.               |
-| `ip-location-lookup` | IP Location Lookup | Needs a geolocation provider. None is approved; Cloudflare does not offer one for this.   |
-| `ip-blacklist-check` | IP Blacklist Check | Reputation lists (DNSBLs) often refuse public resolvers. Needs a provider decision first. |
-| `my-isp`             | What Is My ISP     | Needs a public-IP and ASN/ISP provider. Options researched; awaiting approval.            |
+| Registry ID          | Tool               | How it works and its limits                                                                                                                                     |
+| -------------------- | ------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `ping-ipv4`          | Ping IPv4 Address  | Globalping measurement API, no key. Runs on Globalping's probes, not the visitor's device; free use about 250 tests per hour per IP.                            |
+| `ping-ipv6`          | Ping IPv6 Address  | Same, IPv6.                                                                                                                                                     |
+| `traceroute`         | Traceroute         | Same, IPv4 traceroute from Globalping's probes.                                                                                                                 |
+| `ip-location-lookup` | IP Location Lookup | Team Cymru IP-to-ASN data through Cloudflare DNS: network, prefix and the country the block is registered in. Not a physical location; no city or map.          |
+| `ip-blacklist-check` | IP Blacklist Check | Five named DNS blocklists through Cloudflare DNS, IPv4 only. Says which lists answered; Spamhaus refuses public resolvers and normally shows “Could not check”. |
+| `my-isp`             | What Is My ISP     | Public IPv4 from Cloudflare's trace, then Team Cymru through Cloudflare DNS: the network (AS) that announces the address, normally the ISP.                     |
 
-Each of these needs a separate decision on provider, data sent and privacy notice before
-it is built, in line with the rules for online tools in `docs/TOOLS.md`.
+Details: [TOOLS.md](TOOLS.md#ping-and-traceroute-globalping) and
+[TOOLS.md](TOOLS.md#what-is-my-isp-ip-location-lookup-and-ip-blacklist-check).
 
 ## Productivity Tools (status by tool)
 
@@ -453,17 +453,16 @@ availability). See [TOOLS.md](TOOLS.md#name-checker).
 Also available: Image to Text Converter (Tesseract.js OCR in the browser, English and Bangla, engine
 and data served from this site). See [TOOLS.md](TOOLS.md#image-to-text-converter).
 
-Still planned:
-
-| Registry ID          | Tool               | Status                                                                           |
-| -------------------- | ------------------ | -------------------------------------------------------------------------------- |
-| `bin-checker`        | BIN Checker        | Blocked: needs a BIN data provider, and none is approved.                        |
-| `domain-name-search` | Domain Name Search | Blocked: availability needs an RDAP or registrar provider, and none is approved. |
+Also available: BIN Checker (offline; accepts only the first 6 to 8 digits and names the card
+network from published ranges; bank, country and card type are shown as not available because
+no BIN data source is approved) and Domain Name Search (asks the domain's registry over RDAP;
+“registered”, “not found” or “unknown” for registries without RDAP such as .bd; never decides
+from DNS). See [TOOLS.md](TOOLS.md#bin-checker) and [TOOLS.md](TOOLS.md#domain-name-search-rdap).
 
 ## Notes for later milestones
 
-- **Milestone 6 (PDF)** will need `pdf-lib`; add it to `docs/LICENSES.md` with verified
-  licence data when introduced.
+- **Milestone 6 (PDF)** is done with `pdf-lib` (listed in `docs/LICENSES.md`), loaded only
+  when a PDF action runs. See [TOOLS.md](TOOLS.md#pdf-tools).
 - **Milestone 8 (Subnet, CIDR & IP range)** is done and fully offline: see
   [TOOLS.md](TOOLS.md#subnet-calculator-and-cidr--ip-range-calculator).
 - **Milestone 8 (IP Lookup, DNS Lookup, Latency check)** were approved with a named
@@ -477,10 +476,17 @@ Still planned:
 
 ## Recommended next step
 
-Milestone 5 is complete apart from recruiter presets, which wait for verified official
-sources. Next: Milestone 6 (PDF tools), starting with a PDF library evaluation and Create
-PDF. Open P2 items from [FILE_TOOLS_AUDIT.md](FILE_TOOLS_AUDIT.md) (the Resizer's
-encoder-fallback policy, Cropper touch tests) remain.
+Every registry tool is available. What remains:
+
+- Recruiter photo/signature presets for `job-photo-resizer`, which wait for verified official
+  sources.
+- Bangla text in Create PDF: the built-in PDF font is Latin-only, so the tool refuses Bangla
+  with a clear message. Supporting it needs an embedded Bangla font (and `@pdf-lib/fontkit`),
+  which is a dependency decision.
+- Live checks of the provider-based tools (Globalping, Team Cymru, DNS blocklists, RDAP
+  registries) once deployed; they are tested only against mocked responses.
+- Open P2 items from [FILE_TOOLS_AUDIT.md](FILE_TOOLS_AUDIT.md) (the Resizer's encoder-fallback
+  policy, Cropper touch tests).
 
 ## Milestone 9.1 — Offline utility tools delivered
 

@@ -15,21 +15,21 @@ photo/signature tool have no code yet, so only their registry entries were revie
 
 ## Tools in the category (from `src/registry/tools.ts`)
 
-| ID                  | Name                      | Status    | Route                      | Notes                                              |
-| ------------------- | ------------------------- | --------- | -------------------------- | -------------------------------------------------- |
-| `image-compressor`  | Image Compressor          | Available | `#/tool/image-compressor`  |                                                    |
-| `image-converter`   | Image Converter           | Available | `#/tool/image-converter`   | Added in this change (new registry entry)          |
-| `image-resizer`     | Image Resizer             | Available | `#/tool/image-resizer`     |                                                    |
-| `image-cropper`     | Image Cropper             | Available | `#/tool/image-cropper`     |                                                    |
-| `job-photo-resizer` | Photo & Signature Resizer | Available | `#/tool/job-photo-resizer` | Custom sizes only; no unverified official presets  |
-| `pdf-create`        | Create PDF                | Planned   | —                          | Needs a PDF library decision (`pdf-lib`)           |
-| `pdf-merge`         | PDF Merge & Split         | Planned   | —                          | 〃                                                 |
-| `pdf-tools`         | PDF Page Tools            | Planned   | —                          | 〃                                                 |
-| `pdf-compress`      | Reduce PDF Size           | Planned   | —                          | 〃; real PDF size reduction is limited in browsers |
+| ID                  | Name                      | Status    | Route                      | Notes                                             |
+| ------------------- | ------------------------- | --------- | -------------------------- | ------------------------------------------------- |
+| `image-compressor`  | Image Compressor          | Available | `#/tool/image-compressor`  |                                                   |
+| `image-converter`   | Image Converter           | Available | `#/tool/image-converter`   | Added in this change (new registry entry)         |
+| `image-resizer`     | Image Resizer             | Available | `#/tool/image-resizer`     |                                                   |
+| `image-cropper`     | Image Cropper             | Available | `#/tool/image-cropper`     |                                                   |
+| `job-photo-resizer` | Photo & Signature Resizer | Available | `#/tool/job-photo-resizer` | Custom sizes only; no unverified official presets |
+| `pdf-create`        | Create PDF                | Available | `#/tool/pdf-create`        | Added later with `pdf-lib`; Latin text only       |
+| `pdf-merge`         | PDF Merge & Split         | Available | `#/tool/pdf-merge`         | Added later with `pdf-lib`                        |
+| `pdf-tools`         | PDF Page Tools            | Available | `#/tool/pdf-tools`         | Added later with `pdf-lib`                        |
+| `pdf-compress`      | Reduce PDF Size           | Available | `#/tool/pdf-compress`      | Rewrites structure; output may not be smaller     |
 
 IDs and routes are unique (enforced by `tests/registry.test.ts`); planned tools have no
 route or view (also enforced). The category card showed "4 available · 5 planned" at the
-time of the audit; it now shows "5 available · 4 planned".
+time of the audit; with the PDF tools added later it now shows all 9 tools as available.
 
 ## Shared behaviour (all four available tools)
 
@@ -75,7 +75,7 @@ noted; each is proposed as a separate change.
 | 7   | P3       | **No batch processing**; one image at a time in every tool.                                                                                                                                                                                                                                               | Separate feature proposal (memory limits and download UX need design).                                                                           | —                                                                                                                  |
 | 8   | P3       | **Input formats limited to JPEG, PNG and WebP.** GIF, BMP, AVIF and HEIC are rejected. Animated images become a single frame.                                                                                                                                                                             | Consider AVIF/GIF input where browsers decode them; never claim HEIC without a decoder.                                                          | Supported inputs listed per browser and tested.                                                                    |
 | 9   | P4       | **Route style differs**: two entries use string literals instead of the `route()` helper. Behaviour is identical.                                                                                                                                                                                         | Use `route()` everywhere.                                                                                                                        | No functional change; registry tests pass.                                                                         |
-| 10  | —        | **Planned PDF tools** need a library decision (`pdf-lib` is MIT) and licence entry in `docs/LICENSES.md`; the category description already mentions PDFs.                                                                                                                                                 | Separate milestone (roadmap Milestone 6).                                                                                                        | —                                                                                                                  |
+| 10  | —        | **Planned PDF tools** need a library decision (`pdf-lib` is MIT) and licence entry in `docs/LICENSES.md`; the category description already mentions PDFs.                                                                                                                                                 | Resolved: delivered in Milestone 6.                                                                                                              | —                                                                                                                  |
 | 11  | —        | **Photo & Signature Resizer** must not hard-code passport, ID or job-portal rules without verified official notices.                                                                                                                                                                                      | Collect official specifications first; until then, users can combine the Cropper (passport-style ratio is labelled as a shape only) and Resizer. | Every preset cites its official source and date.                                                                   |
 
 ## Follow-up: reliability milestone (P1 items 1 and 2 resolved)

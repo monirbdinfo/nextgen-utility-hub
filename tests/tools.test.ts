@@ -77,7 +77,7 @@ describe('tool pages', () => {
     const counts = [...root.querySelectorAll('.card-count')].map((c) => c.textContent);
     expect(counts[0]).toBe('5 available tools');
     expect(counts[3]).toBe('9 available tools');
-    expect(counts[4]).toBe('20 available · 6 planned');
+    expect(counts[4]).toBe('26 available tools');
   });
 
   it('starts at the top of home when leaving a tool via the breadcrumb', () => {

@@ -286,3 +286,95 @@ export function holder(n: RdapNetwork): RdapEntity | null {
 /** The date of the first event with one of these actions, as the registry wrote it. */
 export const eventDate = (n: RdapNetwork, ...actions: string[]): string | null =>
   n.events.find((e) => actions.includes(e.action))?.date ?? null;
+
+// ---------- Domains ----------
+
+export const DNS_BOOTSTRAP_URL = 'https://data.iana.org/rdap/dns.json';
+
+/** Read IANA's dns.json: `{ services: [[["com", "net"], ["https://…/"]], …] }`, keyed by TLD. */
+export function parseDnsBootstrap(body: unknown): Result<Map<string, string>, 'parse'> {
+  const services = obj(body)?.services;
+  if (!Array.isArray(services)) return fail('parse');
+  const out = new Map<string, string>();
+  for (const svc of services) {
+    if (!Array.isArray(svc) || !Array.isArray(svc[0]) || !Array.isArray(svc[1])) continue;
+    const url = (svc[1] as unknown[]).find(
+      (u): u is string => typeof u === 'string' && u.startsWith('https://'),
+    );
+    if (!url) continue;
+    for (const tld of svc[0] as unknown[])
+      if (typeof tld === 'string' && /^[a-z0-9-]+(\.[a-z0-9-]+)*$/i.test(tld))
+        out.set(tld.toLowerCase(), url);
+  }
+  return out.size ? ok(out) : fail('parse');
+}
+
+/** The service for the longest bootstrap suffix of `name` (normally its TLD), if any. */
+export function findDomainService(
+  services: ReadonlyMap<string, string>,
+  name: string,
+): string | null {
+  const labels = name.toLowerCase().split('.');
+  for (let i = 1; i < labels.length; i++) {
+    const url = services.get(labels.slice(i).join('.'));
+    if (url) return url;
+  }
+  return null;
+}
+
+export const rdapDomainUrl = (base: string, name: string): string =>
+  `${base.replace(/\/?$/, '/')}domain/${encodeURIComponent(name)}`;
+
+export interface RdapDomain {
+  name: string | null;
+  unicodeName: string | null;
+  handle: string | null;
+  status: string[];
+  events: RdapEvent[];
+  nameservers: string[];
+  registrar: string | null;
+  /** true / false when the registry says whether the zone is DNSSEC-signed; null when it does not. */
+  dnssec: boolean | null;
+  port43: string | null;
+}
+
+const MAX_NAMESERVERS = 13;
+
+/** Read an RDAP "domain" object. Anything else is refused. */
+export function parseRdapDomain(body: unknown): Result<RdapDomain, 'parse' | 'not-domain'> {
+  const b = obj(body);
+  if (!b) return fail('parse');
+  if (b.objectClassName !== 'domain') return fail('not-domain');
+  const entities: RdapEntity[] = [];
+  readEntities(b.entities, 0, entities);
+  const registrar = entities.find((e) => e.roles.includes('registrar'));
+  const events = Array.isArray(b.events)
+    ? b.events.flatMap((raw) => {
+        const e = obj(raw);
+        const action = str(e?.eventAction);
+        const date = str(e?.eventDate);
+        return action && date ? [{ action, date }] : [];
+      })
+    : [];
+  const nameservers = Array.isArray(b.nameservers)
+    ? b.nameservers
+        .flatMap((n) => (str(obj(n)?.ldhName) ? [str(obj(n)?.ldhName)!.toLowerCase()] : []))
+        .slice(0, MAX_NAMESERVERS)
+    : [];
+  const signed = obj(b.secureDNS)?.delegationSigned;
+  return ok({
+    name: str(b.ldhName)?.toLowerCase() ?? null,
+    unicodeName: str(b.unicodeName),
+    handle: str(b.handle),
+    status: strings(b.status),
+    events,
+    nameservers,
+    registrar: registrar ? (registrar.org ?? registrar.name ?? registrar.handle) : null,
+    dnssec: typeof signed === 'boolean' ? signed : null,
+    port43: str(b.port43),
+  });
+}
+
+/** The date of the first event with one of these actions, for a domain. */
+export const domainEventDate = (d: RdapDomain, ...actions: string[]): string | null =>
+  d.events.find((e) => actions.includes(e.action))?.date ?? null;

@@ -131,3 +131,39 @@ test.describe('PDF tools (pdf-lib loaded on demand)', () => {
     expect(problems).toEqual([]);
   });
 });
+
+test('every PDF form control has a label', async ({ page }) => {
+  for (const id of ['pdf-create', 'pdf-merge', 'pdf-tools', 'pdf-compress']) {
+    await page.goto(`/#/tool/${id}`);
+    const unlabelled = await page
+      .locator('.pdf-tool input, .pdf-tool select, .pdf-tool textarea')
+      .evaluateAll((els) =>
+        els
+          .filter((el) => !(el as HTMLInputElement).labels?.length)
+          .map((el) => el.outerHTML.slice(0, 80)),
+      );
+    expect(unlabelled, id).toEqual([]);
+  }
+  await page.goto('/#/tool/pdf-create');
+  await expect(page.getByLabel(/files|ফাইল/i).first()).toHaveAttribute('type', 'file');
+});
+
+test('long text flows onto new pages; Bangla text gets a clear message', async ({ page }) => {
+  await page.goto('/#/tool/pdf-create');
+  const area = page.locator('.pdf-tool textarea');
+  // 120 short lines plus one very long line: about three A4 pages at 16 pt line spacing.
+  await area.fill(
+    [...Array.from({ length: 120 }, (_, i) => `Line ${i + 1}`), 'word '.repeat(200)].join('\n'),
+  );
+  const download = page.waitForEvent('download');
+  await page.getByRole('button', { name: 'Create PDF' }).click();
+  const doc = await PDFDocument.load(await readDownload(await download));
+  expect(doc.getPageCount()).toBe(3);
+  // Every page carries drawn text (before the fix, pages 2 and 3 were added empty and the text
+  // was drawn over page 1).
+  for (const p of doc.getPages()) expect(p.node.Contents()).toBeDefined();
+
+  await area.fill('নমস্কার');
+  await page.getByRole('button', { name: 'Create PDF' }).click();
+  await expect(page.locator('.pdf-tool')).toContainText('the built-in PDF font cannot show');
+});

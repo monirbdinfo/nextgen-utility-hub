@@ -17,6 +17,9 @@ export class NetFailure extends Error {
 export interface FetchOptions {
   timeoutMs: number;
   headers?: Record<string, string>;
+  /** GET by default; POST sends `body` (used only by the Globalping measurement tools). */
+  method?: 'GET' | 'POST';
+  body?: string;
   /** Cancels the request (e.g. when the user leaves the tool). */
   signal?: AbortSignal;
 }
@@ -35,8 +38,9 @@ export async function request(url: string, opts: FetchOptions): Promise<Response
   opts.signal?.addEventListener('abort', onAbort);
   try {
     const res = await fetch(url, {
-      method: 'GET',
+      method: opts.method ?? 'GET',
       headers: opts.headers,
+      body: opts.body,
       credentials: 'omit',
       cache: 'no-store',
       referrerPolicy: 'no-referrer',
