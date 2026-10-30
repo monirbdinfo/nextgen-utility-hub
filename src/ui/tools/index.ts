@@ -35,6 +35,10 @@ import { qrCodeGenerator } from './qrGenerator';
 import { qrScanner, wifiQrScanner } from './qrScanner';
 import { reverseImageSearch } from './reverseImage';
 import { internetSpeedTest } from './speedTest';
+import { binChecker } from './binChecker';
+import { domainSearch } from './domainSearch';
+import { pingIpv4, pingIpv6, traceroute } from './globalpingTools';
+import { ipBlacklist, ipLocation, myIsp } from './ipIntelTools';
 import {
   invisibleCharacter,
   loremGenerator,
@@ -95,6 +99,12 @@ export const toolViews: Readonly<Record<string, ToolView>> = {
   'ipv6-compatibility': ipv6Compatibility,
   'ip-whois': ipWhois,
   'ipv6-whois': ipv6Whois,
+  'ping-ipv4': pingIpv4,
+  'ping-ipv6': pingIpv6,
+  traceroute,
+  'ip-location-lookup': ipLocation,
+  'ip-blacklist-check': ipBlacklist,
+  'my-isp': myIsp,
   'lorem-ipsum': loremGenerator,
   'time-card-calculator': timeCardCalculator,
   'credit-card-checker': creditCardChecker,
@@ -112,6 +122,8 @@ export const toolViews: Readonly<Record<string, ToolView>> = {
   'bimi-checker': bimiChecker,
   'username-checker': nameChecker,
   'image-to-text': imageToText,
+  'bin-checker': binChecker,
+  'domain-name-search': domainSearch,
 };
 
 export type { ToolContext, ToolView } from './kit';

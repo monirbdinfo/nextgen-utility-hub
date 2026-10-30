@@ -43,5 +43,5 @@ export interface Tool {
    * `rdap` (IANA's registry list and the regional internet registries' RDAP services).
    * Everything else runs offline in the browser.
    */
-  online?: 'cloudflare' | 'same-site' | 'rdap';
+  online?: 'cloudflare' | 'same-site' | 'rdap' | 'globalping';
 }

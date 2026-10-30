@@ -132,7 +132,7 @@ test('toolkit cards stay visible, mark the open toolkit and show its tools below
   await expect(page.locator('.tool .tool-cta').first()).toHaveText('Open tool');
   await cards.getByRole('link', { name: 'Network & IT Diagnostic Toolkit' }).click();
   await expect(page.locator('#category-heading')).toHaveText('Network & IT Diagnostic Toolkit');
-  await expect(page.locator('.tool .tool-cta')).toHaveCount(20);
+  await expect(page.locator('.tool .tool-cta')).toHaveCount(26);
   await expect(
     page.getByRole('navigation', { name: 'Primary' }).getByRole('link', { name: 'Home' }),
   ).not.toHaveAttribute('aria-current', 'page');

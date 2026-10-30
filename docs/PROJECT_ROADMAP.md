@@ -15,12 +15,12 @@ This roadmap follows the real implementation. A tool is only marked **Available*
 | 5         | Image resize, crop, compression, conversion, photo/signature resizer   | Done (presets deferred: no verified source)   |
 | 6         | PDF creation, merge, split, page tools, size reduction                 | Planned                                       |
 | 7         | CV and cover-letter templates with print/PDF export                    | Planned                                       |
-| 8         | Network toolkit: calculators, IP/DNS tools, IPv6, email headers        | 17 of 26 available; 9 blocked (see below)     |
+| 8         | Network toolkit: calculators, IP/DNS tools, IPv6, email headers        | 26 of 26 available (some limited, see below)  |
 | 9         | Bandwidth/data usage, integration, accessibility and regression review | Planned                                       |
 
 ## Tool catalog by milestone
 
-Network toolkit: 26 entries, 17 available, 9 planned. The 9 planned ones are listed under Milestone 8 below.
+Network toolkit: 26 entries, all available. The limits of the provider-based ones are listed under Milestone 8 below.
 
 | Milestone | Category | Registry ID              | Tool                               | Status    |
 | --------- | -------- | ------------------------ | ---------------------------------- | --------- |
@@ -419,19 +419,19 @@ WHOIS Lookup (one shared RDAP service: IANA bootstrap, then the responsible regi
 registry). See [TOOLS.md](TOOLS.md#ipv6-compatibility-checker) and
 [TOOLS.md](TOOLS.md#ip-whois-and-ipv6-whois-rdap).
 
-Still planned, and why each is blocked:
+Added after a provider decision (available, each limited as stated on its page):
 
-| Registry ID          | Tool               | Blocker                                                                                   |
-| -------------------- | ------------------ | ----------------------------------------------------------------------------------------- |
-| `ping-ipv4`          | Ping IPv4 Address  | Browsers cannot send ICMP echo. A ping needs a server, which this project does not run.   |
-| `ping-ipv6`          | Ping IPv6 Address  | Same as above.                                                                            |
-| `traceroute`         | Traceroute         | Browsers cannot send the probes a traceroute uses. Same server requirement.               |
-| `ip-location-lookup` | IP Location Lookup | Needs a geolocation provider. None is approved; Cloudflare does not offer one for this.   |
-| `ip-blacklist-check` | IP Blacklist Check | Reputation lists (DNSBLs) often refuse public resolvers. Needs a provider decision first. |
-| `my-isp`             | What Is My ISP     | Needs a public-IP and ASN/ISP provider. Options researched; awaiting approval.            |
+| Registry ID          | Tool               | How it works and its limits                                                                                                                                     |
+| -------------------- | ------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `ping-ipv4`          | Ping IPv4 Address  | Globalping measurement API, no key. Runs on Globalping's probes, not the visitor's device; free use about 250 tests per hour per IP.                            |
+| `ping-ipv6`          | Ping IPv6 Address  | Same, IPv6.                                                                                                                                                     |
+| `traceroute`         | Traceroute         | Same, IPv4 traceroute from Globalping's probes.                                                                                                                 |
+| `ip-location-lookup` | IP Location Lookup | Team Cymru IP-to-ASN data through Cloudflare DNS: network, prefix and the country the block is registered in. Not a physical location; no city or map.          |
+| `ip-blacklist-check` | IP Blacklist Check | Five named DNS blocklists through Cloudflare DNS, IPv4 only. Says which lists answered; Spamhaus refuses public resolvers and normally shows “Could not check”. |
+| `my-isp`             | What Is My ISP     | Public IPv4 from Cloudflare's trace, then Team Cymru through Cloudflare DNS: the network (AS) that announces the address, normally the ISP.                     |
 
-Each of these needs a separate decision on provider, data sent and privacy notice before
-it is built, in line with the rules for online tools in `docs/TOOLS.md`.
+Details: [TOOLS.md](TOOLS.md#ping-and-traceroute-globalping) and
+[TOOLS.md](TOOLS.md#what-is-my-isp-ip-location-lookup-and-ip-blacklist-check).
 
 ## Productivity Tools (status by tool)
 
@@ -453,12 +453,11 @@ availability). See [TOOLS.md](TOOLS.md#name-checker).
 Also available: Image to Text Converter (Tesseract.js OCR in the browser, English and Bangla, engine
 and data served from this site). See [TOOLS.md](TOOLS.md#image-to-text-converter).
 
-Still planned:
-
-| Registry ID          | Tool               | Status                                                                           |
-| -------------------- | ------------------ | -------------------------------------------------------------------------------- |
-| `bin-checker`        | BIN Checker        | Blocked: needs a BIN data provider, and none is approved.                        |
-| `domain-name-search` | Domain Name Search | Blocked: availability needs an RDAP or registrar provider, and none is approved. |
+Also available: BIN Checker (offline; accepts only the first 6 to 8 digits and names the card
+network from published ranges; bank, country and card type are shown as not available because
+no BIN data source is approved) and Domain Name Search (asks the domain's registry over RDAP;
+“registered”, “not found” or “unknown” for registries without RDAP such as .bd; never decides
+from DNS). See [TOOLS.md](TOOLS.md#bin-checker) and [TOOLS.md](TOOLS.md#domain-name-search-rdap).
 
 ## Notes for later milestones
 

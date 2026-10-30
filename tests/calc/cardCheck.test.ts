@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { checkCard, groupCard, luhn } from '../../src/calc/cardCheck';
+import { checkCard, groupCard, luhn, networkForPrefix, parseBin } from '../../src/calc/cardCheck';
 
 const check = (s: string) => {
   const r = checkCard(s);
@@ -77,5 +77,26 @@ describe('groupCard', () => {
   it('groups 4-4-4-4, and 4-6-5 for 15-digit numbers', () => {
     expect(groupCard('4111111111111111')).toBe('4111 1111 1111 1111');
     expect(groupCard('378282246310005')).toBe('3782 822463 10005');
+  });
+});
+
+describe('BIN checks', () => {
+  it('accepts 6 to 8 digits only, so a full card number is refused', () => {
+    expect(parseBin('411111')).toEqual({ ok: true, value: '411111' });
+    expect(parseBin(' 5555-5555 ')).toEqual({ ok: true, value: '55555555' });
+    expect(parseBin('৪১১১১১')).toEqual({ ok: true, value: '411111' });
+    expect(parseBin('')).toEqual({ ok: false, error: 'empty' });
+    expect(parseBin('4111a1')).toEqual({ ok: false, error: 'characters' });
+    expect(parseBin('41111')).toEqual({ ok: false, error: 'too-short' });
+    expect(parseBin('411111111')).toEqual({ ok: false, error: 'too-long' });
+    expect(parseBin('4111 1111 1111 1111')).toEqual({ ok: false, error: 'too-long' });
+  });
+
+  it('names the network from published ranges, or nothing', () => {
+    expect(networkForPrefix('411111')?.network).toBe('visa');
+    expect(networkForPrefix('222100')?.network).toBe('mastercard');
+    expect(networkForPrefix('378282')).toEqual({ network: 'amex', lengths: [15] });
+    expect(networkForPrefix('621234')?.network).toBe('unionpay');
+    expect(networkForPrefix('999999')).toBeNull();
   });
 });

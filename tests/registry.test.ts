@@ -95,6 +95,12 @@ describe('registry integrity', () => {
       'ipv6-compatibility',
       'ip-whois',
       'ipv6-whois',
+      'ping-ipv4',
+      'ping-ipv6',
+      'traceroute',
+      'ip-location-lookup',
+      'ip-blacklist-check',
+      'my-isp',
       'lorem-ipsum',
       'time-card-calculator',
       'credit-card-checker',
@@ -112,6 +118,8 @@ describe('registry integrity', () => {
       'bimi-checker',
       'username-checker',
       'image-to-text',
+      'bin-checker',
+      'domain-name-search',
     ]);
   });
 

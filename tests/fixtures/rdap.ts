@@ -117,3 +117,46 @@ export const APNIC_V6 = {
     },
   ],
 };
+
+/** Shaped like IANA's dns.json (RFC 9224); a small subset. */
+export const BOOTSTRAP_DNS = {
+  version: '1.0',
+  publication: '2026-10-01T00:00:00Z',
+  services: [
+    [['com', 'net'], ['https://rdap.verisign.com/com/v1/']],
+    [['org'], ['https://rdap.publicinterestregistry.org/rdap/']],
+    [['uk'], ['http://insecure.example/', 'https://rdap.nominet.uk/uk/']],
+  ],
+};
+
+/** Shaped like a thin-registry RDAP domain answer (RFC 9083); values invented. */
+export const VERISIGN_DOMAIN = {
+  objectClassName: 'domain',
+  handle: '2336799_DOMAIN_COM-VRSN',
+  ldhName: 'EXAMPLE.COM',
+  status: ['client delete prohibited', 'client transfer prohibited'],
+  entities: [
+    {
+      objectClassName: 'entity',
+      handle: '376',
+      roles: ['registrar'],
+      vcardArray: [
+        'vcard',
+        [
+          ['version', {}, 'text', '4.0'],
+          ['fn', {}, 'text', 'Example Registrar, Inc.'],
+        ],
+      ],
+    },
+  ],
+  events: [
+    { eventAction: 'registration', eventDate: '1995-08-14T04:00:00Z' },
+    { eventAction: 'expiration', eventDate: '2027-08-13T04:00:00Z' },
+    { eventAction: 'last changed', eventDate: '2026-08-14T07:01:38Z' },
+  ],
+  secureDNS: { delegationSigned: true },
+  nameservers: [
+    { objectClassName: 'nameserver', ldhName: 'A.IANA-SERVERS.NET' },
+    { objectClassName: 'nameserver', ldhName: 'B.IANA-SERVERS.NET' },
+  ],
+};

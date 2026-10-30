@@ -1,12 +1,18 @@
 import {
   BOOTSTRAP_URLS,
+  DNS_BOOTSTRAP_URL,
+  findDomainService,
   findService,
   parseBootstrap,
+  parseDnsBootstrap,
+  parseRdapDomain,
+  rdapDomainUrl,
   parseRdapNetwork,
   rdapIpUrl,
   type BootstrapEntry,
   type IpVersion,
   type ParsedIp,
+  type RdapDomain,
   type RdapNetwork,
 } from '../calc/rdap';
 import { NetFailure, request, type NetError } from './net';
@@ -103,6 +109,78 @@ export async function lookupIpRdap(ip: ParsedIp, signal: AbortSignal): Promise<R
       server,
       source: res.url || url,
       redirected: res.redirected || (!!res.url && res.url !== url),
+      at: new Date(),
+    };
+  } catch (e) {
+    throw translate(e);
+  }
+}
+
+// ---------- Domains ----------
+
+export type DomainLookup =
+  | { kind: 'registered'; domain: RdapDomain; server: string; source: string; at: Date }
+  /** The registry answered 404: it holds no record of this name. */
+  | { kind: 'not-found'; server: string; source: string; at: Date }
+  /** No RDAP service is listed for this name's TLD, so nothing can be said. */
+  | { kind: 'no-service'; tld: string; at: Date };
+
+let dnsBootstrap: Promise<Map<string, string>> | null = null;
+
+/** Clear the in-memory domain bootstrap cache (tests). */
+export const resetDomainRdapCache = (): void => {
+  dnsBootstrap = null;
+};
+
+function domainBootstrap(signal: AbortSignal): Promise<Map<string, string>> {
+  if (!dnsBootstrap) {
+    const p = (async () => {
+      const res = await request(DNS_BOOTSTRAP_URL, {
+        timeoutMs: RDAP_TIMEOUT_MS,
+        headers: { accept: 'application/json' },
+        signal,
+      });
+      const parsed = parseDnsBootstrap(await json(res));
+      if (!parsed.ok) throw new RdapFailure('bootstrap');
+      return parsed.value;
+    })();
+    dnsBootstrap = p;
+    p.catch(() => {
+      if (dnsBootstrap === p) dnsBootstrap = null;
+    });
+  }
+  return dnsBootstrap;
+}
+
+/**
+ * Ask the registry responsible for `name` (already normalised to ASCII) whether it holds the name.
+ * Rejects with RdapFailure for anything other than an answer or a 404.
+ */
+export async function lookupDomainRdap(name: string, signal: AbortSignal): Promise<DomainLookup> {
+  try {
+    const services = await domainBootstrap(signal);
+    const server = findDomainService(services, name);
+    if (!server) return { kind: 'no-service', tld: name.split('.').pop() ?? name, at: new Date() };
+    const url = rdapDomainUrl(server, name);
+    let res: Response;
+    try {
+      res = await request(url, {
+        timeoutMs: RDAP_TIMEOUT_MS,
+        headers: { accept: 'application/rdap+json' },
+        signal,
+      });
+    } catch (e) {
+      if (e instanceof NetFailure && e.kind === 'http' && e.status === 404)
+        return { kind: 'not-found', server, source: url, at: new Date() };
+      throw e;
+    }
+    const parsed = parseRdapDomain(await json(res));
+    if (!parsed.ok) throw new RdapFailure('parse');
+    return {
+      kind: 'registered',
+      domain: parsed.value,
+      server,
+      source: res.url || url,
       at: new Date(),
     };
   } catch (e) {

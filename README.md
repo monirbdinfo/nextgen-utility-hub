@@ -9,10 +9,12 @@ Website: <https://tools.nextgentechbd.com/>, deployed from
 `main` by GitHub Actions (first successful deployment: 2 October 2026). Changes on other
 branches appear there only after they are merged into `main`. See [Deployment](#deployment).
 
-## Status: Milestone 5 in progress (image tools)
+## Status: all registry tools available
 
-12 of 28 registry tools are **Available**; the other 16 are **Planned** (roadmap only, shown
-with a badge and not linked). See [docs/PROJECT_ROADMAP.md](docs/PROJECT_ROADMAP.md).
+All 68 registry tools are **Available**. Some of them are deliberately limited where a browser
+or the available data cannot do more (each tool page says how). See
+[docs/PROJECT_ROADMAP.md](docs/PROJECT_ROADMAP.md). The table below lists the early tools; the
+full list is in the roadmap and on the site.
 
 | Available now (run entirely in your browser)                                                  | Toolkit              |
 | --------------------------------------------------------------------------------------------- | -------------------- |
@@ -38,19 +40,24 @@ Bangla/English toggle (persisted, sets `<html lang>`), light/dark theme, keyboar
 search, hash routing with deep links, typed central registry. Calculation conventions, rounding rules and limitations are in
 [docs/TOOLS.md](docs/TOOLS.md).
 
-Not available yet: recruiter-specific photo/signature presets (no verified official source
-yet), and six Network tools that need a provider or a capability a browser does not have
-(ping IPv4 and IPv6, traceroute, IP location, blacklist and ISP). Two
-Productivity tools are also still planned (BIN and domain tools). The roadmap gives the reason for each.
+Not available yet: recruiter-specific photo/signature presets (no verified official source yet).
 
-Five Network tools use the internet, only when you press their button: IP Lookup, IP to
-Hostname and DNS Lookup contact Cloudflare, Domain to IP Lookup contacts Cloudflare, and the
-Latency check contacts this site's own server. The Internet Speed Test also downloads test
-data from Cloudflare when you press Start, and the BIMI Checker and IPv6 Compatibility Checker ask
-Cloudflare DNS about a domain. IP WHOIS and IPv6 WHOIS Lookup ask IANA which regional internet
-registry is responsible and then that registry (RDAP), for the address you enter only. Reverse Image Search only builds links to search
-providers; it sends nothing itself and never uploads a picture. All other tools run without any
-network request.
+Some tools use the internet, only when you press their button, and each one says before use
+what is sent and to whom:
+
+- **Cloudflare:** IP Lookup, IP to Hostname, DNS Lookup, Domain to IP, the BIMI Checker and the
+  IPv6 Compatibility Checker (Cloudflare DNS); the Internet Speed Test (test data). What Is My
+  ISP, IP Location Lookup and IP Blacklist Check also go through Cloudflare DNS, which asks Team
+  Cymru's IP-to-ASN service or five named DNS blocklists on the visitor's behalf.
+- **This site's own server:** the Latency check.
+- **IANA and the responsible registry (RDAP):** IP WHOIS, IPv6 WHOIS and Domain Name Search.
+- **Globalping** (public measurement network): Ping IPv4, Ping IPv6 and Traceroute. Browsers
+  cannot send ping or traceroute probes, so these run on Globalping's probes, not on the
+  visitor's device, and the page says so.
+
+Reverse Image Search only builds links to search providers; it sends nothing itself and never
+uploads a picture. The BIN Checker works offline and accepts only the first 6 to 8 digits of a
+card. All other tools run without any network request.
 
 ## Toolkits
 
@@ -178,9 +185,8 @@ docs/         Roadmap, tool conventions, category audit, licensing
 ## Privacy, security and limitations
 
 - Static site: no server, accounts, cookies, analytics or external requests. Language and
-  theme preferences are kept in `localStorage` only. The only exceptions are five Network
-  tools, and only when the user presses their button: four send requests to Cloudflare and
-  the Latency check sends small requests to this site's server.
+  theme preferences are kept in `localStorage` only. The only exceptions are the online tools
+  listed above, and only when the user presses their button. No API key is used anywhere.
   Each says what is sent and to whom before use (see
   [docs/TOOLS.md](docs/TOOLS.md#online-network-tools-ip-lookup-ip-to-hostname-dns-lookup-domain-to-ip-latency-check)).
 - File tools process files locally. The Image Resizer, Cropper, Compressor, Converter and
@@ -188,8 +194,9 @@ docs/         Roadmap, tool conventions, category audit, licensing
   images are never uploaded, stored or logged (see
   [docs/TOOLS.md](docs/TOOLS.md#image-resizer) and the category audit in
   [docs/FILE_TOOLS_AUDIT.md](docs/FILE_TOOLS_AUDIT.md)).
-- Browsers cannot open raw sockets, send ICMP pings or scan ports. The IP, IPv6 and email
-  header tools are pure calculation or parsing and send nothing. The online network tools are
+- Browsers cannot open raw sockets, send ICMP pings or scan ports. Ping and Traceroute
+  therefore ask Globalping to run them from its probes. The IP, IPv6 and email header
+  calculators are pure calculation or parsing and send nothing. The online network tools are
   limited to what the browser safely allows, and the project will not include unauthorised
   scanning or other unsafe diagnostic features.
 - Fonts come from the user’s system. Bangla text needs a Bengali-capable system font
