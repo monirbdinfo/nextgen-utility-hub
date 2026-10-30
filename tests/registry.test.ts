@@ -107,6 +107,7 @@ describe('registry integrity', () => {
       'reverse-image-search',
       'internet-speed-test',
       'bimi-checker',
+      'username-checker',
     ]);
   });
 

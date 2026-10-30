@@ -18,6 +18,7 @@ const CROSS_BROWSER_SPECS = [
   'qr.spec.ts',
   'speed-reverse.spec.ts',
   'bimi.spec.ts',
+  'name-checker.spec.ts',
 ];
 
 export default defineConfig({
