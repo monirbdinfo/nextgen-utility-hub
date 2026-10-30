@@ -24,8 +24,10 @@ import {
   ipv6ToIpv4,
   localIpv6Generator,
 } from './networkIpv6';
+import { bimiChecker } from './bimiChecker';
 import { emailHeaderAnalyzer } from './emailHeaders';
 import { imageToText } from './imageToText';
+import { nameChecker } from './nameChecker';
 import { creditCardChecker, notepadOnline, timeCardCalculator } from './productivityMisc';
 import { qrCodeGenerator } from './qrGenerator';
 import { qrScanner, wifiQrScanner } from './qrScanner';
@@ -102,6 +104,8 @@ export const toolViews: Readonly<Record<string, ToolView>> = {
   'wifi-qr-scanner': wifiQrScanner,
   'reverse-image-search': reverseImageSearch,
   'internet-speed-test': internetSpeedTest,
+  'bimi-checker': bimiChecker,
+  'username-checker': nameChecker,
   'image-to-text': imageToText,
 };
 

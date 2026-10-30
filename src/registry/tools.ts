@@ -817,6 +817,31 @@ export const tools: readonly Tool[] = [
     online: 'cloudflare',
   },
   {
+    id: 'bimi-checker',
+    category: 'productivity',
+    name: { en: 'BIMI Checker & Generator', bn: 'BIMI চেকার ও জেনারেটর' },
+    description: {
+      en: 'Check a domain’s BIMI and DMARC records through Cloudflare DNS when you ask, or create a BIMI record in your browser.',
+      bn: 'চাইলে Cloudflare DNS দিয়ে ডোমেইনের BIMI ও DMARC রেকর্ড পরীক্ষা করুন, অথবা ব্রাউজারেই BIMI রেকর্ড তৈরি করুন।',
+    },
+    keywords: ['bimi', 'dmarc', 'email logo', 'dns', 'generator', 'বিমি'],
+    status: 'available',
+    route: route('bimi-checker'),
+    online: 'cloudflare',
+  },
+  {
+    id: 'username-checker',
+    category: 'productivity',
+    name: { en: 'Name Checker', bn: 'ইউজারনেম চেকার' },
+    description: {
+      en: 'Check whether a username fits the format rules of GitHub, X, Instagram, TikTok, YouTube and more. Runs in your browser; it does not check availability.',
+      bn: 'GitHub, X, Instagram, TikTok, YouTube ইত্যাদির ফরম্যাট নিয়মে একটি ইউজারনেম মেলে কি না দেখুন। ব্রাউজারেই চলে; নামটি খালি আছে কি না দেখে না।',
+    },
+    keywords: ['username', 'handle', 'social media', 'name rules', 'ইউজারনেম'],
+    status: 'available',
+    route: route('username-checker'),
+  },
+  {
     id: 'image-to-text',
     category: 'productivity',
     name: { en: 'Image to Text Converter', bn: 'ছবি থেকে টেক্সট' },
@@ -833,10 +858,6 @@ export const tools: readonly Tool[] = [
     // prettier-ignore
     ['bin-checker','BIN Checker','BIN চেকার','Check a bank identification number using a supported data source.','সমর্থিত ডেটা সোর্স দিয়ে ব্যাংক শনাক্তকরণ নম্বর পরীক্ষা করুন।',['bin','bank identification','বিন']],
     // prettier-ignore
-    ['username-checker','Name Checker','ইউজারনেম চেকার','Check username availability on supported services.','সমর্থিত সার্ভিসে ইউজারনেম পাওয়া যায় কি না দেখুন।',['username','social media','ইউজারনেম']],
-    // prettier-ignore
     ['domain-name-search','Domain Name Search','ডোমেইন নাম সার্চ','Check domain availability through a supported lookup provider.','সমর্থিত লুকআপ প্রোভাইডার দিয়ে ডোমেইন প্রাপ্যতা দেখুন।',['domain search','availability','ডোমেইন']],
-    // prettier-ignore
-    ['bimi-checker','BIMI Checker & Generator','BIMI চেকার ও জেনারেটর','Inspect BIMI DNS records and related configuration.','BIMI DNS রেকর্ড ও সংশ্লিষ্ট কনফিগারেশন পরীক্ষা করুন।',['bimi','dns','generator','বিমি']],
   ] as const).map(([id,en,bn,de,db,keywords]) => ({id,category:'productivity' as const,name:{en,bn},description:{en:de,bn:db},keywords:[...keywords,'productivity tools','প্রোডাক্টিভিটি'],status:'planned' as const})),
 ];

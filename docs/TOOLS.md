@@ -737,6 +737,58 @@ standard (not Micro, Kanji or Structured Append) codes.
   whether the network is hidden. The password is hidden until “Show the password” is ticked, and
   can be copied only while shown.
 
+## BIMI Checker & Generator
+
+**Checker** (online, Cloudflare). Before the button the page says that two DNS questions go to
+Cloudflare's public resolver (`https://cloudflare-dns.com/dns-query`, the same DoH JSON API as DNS
+Lookup): TXT at `<selector>._bimi.<domain>` and TXT at `_dmarc.<domain>`. Nothing is sent until
+“Check BIMI”. The logo and certificate files are **not** downloaded or checked.
+
+Record rules applied (`src/calc/bimi.ts`):
+
+- The record must start with `v=BIMI1` exactly; tags are `tag=value` separated by `;`; a tag may
+  appear only once. `l=` must be present (it may be empty). Unknown tags are a warning; `lps=` and
+  `avp=` (newer optional tags in the BIMI draft) are accepted.
+- `l=` must be an `https://` address and should end in `.svg` (SVG Tiny PS); a comma list is a
+  warning. `a=` (the mark certificate) must be `https://` and should end in `.pem`. No `a=` (or the
+  old `a=self`) is a warning: Gmail and Apple Mail show logos only with a Verified (or, for Gmail,
+  Common) Mark Certificate.
+- `v=BIMI1; l=; a=;` is a **declination** record (the domain asks for no logo).
+- More than one `v=BIMI1` TXT record at the name is reported as an error.
+- **DMARC:** the policy must be `p=quarantine` or `p=reject`, `pct=100` (the default) and not
+  `sp=none`. The check reads `_dmarc.<domain>` only; for a subdomain without its own record the
+  parent domain's policy may apply, and the page says so rather than guessing the organisational
+  domain.
+
+The result is a format check of the published records, **not** an official certification; each
+mail service decides whether to show a logo.
+
+**Generator** (offline). Domain, logo address (`https`, `.svg`), optional certificate address
+(`https`, `.pem`) and selector (default `default`) produce the record name
+(`default._bimi.example.com`) and value (`v=BIMI1; l=…; a=…;`). Nothing is sent.
+
+## Name Checker
+
+Checks whether a username fits each platform's **format** rules, live, entirely in the browser
+(no request to any platform). It does **not** check whether a name is free and is not an official
+verification; the page says so. A leading `@` is ignored; spaces and input over 100 characters
+are refused. Rules (`src/calc/nameRules.ts`):
+
+| Platform       | Length | Characters                           | Other rules                                   | Source             |
+| -------------- | ------ | ------------------------------------ | --------------------------------------------- | ------------------ |
+| GitHub         | 1–39   | A–Z, 0–9, `-`                        | no `-` at start/end, no `--`                  | reported \*        |
+| X (Twitter)    | 5–15   | A–Z, 0–9, `_`                        | may not contain “twitter” or “admin”          | X help pages       |
+| Instagram      | 1–30   | A–Z, 0–9, `.`, `_`                   | no `.` at start/end, no `..`                  | reported \*        |
+| TikTok         | 2–24   | A–Z, 0–9, `.`, `_`                   | may not end with `.`                          | reported \*        |
+| YouTube handle | 3–30   | letters/digits of any script, `._-·` | no separator at start/end                     | YouTube help pages |
+| Facebook       | 5+     | A–Z, 0–9, `.`                        | may not end in a domain extension (`.com`, …) | reported \*        |
+| Telegram       | 5–32   | A–Z, 0–9, `_`                        | starts with a letter, may not end with `_`    | reported \*        |
+| Reddit         | 3–20   | A–Z, 0–9, `_`, `-`                   |                                               | reported \*        |
+
+\* Widely documented but not found in the platform's own help pages; marked with \* on the page.
+YouTube's shorter limits for Han/Hangul (1–10) and some other scripts (2–20) are not modelled. All
+platforms also refuse taken, reserved or policy-breaking names, and they change their rules.
+
 ## Image to Text Converter
 
 OCR with [Tesseract.js](https://github.com/naptha/tesseract.js) 7.0.0, run in a Web Worker in the
