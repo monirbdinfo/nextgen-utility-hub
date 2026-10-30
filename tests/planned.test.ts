@@ -106,6 +106,6 @@ describe('planned tools', () => {
   it('are counted separately on the toolkit card', () => {
     const root = setup();
     const counts = [...root.querySelectorAll('.card-count')].map((c) => c.textContent);
-    expect(counts[4]).toBe('17 available · 10 planned');
+    expect(counts[4]).toBe('20 available · 7 planned');
   });
 });

@@ -26,6 +26,8 @@ import {
 } from './networkIpv6';
 import { bimiChecker } from './bimiChecker';
 import { emailHeaderAnalyzer } from './emailHeaders';
+import { ipv6Compatibility } from './ipv6Compat';
+import { ipv6Whois, ipWhois } from './ipWhois';
 import { imageToText } from './imageToText';
 import { nameChecker } from './nameChecker';
 import { creditCardChecker, notepadOnline, timeCardCalculator } from './productivityMisc';
@@ -90,6 +92,9 @@ export const toolViews: Readonly<Record<string, ToolView>> = {
   'email-header-analyzer': emailHeaderAnalyzer,
   'ip-to-hostname': ipToHostname,
   'domain-to-ip': domainToIp,
+  'ipv6-compatibility': ipv6Compatibility,
+  'ip-whois': ipWhois,
+  'ipv6-whois': ipv6Whois,
   'lorem-ipsum': loremGenerator,
   'time-card-calculator': timeCardCalculator,
   'credit-card-checker': creditCardChecker,

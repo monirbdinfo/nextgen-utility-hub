@@ -413,19 +413,22 @@ Compression, IPv6 Expand, IPv6 CIDR to Range, IPv6 Range to CIDR, IP Subnet Calc
 (IPv4 and IPv6), Local IPv6 Address Generator, Trace Email (Header Analyzer), IP to
 Hostname Lookup and Domain to IP Lookup. The last two use Cloudflare DNS, like DNS Lookup.
 
+Added later (available): IPv6 Compatibility Checker (DNS findings only, through Cloudflare DNS;
+browser IPv6 connectivity and reachability are shown as not tested), and IP WHOIS Lookup and IPv6
+WHOIS Lookup (one shared RDAP service: IANA bootstrap, then the responsible regional internet
+registry). See [TOOLS.md](TOOLS.md#ipv6-compatibility-checker) and
+[TOOLS.md](TOOLS.md#ip-whois-and-ipv6-whois-rdap).
+
 Still planned, and why each is blocked:
 
-| Registry ID          | Tool                       | Blocker                                                                                   |
-| -------------------- | -------------------------- | ----------------------------------------------------------------------------------------- |
-| `ping-ipv4`          | Ping IPv4 Address          | Browsers cannot send ICMP echo. A ping needs a server, which this project does not run.   |
-| `ping-ipv6`          | Ping IPv6 Address          | Same as above.                                                                            |
-| `traceroute`         | Traceroute                 | Browsers cannot send the probes a traceroute uses. Same server requirement.               |
-| `ip-location-lookup` | IP Location Lookup         | Needs a geolocation provider. None is approved; Cloudflare does not offer one for this.   |
-| `ip-blacklist-check` | IP Blacklist Check         | Reputation lists (DNSBLs) often refuse public resolvers. Needs a provider decision first. |
-| `ip-whois`           | IP WHOIS Lookup            | Needs an RDAP or WHOIS provider. None is approved.                                        |
-| `ipv6-whois`         | IPv6 WHOIS Lookup          | Same as IP WHOIS.                                                                         |
-| `ipv6-compatibility` | IPv6 Compatibility Checker | Needs a test endpoint that answers from IPv6 and allows browser requests. Not yet chosen. |
-| `my-isp`             | What Is My ISP             | Needs an ASN or ISP dataset. None is approved.                                            |
+| Registry ID          | Tool               | Blocker                                                                                   |
+| -------------------- | ------------------ | ----------------------------------------------------------------------------------------- |
+| `ping-ipv4`          | Ping IPv4 Address  | Browsers cannot send ICMP echo. A ping needs a server, which this project does not run.   |
+| `ping-ipv6`          | Ping IPv6 Address  | Same as above.                                                                            |
+| `traceroute`         | Traceroute         | Browsers cannot send the probes a traceroute uses. Same server requirement.               |
+| `ip-location-lookup` | IP Location Lookup | Needs a geolocation provider. None is approved; Cloudflare does not offer one for this.   |
+| `ip-blacklist-check` | IP Blacklist Check | Reputation lists (DNSBLs) often refuse public resolvers. Needs a provider decision first. |
+| `my-isp`             | What Is My ISP     | Needs a public-IP and ASN/ISP provider. Options researched; awaiting approval.            |
 
 Each of these needs a separate decision on provider, data sent and privacy notice before
 it is built, in line with the rules for online tools in `docs/TOOLS.md`.

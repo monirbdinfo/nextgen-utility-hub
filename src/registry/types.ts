@@ -39,8 +39,9 @@ export interface Tool {
   route?: string;
   /**
    * Set for the few tools that must contact a server, and only after the user asks:
-   * `cloudflare` (Cloudflare 1.1.1.1 services) or `same-site` (the server hosting this site).
+   * `cloudflare` (Cloudflare 1.1.1.1 services), `same-site` (the server hosting this site) or
+   * `rdap` (IANA's registry list and the regional internet registries' RDAP services).
    * Everything else runs offline in the browser.
    */
-  online?: 'cloudflare' | 'same-site';
+  online?: 'cloudflare' | 'same-site' | 'rdap';
 }

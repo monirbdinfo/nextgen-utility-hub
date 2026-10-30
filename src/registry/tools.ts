@@ -627,6 +627,45 @@ export const tools: readonly Tool[] = [
     route: route('domain-to-ip'),
     online: 'cloudflare',
   },
+  {
+    id: 'ipv6-compatibility',
+    category: 'network',
+    name: { en: 'IPv6 Compatibility Checker', bn: 'IPv6 সামঞ্জস্য পরীক্ষা' },
+    description: {
+      en: 'See whether a domain’s website, name servers and mail servers publish IPv6 addresses in DNS, through Cloudflare DNS when you ask.',
+      bn: 'চাইলে Cloudflare DNS দিয়ে দেখুন একটি ডোমেইনের ওয়েবসাইট, নেম সার্ভার ও মেইল সার্ভার DNS-এ IPv6 অ্যাড্রেস প্রকাশ করে কি না।',
+    },
+    keywords: ['ipv6', 'compatibility', 'aaaa', 'ipv6 ready', 'সামঞ্জস্য'],
+    status: 'available',
+    route: route('ipv6-compatibility'),
+    online: 'cloudflare',
+  },
+  {
+    id: 'ip-whois',
+    category: 'network',
+    name: { en: 'IP WHOIS Lookup', bn: 'আইপি WHOIS লুকআপ' },
+    description: {
+      en: 'See who an IPv4 address block is registered to, from the responsible regional internet registry (RDAP). Sends the address only when you press the button.',
+      bn: 'দায়িত্বপ্রাপ্ত আঞ্চলিক ইন্টারনেট রেজিস্ট্রি (RDAP) থেকে দেখুন একটি IPv4 অ্যাড্রেস ব্লক কার নামে নিবন্ধিত। বোতাম চাপলেই কেবল অ্যাড্রেসটি পাঠানো হয়।',
+    },
+    keywords: ['whois', 'rdap', 'ip registration', 'ipv4', 'নিবন্ধন'],
+    status: 'available',
+    route: route('ip-whois'),
+    online: 'rdap',
+  },
+  {
+    id: 'ipv6-whois',
+    category: 'network',
+    name: { en: 'IPv6 WHOIS Lookup', bn: 'IPv6 WHOIS লুকআপ' },
+    description: {
+      en: 'See who an IPv6 address block is registered to, from the responsible regional internet registry (RDAP). Sends the address only when you press the button.',
+      bn: 'দায়িত্বপ্রাপ্ত আঞ্চলিক ইন্টারনেট রেজিস্ট্রি (RDAP) থেকে দেখুন একটি IPv6 অ্যাড্রেস ব্লক কার নামে নিবন্ধিত। বোতাম চাপলেই কেবল অ্যাড্রেসটি পাঠানো হয়।',
+    },
+    keywords: ['ipv6', 'whois', 'rdap', 'আইপি'],
+    status: 'available',
+    route: route('ipv6-whois'),
+    online: 'rdap',
+  },
   // prettier-ignore
   ...([
     ['ping-ipv4','Ping IPv4 Address','IPv4 পিং','Check IPv4 reachability where supported.','সমর্থিত পরিবেশে IPv4 সংযোগ পরীক্ষা করুন।',['ping','ipv4','পিং']],
@@ -638,12 +677,6 @@ export const tools: readonly Tool[] = [
     ['ip-location-lookup','IP Location Lookup','আইপি লোকেশন লুকআপ','Look up approximate public IP geolocation.','পাবলিক আইপির আনুমানিক অবস্থান দেখুন।',['ip location','geolocation','আইপি']],
     // prettier-ignore
     ['ip-blacklist-check','IP Blacklist Check','আইপি ব্ল্যাকলিস্ট চেক','Check public reputation sources where access is available.','সুযোগ থাকলে পাবলিক রেপুটেশন সোর্স পরীক্ষা করুন।',['blacklist','reputation','ব্ল্যাকলিস্ট']],
-    // prettier-ignore
-    ['ip-whois','IP WHOIS Lookup','আইপি WHOIS লুকআপ','View IP allocation and registration information.','আইপি বরাদ্দ ও নিবন্ধনের তথ্য দেখুন।',['whois','ip registration','নিবন্ধন']],
-    // prettier-ignore
-    ['ipv6-whois','IPv6 WHOIS Lookup','IPv6 WHOIS লুকআপ','View IPv6 allocation and registration information.','IPv6 বরাদ্দ ও নিবন্ধনের তথ্য দেখুন।',['ipv6','whois','আইপি']],
-    // prettier-ignore
-    ['ipv6-compatibility','IPv6 Compatibility Checker','IPv6 সামঞ্জস্য পরীক্ষা','Check IPv6 support using a supported test endpoint.','সমর্থিত টেস্ট এন্ডপয়েন্ট দিয়ে IPv6 সাপোর্ট পরীক্ষা করুন।',['ipv6','compatibility','সামঞ্জস্য']],
     // prettier-ignore
     ['my-isp','What Is My ISP','আমার ISP কী','Look up the internet service provider associated with a public IP.','পাবলিক আইপির সঙ্গে যুক্ত ইন্টারনেট সেবাদাতা দেখুন।',['isp','provider','আইএসপি']],
   ] as const).map(([id,en,bn,de,db,keywords]) => ({id,category:'network' as const,name:{en,bn},description:{en:de,bn:db},keywords:[...keywords,'ip tools','আইপি টুলস'],status:'planned' as const})),

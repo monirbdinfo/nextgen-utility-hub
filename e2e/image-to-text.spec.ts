@@ -77,6 +77,20 @@ test.describe('Image to Text', () => {
     await expect(page.getByRole('button', { name: 'Extract text' })).toBeEnabled();
   });
 
+  test('Clear text keeps the picture; Reset closes it', async ({ page }) => {
+    await page.goto('/#/tool/image-to-text');
+    await extract(page, 'ocr-english.png', 'eng');
+    await expect(page.locator('#ocr-text')).toHaveValue(/Hello/, { timeout: OCR_TIMEOUT });
+    await page.getByRole('button', { name: 'Clear text' }).click();
+    await expect(page.locator('#ocr-text')).toBeHidden();
+    await expect(page.getByRole('status').filter({ hasText: 'Text cleared' })).toBeVisible();
+    await expect(page.locator('.image-card')).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Extract text' })).toBeFocused();
+    await page.getByRole('button', { name: 'Reset' }).first().click();
+    await expect(page.locator('.image-card')).toBeHidden();
+    await expect(page.getByRole('button', { name: 'Extract text' })).toBeHidden();
+  });
+
   test('refuses a file that is not a picture', async ({ page }) => {
     await page.goto('/#/tool/image-to-text');
     await page.locator('#ocr-file').setInputFiles(`${FIX}corrupt.png`);
