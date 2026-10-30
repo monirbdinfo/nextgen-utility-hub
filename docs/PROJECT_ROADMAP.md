@@ -443,16 +443,17 @@ Also available: Internet Speed Test (online: downloads test data from Cloudflare
 download and round trip only, no upload) and Reverse Image Search (links to search providers; this
 site never uploads the picture). See
 [TOOLS.md](TOOLS.md#internet-speed-test-and-reverse-image-search).
+Also available: BIMI Checker & Generator (checks BIMI and DMARC through Cloudflare DNS when asked;
+the generator is offline). See [TOOLS.md](TOOLS.md#bimi-checker--generator).
 
 Still planned:
 
-| Registry ID          | Tool                     | Status                                                                                                        |
-| -------------------- | ------------------------ | ------------------------------------------------------------------------------------------------------------- |
-| `bimi-checker`       | BIMI Checker & Generator | Next. A DNS TXT lookup through Cloudflare DNS, plus a record generator.                                       |
-| `bin-checker`        | BIN Checker              | Blocked: needs a BIN data provider, and none is approved.                                                     |
-| `username-checker`   | Name Checker             | Blocked: availability needs each platform's API; search links alone do not check anything.                    |
-| `domain-name-search` | Domain Name Search       | Blocked: availability needs an RDAP or registrar provider, and none is approved.                              |
-| `image-to-text`      | Image to Text Converter  | Blocked: OCR needs an engine and language data (megabytes) that must be bundled or fetched; needs a decision. |
+| Registry ID          | Tool                    | Status                                                                                                        |
+| -------------------- | ----------------------- | ------------------------------------------------------------------------------------------------------------- |
+| `bin-checker`        | BIN Checker             | Blocked: needs a BIN data provider, and none is approved.                                                     |
+| `username-checker`   | Name Checker            | Blocked: availability needs each platform's API; search links alone do not check anything.                    |
+| `domain-name-search` | Domain Name Search      | Blocked: availability needs an RDAP or registrar provider, and none is approved.                              |
+| `image-to-text`      | Image to Text Converter | Blocked: OCR needs an engine and language data (megabytes) that must be bundled or fetched; needs a decision. |
 
 ## Notes for later milestones
 

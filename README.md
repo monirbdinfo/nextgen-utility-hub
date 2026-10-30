@@ -40,13 +40,14 @@ search, hash routing with deep links, typed central registry. Calculation conven
 
 Not available yet: recruiter-specific photo/signature presets (no verified official source
 yet), and nine Network tools that need a provider or a capability a browser does not have
-(ping, traceroute, IP location, blacklist, WHOIS, ISP and IPv6 compatibility). Five
-Productivity tools are also still planned (BIMI, BIN, name, domain and OCR tools). The roadmap gives the reason for each.
+(ping, traceroute, IP location, blacklist, WHOIS, ISP and IPv6 compatibility). Four
+Productivity tools are also still planned (BIN, name, domain and OCR tools). The roadmap gives the reason for each.
 
 Five Network tools use the internet, only when you press their button: IP Lookup, IP to
 Hostname and DNS Lookup contact Cloudflare, Domain to IP Lookup contacts Cloudflare, and the
 Latency check contacts this site's own server. The Internet Speed Test also downloads test
-data from Cloudflare when you press Start. Reverse Image Search only builds links to search
+data from Cloudflare when you press Start, and the BIMI Checker asks Cloudflare DNS for a domain's
+BIMI and DMARC records. Reverse Image Search only builds links to search
 providers; it sends nothing itself and never uploads a picture. All other tools run without any
 network request.
 
