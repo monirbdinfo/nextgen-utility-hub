@@ -683,6 +683,33 @@ parsing and matching are in `src/calc/rdap.ts`.
   live IANA and registry services, including their CORS headers, were **not** reachable from the
   development environment and are not verified.
 
+## PDF tools
+
+Create PDF, PDF Merge & Split, PDF Page Tools and Reduce PDF Size (`src/ui/tools/pdfTools.ts`)
+run in the browser with `pdf-lib`, which is loaded only when a PDF action runs. Files are never
+uploaded.
+
+- **Create PDF:** text is laid out on A4-size pages in the built-in Helvetica font (11 pt,
+  16 pt line spacing, 48 pt margins), wrapped at word boundaries (`src/calc/pdfText.ts`); a word
+  longer than a line is broken rather than cut off, and text continues onto new pages. PNG and
+  JPEG images are embedded directly; other image types are converted to PNG through a canvas.
+  The built-in font can only show Latin (WinAnsi) characters: text with Bangla or other scripts
+  is refused with a message suggesting the browser's Print → Save as PDF.
+- **Merge & Split:** merges the chosen PDFs in order, or extracts a page range (e.g. `1-3,5`).
+- **Page Tools:** new page order, rotation of all pages, and removal of a page range (the last
+  page is never removed).
+- **Reduce PDF Size:** rewrites the PDF with object streams and reports the size before and
+  after. It cannot recompress embedded images, so the output may not be smaller; the page says so.
+- Encrypted or damaged files give an error instead of a result. Every control has a label.
+
+## CV / Resume Templates, Cover Letter Templates and Application Checklist
+
+Job Application Toolkit (`src/ui/tools/jobApplication.ts`). The CV and cover letter are built
+from the form into a preview that can be copied or printed / saved as PDF with the browser's own
+print dialog (so Bangla text works). Entries are kept in memory for the page visit only, never
+stored or sent. The checklist is a fixed list of common application steps to tick off, with
+progress, copy and print; ticks are also kept in memory only.
+
 ## Ping and Traceroute (Globalping)
 
 Online (`online: 'globalping'`). Ping IPv4 Address, Ping IPv6 Address and Traceroute share one

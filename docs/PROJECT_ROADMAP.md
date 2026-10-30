@@ -13,10 +13,10 @@ This roadmap follows the real implementation. A tool is only marked **Available*
 | 3         | Date/age, date difference, EMI, digits, number/Taka words, date text   | Done (PR #3, merged `9d0ed68`), site deployed |
 | 4         | Unicode text cleaning and normalization                                | Done (PR #3, merged `9d0ed68`), site deployed |
 | 5         | Image resize, crop, compression, conversion, photo/signature resizer   | Done (presets deferred: no verified source)   |
-| 6         | PDF creation, merge, split, page tools, size reduction                 | Planned                                       |
-| 7         | CV and cover-letter templates with print/PDF export                    | Planned                                       |
+| 6         | PDF creation, merge, split, page tools, size reduction                 | Done (pdf-lib, loaded on demand)              |
+| 7         | CV and cover-letter templates with print/PDF export                    | Done (browser print / Save as PDF)            |
 | 8         | Network toolkit: calculators, IP/DNS tools, IPv6, email headers        | 26 of 26 available (some limited, see below)  |
-| 9         | Bandwidth/data usage, integration, accessibility and regression review | Planned                                       |
+| 9         | Bandwidth/data usage, integration, accessibility and regression review | Tools done; review is ongoing                 |
 
 ## Tool catalog by milestone
 
@@ -37,13 +37,13 @@ Network toolkit: 26 entries, all available. The limits of the provider-based one
 | 5         | Files    | `image-resizer`          | Image Resizer                      | Available |
 | 5         | Files    | `image-cropper`          | Image Cropper                      | Available |
 | 5         | Files    | `job-photo-resizer`      | Photo & Signature Resizer          | Available |
-| 6         | Files    | `pdf-create`             | Create PDF                         | Planned   |
-| 6         | Files    | `pdf-merge`              | PDF Merge & Split                  | Planned   |
-| 6         | Files    | `pdf-tools`              | PDF Page Tools                     | Planned   |
-| 6         | Files    | `pdf-compress`           | Reduce PDF Size                    | Planned   |
-| 7         | Jobs     | `cv-templates`           | CV / Resume Templates              | Planned   |
-| 7         | Jobs     | `cover-letter-templates` | Cover Letter Templates             | Planned   |
-| 7         | Jobs     | `cv-checklist`           | Application Checklist              | Planned   |
+| 6         | Files    | `pdf-create`             | Create PDF                         | Available |
+| 6         | Files    | `pdf-merge`              | PDF Merge & Split                  | Available |
+| 6         | Files    | `pdf-tools`              | PDF Page Tools                     | Available |
+| 6         | Files    | `pdf-compress`           | Reduce PDF Size                    | Available |
+| 7         | Jobs     | `cv-templates`           | CV / Resume Templates              | Available |
+| 7         | Jobs     | `cover-letter-templates` | Cover Letter Templates             | Available |
+| 7         | Jobs     | `cv-checklist`           | Application Checklist              | Available |
 | 8         | Network  | `subnet-calculator`      | Subnet Calculator                  | Available |
 | 8         | Network  | `cidr-calculator`        | CIDR & IP Range Calculator         | Available |
 | 8         | Network  | `my-ip-info`             | IP Lookup                          | Available |
@@ -461,8 +461,8 @@ from DNS). See [TOOLS.md](TOOLS.md#bin-checker) and [TOOLS.md](TOOLS.md#domain-n
 
 ## Notes for later milestones
 
-- **Milestone 6 (PDF)** will need `pdf-lib`; add it to `docs/LICENSES.md` with verified
-  licence data when introduced.
+- **Milestone 6 (PDF)** is done with `pdf-lib` (listed in `docs/LICENSES.md`), loaded only
+  when a PDF action runs. See [TOOLS.md](TOOLS.md#pdf-tools).
 - **Milestone 8 (Subnet, CIDR & IP range)** is done and fully offline: see
   [TOOLS.md](TOOLS.md#subnet-calculator-and-cidr--ip-range-calculator).
 - **Milestone 8 (IP Lookup, DNS Lookup, Latency check)** were approved with a named
@@ -476,10 +476,17 @@ from DNS). See [TOOLS.md](TOOLS.md#bin-checker) and [TOOLS.md](TOOLS.md#domain-n
 
 ## Recommended next step
 
-Milestone 5 is complete apart from recruiter presets, which wait for verified official
-sources. Next: Milestone 6 (PDF tools), starting with a PDF library evaluation and Create
-PDF. Open P2 items from [FILE_TOOLS_AUDIT.md](FILE_TOOLS_AUDIT.md) (the Resizer's
-encoder-fallback policy, Cropper touch tests) remain.
+Every registry tool is available. What remains:
+
+- Recruiter photo/signature presets for `job-photo-resizer`, which wait for verified official
+  sources.
+- Bangla text in Create PDF: the built-in PDF font is Latin-only, so the tool refuses Bangla
+  with a clear message. Supporting it needs an embedded Bangla font (and `@pdf-lib/fontkit`),
+  which is a dependency decision.
+- Live checks of the provider-based tools (Globalping, Team Cymru, DNS blocklists, RDAP
+  registries) once deployed; they are tested only against mocked responses.
+- Open P2 items from [FILE_TOOLS_AUDIT.md](FILE_TOOLS_AUDIT.md) (the Resizer's encoder-fallback
+  policy, Cropper touch tests).
 
 ## Milestone 9.1 — Offline utility tools delivered
 
