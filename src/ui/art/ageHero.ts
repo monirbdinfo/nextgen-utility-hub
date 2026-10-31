@@ -26,13 +26,13 @@ const TEXT = {
     line1: 'Discover',
     line2: 'Your Age',
     line3: '& Next Birthday',
-    units: ['Years', 'Months', 'Days', 'Hours', 'Minutes', 'Seconds'],
+    units: ['Years', 'Months', 'Days', 'Weeks', 'Hours'],
   },
   bn: {
     line1: 'জেনে নিন',
     line2: 'আপনার বয়স',
     line3: 'ও পরের জন্মদিন',
-    units: ['বছর', 'মাস', 'দিন', 'ঘণ্টা', 'মিনিট', 'সেকেন্ড'],
+    units: ['বছর', 'মাস', 'দিন', 'সপ্তাহ', 'ঘণ্টা'],
   },
 } as const;
 

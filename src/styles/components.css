@@ -2954,31 +2954,15 @@ a.btn {
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
-/* Totals: 2 columns (seconds across both) when narrow; 3 + 2 from 420 px. */
+/* Totals (weeks, days, hours): one row of three at every width. */
 .age-tiles-totals {
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   margin-top: var(--space-3);
-}
-
-.age-tiles-totals .age-tile:last-child {
-  grid-column: 1 / -1;
 }
 
 @container ageresult (min-width: 420px) {
   .age-tiles-main {
     grid-template-columns: repeat(4, minmax(0, 1fr));
-  }
-
-  .age-tiles-totals {
-    grid-template-columns: repeat(6, minmax(0, 1fr));
-  }
-
-  .age-tiles-totals .age-tile {
-    grid-column: span 2;
-  }
-
-  .age-tiles-totals .age-tile:nth-child(n + 4) {
-    grid-column: span 3;
   }
 }
 
