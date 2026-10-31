@@ -570,7 +570,7 @@ The Age Calculator follows the NextGen Tech BD tool-page mockup. The calculation
   data stored” badges next to “Runs in your browser” (no tool keeps its inputs; only the
   language and theme preferences are saved).
 - **Calculator:** “Enter your dates” card with quick-date chips; “Your age” card with
-  colour tiles (years, months, days, total months; weeks, days, hours, minutes, seconds), the
+  colour tiles (years, months, days, total months; weeks, days, hours), the
   next birthday and the age at it. Values sit in a definition list, the full age is also given
   as one sentence for screen readers, and Copy result is unchanged.
 - **Below:** four feature cards, “How is this calculated?”, common uses, four examples with
@@ -609,3 +609,6 @@ next-birthday date wrapped over four lines, and related-tool names spilled out o
 Bangla: no horizontal scroll, nothing spilling out of its card, equal and aligned date inputs,
 no wrapped button or chip text, no overflowing tile values, and a one-line next-birthday date.
 It fails on the previous layout (7 of 12 cases) and passes on the fix.
+
+Follow-up: the Minutes and Seconds tiles were removed at the owner's request; the totals row is
+now weeks, days and hours.

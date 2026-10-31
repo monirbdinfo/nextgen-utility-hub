@@ -117,7 +117,11 @@ describe('age calculator', () => {
     expect(tile(root, 'totals', 'Days')).toBe('13,258');
     expect(tile(root, 'totals', 'Weeks')).toBe('1,894');
     expect(tile(root, 'totals', 'Hours')).toBe('318,192');
-    expect(tile(root, 'totals', 'Seconds')).toBe('1,145,491,200');
+    expect([...root.querySelectorAll('.age-tiles-totals dt')].map((d) => d.textContent)).toEqual([
+      'Weeks',
+      'Days',
+      'Hours',
+    ]);
     expect(text(root, '.age-bday-next .age-bday-date')).toBe('15 June 2027');
     expect(text(root, '.age-bday-next .age-bday-sub')).toBe('Tuesday · 256 days from now');
     expect(text(root, '.age-bday-will')).toContain('37 years old');
