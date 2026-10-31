@@ -3,6 +3,7 @@ import { getCategory, toolsByCategory, type Tool } from '../registry';
 import { fromLocalDate } from '../calc/dates';
 import { toHash } from '../router/router';
 import { ageHeroArt } from './art/ageHero';
+import { numberHeroArt } from './art/numberHero';
 import { statusKey, type AppContext } from './context';
 import { icon } from './icons';
 import { TOOL_ICONS } from './toolkits';
@@ -41,7 +42,12 @@ export function createToolPage(ctx: AppContext, tool: Tool, store: ToolStore): H
   // A view that shows its own related tools (data-own-related) replaces the generic list.
   const ownRelated = body?.dataset.ownRelated === 'true';
   // Tool-specific header illustration (decorative).
-  const art = tool.id === 'age-calculator' ? ageHeroArt(lang, fromLocalDate(new Date())) : null;
+  const art =
+    tool.id === 'age-calculator'
+      ? ageHeroArt(lang, fromLocalDate(new Date()))
+      : tool.id === 'number-to-words-bn'
+        ? numberHeroArt(lang)
+        : null;
 
   return h(
     'section',
@@ -49,7 +55,9 @@ export function createToolPage(ctx: AppContext, tool: Tool, store: ToolStore): H
     breadcrumb,
     h(
       'header',
-      { class: `tool-header card-${tool.category}${art ? ' tool-header-art' : ''}` },
+      {
+        class: `tool-header card-${tool.category}${art ? ` tool-header-art tool-header-art-${tool.category}` : ''}`,
+      },
       cat
         ? h(
             'div',
