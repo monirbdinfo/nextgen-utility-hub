@@ -2,10 +2,11 @@ import {
   calculateAge,
   fromLocalDate,
   toISODate,
+  weekday,
   type AgeResult,
   type CivilDate,
 } from '../../calc/dates';
-import { BN_MONTHS, EN_MONTHS } from '../../calc/dateText';
+import { BN_MONTHS, BN_WEEKDAYS, EN_MONTHS, EN_WEEKDAYS } from '../../calc/dateText';
 import { toBanglaDigits } from '../../calc/digits';
 import { groupDigits } from '../../calc/format';
 import { defineStrings } from '../../i18n';
@@ -201,6 +202,15 @@ function shortDate(lang: Lang, d: CivilDate): string {
   return `${d.day} ${EN_MONTHS[d.month - 1]!.slice(0, 3)} ${d.year}`;
 }
 
+/** "16 September 2027" / "১৬ সেপ্টেম্বর ২০২৭": the weekday is shown on its own line. */
+function mediumDate(lang: Lang, d: CivilDate): string {
+  if (lang === 'bn') return toBanglaDigits(`${d.day} ${BN_MONTHS[d.month - 1]} ${d.year}`);
+  return `${d.day} ${EN_MONTHS[d.month - 1]} ${d.year}`;
+}
+
+const weekdayName = (lang: Lang, d: CivilDate): string =>
+  (lang === 'bn' ? BN_WEEKDAYS : EN_WEEKDAYS)[weekday(d)]!;
+
 function shiftISO(iso: string, days: number, years = 0): string {
   const [y, m, d] = iso.split('-').map(Number) as [number, number, number];
   const date = new Date(y + years, m - 1, d + days);
@@ -321,8 +331,12 @@ function ageResult(
             'p',
             {},
             h('strong', {}, L('nextBirthday')),
-            h('span', { class: 'age-bday-date' }, longDate(lang, r.nextBirthday)),
-            h('span', { class: 'age-bday-sub' }, daysLeft),
+            h('span', { class: 'age-bday-date' }, mediumDate(lang, r.nextBirthday)),
+            h(
+              'span',
+              { class: 'age-bday-sub' },
+              `${weekdayName(lang, r.nextBirthday)} · ${daysLeft}`,
+            ),
           ),
         ),
         h(

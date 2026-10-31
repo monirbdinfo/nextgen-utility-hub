@@ -20,6 +20,7 @@ const CROSS_BROWSER_SPECS = [
   'pdf.spec.ts',
   'network-rdap.spec.ts',
   'provider-tools.spec.ts',
+  'age-layout.spec.ts',
   'bimi.spec.ts',
   'name-checker.spec.ts',
   'image-to-text.spec.ts',

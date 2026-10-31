@@ -588,3 +588,24 @@ The Age Calculator follows the NextGen Tech BD tool-page mockup. The calculation
 An ad hoc axe-core scan (not a project dependency, not run in CI) found no violations on the
 Age Calculator (empty and with a result), the mobile drawer, and three other tool pages, in
 light and dark themes, English and Bangla, at 390 and 1,440 px.
+
+### Follow-up: Age Calculator layout fix
+
+The first version switched layouts by window width, but the sidebar takes 250 px: at
+1,024–1,280 px the form and result sat side by side in 350–480 px cards, so the date fields
+shrank to ~140 px, one label wrapped while the other did not (inputs out of line), the
+next-birthday date wrapped over four lines, and related-tool names spilled out of their cards.
+
+- Each part now adapts to the width it actually has (CSS container queries): form and result
+  side by side only from 900 px of page width; fields in two columns from 400 px of form
+  width, as a shared subgrid so both inputs always line up; tiles 2 × 2 or 4 across; birthday
+  cards side by side only when the date and weekday fit on one line; feature, information and
+  example/related grids likewise.
+- The next-birthday card shows the date on one line and the weekday with the days left below.
+- Buttons and chips never wrap their text; in a narrow form the buttons take full-width rows.
+- The header illustration appears only when the header has room for it beside the badges.
+
+`e2e/age-layout.spec.ts` checks, at 1,440, 1,280, 1,024, 768, 390 and 320 px in English and
+Bangla: no horizontal scroll, nothing spilling out of its card, equal and aligned date inputs,
+no wrapped button or chip text, no overflowing tile values, and a one-line next-birthday date.
+It fails on the previous layout (7 of 12 cases) and passes on the fix.
