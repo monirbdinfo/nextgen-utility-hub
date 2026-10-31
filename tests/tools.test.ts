@@ -118,8 +118,8 @@ describe('age calculator', () => {
     expect(tile(root, 'totals', 'Weeks')).toBe('1,894');
     expect(tile(root, 'totals', 'Hours')).toBe('318,192');
     expect(tile(root, 'totals', 'Seconds')).toBe('1,145,491,200');
-    expect(text(root, '.age-bday-next')).toContain('Tuesday, 15 June 2027');
-    expect(text(root, '.age-bday-next')).toContain('256 days from now');
+    expect(text(root, '.age-bday-next .age-bday-date')).toBe('15 June 2027');
+    expect(text(root, '.age-bday-next .age-bday-sub')).toBe('Tuesday · 256 days from now');
     expect(text(root, '.age-bday-will')).toContain('37 years old');
     expect(text(root, '.age-asof')).toBe('As of 2 Oct 2026');
   });
@@ -224,6 +224,7 @@ describe('age calculator', () => {
     expect($(root, '#age-dob').value).toBe('1990-06-15');
     expect(text(root, '.age-result-body')).toContain('৩৬ বছর, ৩ মাস, ১৭ দিন');
     expect(text(root, '.age-tiles-totals')).toContain('১৩,২৫৮');
+    expect(text(root, '.age-bday-next .age-bday-date')).toBe('১৫ জুন ২০২৭');
     expect(document.title).toBe('বয়স ক্যালকুলেটর · নেক্সটজেন ইউটিলিটি হাব');
   });
 
