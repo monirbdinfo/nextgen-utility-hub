@@ -559,3 +559,32 @@ Validation and exact counts are in the pull request. An ad hoc axe-core scan (no
 dependency, not run in CI) found no violations on the home page, two toolkit pages, a tool
 page and the open mobile drawer, in light and dark themes, English and Bangla, at 360 and
 1,536 px.
+
+## Age Calculator page redesign (design v3)
+
+The Age Calculator follows the NextGen Tech BD tool-page mockup. The calculation is unchanged.
+
+- **Header:** a decorative inline-SVG illustration (calendar showing today's date, cake,
+  clock, sticky note of units, confetti; no image request, hidden from screen readers) on a
+  soft gradient background, shown from 1,100 px. Offline tools now show “Private” and “No
+  data stored” badges next to “Runs in your browser” (no tool keeps its inputs; only the
+  language and theme preferences are saved).
+- **Calculator:** “Enter your dates” card with quick-date chips; “Your age” card with
+  colour tiles (years, months, days, total months; weeks, days, hours, minutes, seconds), the
+  next birthday and the age at it. Values sit in a definition list, the full age is also given
+  as one sentence for screen readers, and Copy result is unchanged.
+- **Below:** four feature cards, “How is this calculated?”, common uses, four examples with
+  emoji (each fills in a date of birth) and related tools (replacing the generic “More in”
+  list on this page).
+- **Sidebar:** on a tool page its toolkit opens and lists up to six of its tools with the
+  current one marked, plus “View all tools”. Toolkit pages keep it collapsed because they
+  already list every tool.
+- **Deliberate differences from the mockup:** the mockup's own figures were inconsistent (a
+  17 October birthday shown as “Next birthday: December 17”, and 13,158 instead of 13,162
+  days); the page shows the correct values. “100% free” became “free”, and the badge reads
+  “Private” as on the other offline tools. The mockup's “Last Year”/“Next Year” chips are
+  “A year ago”/“In a year”, which is what they do.
+
+An ad hoc axe-core scan (not a project dependency, not run in CI) found no violations on the
+Age Calculator (empty and with a result), the mobile drawer, and three other tool pages, in
+light and dark themes, English and Bangla, at 390 and 1,440 px.

@@ -8,6 +8,7 @@ export type UiIcon =
   | 'map'
   | 'chevron-right'
   | 'star'
+  | 'clock'
   | IconName
   | 'search'
   | 'menu'
@@ -117,6 +118,7 @@ const paths: Record<UiIcon, string> = {
   server: 'M4 4.5h16v6H4z M4 13.5h16v6H4z M7.5 7.5h.01 M7.5 16.5h.01',
   activity: 'M3 12h4l2.5-6 5 12 2.5-6h4',
   ruler: 'M3 15.5 15.5 3 21 8.5 8.5 21z M7 11.5l2 2 M10 8.5l1.5 1.5 M13 5.5l2 2 M5.5 13.5 7 15',
+  clock: 'M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18z M12 7.5V12l3 2',
   star: 'M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.9l-5.2 2.7 1-5.8-4.3-4.1 5.9-.9z',
   'chevron-right': 'M9.5 6l6 6-6 6',
   map: 'M3.5 6.5 9 4l6 2.5 5.5-2.5v13.5L15 20l-6-2.5-5.5 2.5z M9 4v13.5 M15 6.5V20',

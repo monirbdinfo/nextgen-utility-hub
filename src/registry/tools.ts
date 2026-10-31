@@ -15,8 +15,8 @@ export const tools: readonly Tool[] = [
     category: 'general',
     name: { en: 'Age Calculator', bn: 'বয়স ক্যালকুলেটর' },
     description: {
-      en: 'Exact age in years, months and days on any date, plus your next birthday.',
-      bn: 'যেকোনো তারিখে বছর, মাস ও দিনে সঠিক বয়স এবং পরের জন্মদিন।',
+      en: 'Calculate your exact age in years, months and days, see your next birthday and get detailed breakdowns. Fast, accurate and free.',
+      bn: 'বছর, মাস ও দিনে আপনার সঠিক বয়স, পরের জন্মদিন এবং বিস্তারিত হিসাব দেখুন। দ্রুত, নির্ভুল ও বিনামূল্যে।',
     },
     keywords: ['age', 'birthday', 'date of birth', 'dob', 'বয়স', 'জন্মদিন', 'জন্ম তারিখ'],
     status: 'available',
