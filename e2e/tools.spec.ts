@@ -144,10 +144,9 @@ test('works under the GitHub Pages sub-path', async ({ page }) => {
   await page.goto(`${base}#/tool/number-to-words-bn`);
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('Number to Words');
   await page.getByLabel('Number', { exact: true }).fill('2026');
-  await page.getByRole('button', { name: 'Calculate' }).click();
-  await expect(page.locator('.result-row-primary .result-value').first()).toHaveText(
-    'Two Thousand Twenty-Six',
-  );
+  await page.getByRole('button', { name: 'Convert to words' }).click();
+  await page.getByRole('tab', { name: 'In English words' }).click();
+  await expect(page.locator('#nw-panel-en .nw-words')).toHaveText('Two Thousand Twenty-Six');
   await page.getByLabel('Breadcrumb').getByRole('link', { name: 'Home' }).click();
   await expect(page).toHaveURL(`${base}#/`);
   await expect(page.locator('.card')).toHaveCount(6);

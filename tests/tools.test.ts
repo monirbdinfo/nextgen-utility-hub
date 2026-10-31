@@ -345,22 +345,49 @@ describe('digit converter', () => {
 });
 
 describe('number and Taka words', () => {
-  it('shows English and Bangla words', () => {
+  const words = (root: ParentNode, lang: 'bn' | 'en'): string =>
+    $<HTMLElement>(root, `#nw-panel-${lang} .nw-words`).textContent ?? '';
+  const digits = (root: ParentNode, lang: 'bn' | 'en'): string =>
+    $<HTMLElement>(root, `#nw-panel-${lang} .nw-digits`).textContent ?? '';
+  const button = (root: ParentNode, name: string): HTMLButtonElement =>
+    [...root.querySelectorAll<HTMLButtonElement>('button')].find(
+      (b) => b.textContent === name || b.getAttribute('aria-label') === name,
+    )!;
+
+  it('shows Bangla and English words in tabs, from Bangla or English digits', () => {
     const root = open('#/tool/number-to-words-bn');
-    set(root, '#words-number', '1,23,456');
+    expect(text(root, '.nw-result-body .result-empty')).toBe(
+      'Enter a number and convert it to see the result.',
+    );
+    set(root, '#words-number', '১,২৩,৪৫৬');
     submit(root);
-    expect(rowValue(root, 'English')).toBe('One Lakh Twenty-Three Thousand Four Hundred Fifty-Six');
-    expect(rowValue(root, 'Bangla')).toBe('এক লক্ষ তেইশ হাজার চার শত ছাপ্পান্ন'.normalize('NFC'));
-    expect(rowValue(root, 'Digits (Bangla)')).toBe('১,২৩,৪৫৬');
+    expect(words(root, 'bn')).toBe('এক লক্ষ তেইশ হাজার চার শত ছাপ্পান্ন'.normalize('NFC'));
+    expect(digits(root, 'bn')).toBe('(১,২৩,৪৫৬)');
+    expect(words(root, 'en')).toBe('One Lakh Twenty-Three Thousand Four Hundred Fifty-Six');
+    expect(digits(root, 'en')).toBe('(1,23,456)');
+    // Bangla tab first; the English panel is hidden until its tab is chosen.
+    expect($(root, '#nw-tab-bn').getAttribute('aria-selected')).toBe('true');
+    expect($<HTMLElement>(root, '#nw-panel-en').hidden).toBe(true);
+    $<HTMLButtonElement>(root, '#nw-tab-en').click();
+    expect($<HTMLElement>(root, '#nw-panel-en').hidden).toBe(false);
+    expect($<HTMLElement>(root, '#nw-panel-bn').hidden).toBe(true);
+    // Arrow keys move between the tabs.
+    $(root, '#nw-tab-en').dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowLeft' }));
+    expect($(root, '#nw-tab-bn').getAttribute('aria-selected')).toBe('true');
+    expect(document.activeElement?.id).toBe('nw-tab-bn');
   });
 
-  it('switches the English scale', () => {
+  it('switches the English number system; Bangla stays lakh/crore', () => {
     const root = open('#/tool/number-to-words-bn');
     set(root, '#words-number', '1000000');
-    set(root, '#words-scale', 'international');
     submit(root);
-    expect(rowValue(root, 'English')).toBe('One Million');
-    expect(rowValue(root, 'Digits (English)')).toBe('1,000,000');
+    expect(words(root, 'en')).toBe('Ten Lakh');
+    $<HTMLInputElement>(root, '#words-scale-international').click();
+    expect(words(root, 'en')).toBe('One Million');
+    expect(digits(root, 'en')).toBe('(1,000,000)');
+    expect(words(root, 'bn')).toBe('দশ লক্ষ');
+    expect(text(root, '.nw-system-note')).toBe('English words: million/billion');
+    expect(text(root, '.nw-table thead')).toContain('English words (million/billion)');
   });
 
   it('reports malformed numbers', () => {
@@ -368,6 +395,83 @@ describe('number and Taka words', () => {
     set(root, '#words-number', '1.2.3');
     submit(root);
     expect($(root, '#words-number-error').textContent).toContain('isn’t a valid number');
+    set(root, '#words-number', '1234567890123456');
+    submit(root);
+    expect($(root, '#words-number-error').textContent).toContain('Up to 15 digits');
+  });
+
+  it('examples come from the converter and convert when chosen', () => {
+    const root = open('#/tool/number-to-words-bn');
+    const rows = [...root.querySelectorAll('.nw-table tbody tr')].map((r) =>
+      [...r.querySelectorAll('td')].map((c) => c.textContent),
+    );
+    expect(rows[3]).toEqual([
+      '1,25,000',
+      'এক লক্ষ পঁচিশ হাজার'.normalize('NFC'),
+      'One Lakh Twenty-Five Thousand',
+    ]);
+    button(root, 'Convert 1,00,00,000').click();
+    expect($(root, '#words-number').value).toBe('1,00,00,000');
+    expect(words(root, 'en')).toBe('One Crore');
+  });
+
+  it('quick examples, clear, swap digits and reset', () => {
+    const root = open('#/tool/number-to-words-bn');
+    const quick = [...root.querySelectorAll('.nw-quick .chip-btn')];
+    expect(quick.map((b) => b.textContent)).toEqual([
+      '1',
+      '12',
+      '100',
+      '1,000',
+      '1,00,000',
+      '12,34,567',
+      '1,00,00,000',
+    ]);
+    (quick[5] as HTMLButtonElement).click();
+    expect(words(root, 'bn')).toBe('বারো লক্ষ চৌত্রিশ হাজার পাঁচ শত সাতষট্টি'.normalize('NFC'));
+    button(root, 'Swap the number between Bangla and English digits').click();
+    expect($(root, '#words-number').value).toBe('১২,৩৪,৫৬৭');
+    expect(text(root, '.nw-form-status')).toBe('Digits switched to Bangla digits.');
+    expect(words(root, 'en')).toBe('Twelve Lakh Thirty-Four Thousand Five Hundred Sixty-Seven');
+    button(root, 'Clear the number').click();
+    expect($(root, '#words-number').value).toBe('');
+    expect(document.activeElement?.id).toBe('words-number');
+    set(root, '#words-number', '5');
+    submit(root);
+    button(root, 'Reset').click();
+    expect(root.querySelector('.nw-tabs')).toBeNull();
+    expect($<HTMLInputElement>(root, '#words-scale-south-asian').checked).toBe(true);
+  });
+
+  it('copies one language or the whole result', async () => {
+    const writeText = vi.fn().mockResolvedValue(undefined);
+    Object.defineProperty(navigator, 'clipboard', { value: { writeText }, configurable: true });
+    const root = open('#/tool/number-to-words-bn');
+    set(root, '#words-number', '2026');
+    submit(root);
+    button(root, 'Copy the Bangla words').click();
+    await vi.waitFor(() => expect(writeText).toHaveBeenCalledWith('দুই হাজার ছাব্বিশ'));
+    button(root, 'Copy result').click();
+    await vi.waitFor(() => expect(writeText).toHaveBeenCalledTimes(2));
+    expect(writeText.mock.calls[1]?.[0]).toBe(
+      'Bangla: দুই হাজার ছাব্বিশ\nEnglish: Two Thousand Twenty-Six\nDigits (Bangla): ২,০২৬\nDigits (English): 2,026',
+    );
+  });
+
+  it('shows its illustration and related tools', () => {
+    const root = open('#/tool/number-to-words-bn');
+    expect($(root, '.number-hero-art').getAttribute('aria-hidden')).toBe('true');
+    expect(root.querySelector('nav.related')).toBeNull();
+    expect(
+      [...root.querySelectorAll<HTMLAnchorElement>('.nw-related-link')].map((a) =>
+        a.getAttribute('href'),
+      ),
+    ).toEqual([
+      '#/tool/digit-converter',
+      '#/tool/taka-in-words',
+      '#/tool/date-formatter',
+      '#/tool/unicode-cleaner',
+    ]);
   });
 
   it('writes Taka with poisha and refuses to round', () => {
