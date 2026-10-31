@@ -19,6 +19,13 @@ by unit tests in `tests/calc/`.
 - **Age:** a date of birth after the "age on" date is rejected. A birthday on 29 February is
   celebrated on **28 February** in common years. When the "age on" date is a birthday, the
   tool says so and the next birthday is one year later.
+- **Age totals:** the Age Calculator also shows total months, weeks, days, hours, minutes and
+  seconds. Totals count whole days from midnight to midnight (hours = days × 24, and so on);
+  they are not a live clock. English uses international grouping (1,137,196,800); Bangla uses
+  lakh/crore grouping and Bangla digits.
+- **Age quick dates and examples:** “Today”, “Yesterday”, “Tomorrow”, “A year ago”, “In a
+  year” and “My next birthday” set the “age on” date (a year from 29 February falls on 28
+  February); the four examples set a date of birth. Both recalculate straight away.
 - **Date difference:** the end date is **excluded** by default (1 Jan → 2 Jan = 1 day). With
   "Include the end date" both days count, which adds one day (1 Jan → 2 Jan = 2 days; same
   date = 1 day). If the end date is before the start date, the dates are swapped and the

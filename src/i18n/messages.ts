@@ -67,6 +67,9 @@ export const messages = {
     breadcrumb: 'Breadcrumb',
     home: 'Home',
     runsLocally: 'Runs in your browser',
+    badgePrivate: 'Private',
+    badgeNoStorage: 'No data stored',
+    viewAllTools: 'View all tools',
     toolPrivacy:
       'This tool works entirely in your browser. Nothing you enter is uploaded or stored on a server.',
     usesInternet: 'Uses the internet when you ask',
@@ -162,6 +165,9 @@ export const messages = {
     breadcrumb: 'অবস্থান',
     home: 'হোম',
     runsLocally: 'আপনার ব্রাউজারেই চলে',
+    badgePrivate: 'প্রাইভেট',
+    badgeNoStorage: 'কোনো তথ্য সংরক্ষণ হয় না',
+    viewAllTools: 'সব টুল দেখুন',
     toolPrivacy:
       'এই টুলটি সম্পূর্ণ আপনার ব্রাউজারে কাজ করে। আপনি যা লেখেন তা কোনো সার্ভারে আপলোড বা সংরক্ষণ করা হয় না।',
     usesInternet: 'চাইলে ইন্টারনেট ব্যবহার করে',

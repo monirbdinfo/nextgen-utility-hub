@@ -30,6 +30,7 @@ function submit(root: ParentNode): void {
 
 const resultText = (root: ParentNode): string =>
   $<HTMLElement>(root, '.result-body').textContent ?? '';
+const text = (root: ParentNode, sel: string): string => $<HTMLElement>(root, sel).textContent ?? '';
 const rowValue = (root: ParentNode, label: string): string | undefined =>
   [...root.querySelectorAll('.result-row')]
     .find((r) => r.querySelector('dt')?.textContent === label)
@@ -98,13 +99,100 @@ describe('tool pages', () => {
 });
 
 describe('age calculator', () => {
-  it('calculates age and the next birthday', () => {
+  const tile = (root: ParentNode, group: string, label: string): string | undefined =>
+    [...root.querySelectorAll(`.age-tiles-${group} .age-tile`)]
+      .find((t) => t.querySelector('dt')?.textContent === label)
+      ?.querySelector('dd')?.textContent ?? undefined;
+
+  it('calculates age, totals and the next birthday', () => {
     const root = open('#/tool/age-calculator');
     set(root, '#age-dob', '1990-06-15');
     set(root, '#age-ref', '2026-10-02');
     submit(root);
-    expect(rowValue(root, 'Age')).toBe('36 years, 3 months, 17 days');
-    expect(rowValue(root, 'Next birthday')).toBe('Tuesday, 15 June 2027 — in 256 days (turns 37)');
+    expect(text(root, '.age-result-body .sr-only')).toBe('Age: 36 years, 3 months, 17 days');
+    expect(tile(root, 'main', 'Years')).toBe('36');
+    expect(tile(root, 'main', 'Months')).toBe('3');
+    expect(tile(root, 'main', 'Days')).toBe('17');
+    expect(tile(root, 'main', 'Total months')).toBe('435');
+    expect(tile(root, 'totals', 'Days')).toBe('13,258');
+    expect(tile(root, 'totals', 'Weeks')).toBe('1,894');
+    expect(tile(root, 'totals', 'Hours')).toBe('318,192');
+    expect(tile(root, 'totals', 'Seconds')).toBe('1,145,491,200');
+    expect(text(root, '.age-bday-next')).toContain('Tuesday, 15 June 2027');
+    expect(text(root, '.age-bday-next')).toContain('256 days from now');
+    expect(text(root, '.age-bday-will')).toContain('37 years old');
+    expect(text(root, '.age-asof')).toBe('As of 2 Oct 2026');
+  });
+
+  it('quick dates set the “age on” date and recalculate', () => {
+    const root = open('#/tool/age-calculator');
+    const chip = (label: string): HTMLButtonElement =>
+      [...root.querySelectorAll<HTMLButtonElement>('.age-quick .chip-btn')].find(
+        (b) => b.textContent === label,
+      )!;
+    chip('My next birthday').click();
+    expect(text(root, '.age-quick-status')).toBe('Enter a date of birth first.');
+    expect(document.activeElement?.id).toBe('age-dob');
+    set(root, '#age-dob', '2000-01-01');
+    set(root, '#age-ref', '2026-05-05');
+    chip('Today').click();
+    const today = new Date();
+    const iso = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+    expect($(root, '#age-ref').value).toBe(iso);
+    expect(root.querySelector('.age-tiles-main')).not.toBeNull();
+    chip('My next birthday').click();
+    expect($(root, '#age-ref').value).toMatch(/^\d{4}-01-01$/);
+    // On that date it is the birthday itself, so the greeting shows and the next one is a year on.
+    expect(text(root, '.age-result-body')).toContain('Happy birthday!');
+    expect(tile(root, 'main', 'Months')).toBe('0');
+    expect(tile(root, 'main', 'Days')).toBe('0');
+  });
+
+  it('examples fill in a date of birth and calculate', () => {
+    const root = open('#/tool/age-calculator');
+    set(root, '#age-ref', '2026-01-01');
+    const examples = [...root.querySelectorAll<HTMLButtonElement>('.age-example')];
+    expect(examples.map((b) => b.getAttribute('aria-label'))).toEqual([
+      'Child: born 1 Jan 2015',
+      'Student: born 15 Jun 2000',
+      'Adult: born 17 Oct 1990',
+      'Senior: born 5 May 1960',
+    ]);
+    examples[0]!.click();
+    expect($(root, '#age-dob').value).toBe('2015-01-01');
+    expect(tile(root, 'main', 'Years')).toBe('11');
+  });
+
+  it('shows the illustration, offline badges and its own related tools', () => {
+    const root = open('#/tool/age-calculator');
+    expect($(root, '.age-hero-art').getAttribute('aria-hidden')).toBe('true');
+    expect([...root.querySelectorAll('.tool-badges .pill')].map((p) => p.textContent)).toEqual([
+      'Available',
+      'Runs in your browser',
+      'Private',
+      'No data stored',
+    ]);
+    expect(root.querySelector('nav.related')).toBeNull();
+    expect([...root.querySelectorAll('.age-related-name')].map((n) => n.textContent)).toEqual([
+      'Date Difference',
+      'Loan EMI Calculator',
+      'Bandwidth & Data Usage',
+      'Unit Converter',
+    ]);
+  });
+
+  it('opens its toolkit in the sidebar and marks the tool', () => {
+    const root = open('#/tool/age-calculator');
+    const sub = $(root, '#site-nav .side-sublist');
+    expect([...sub.querySelectorAll('a')].map((a) => a.textContent)).toEqual([
+      'Age Calculator',
+      'Date Difference',
+      'Loan EMI Calculator',
+      'Bandwidth & Data Usage',
+      'Unit Converter',
+      'View all tools',
+    ]);
+    expect($(sub, '[aria-current="page"]').textContent).toBe('Age Calculator');
   });
 
   it('rejects a future date of birth and focuses the field', () => {
@@ -134,7 +222,8 @@ describe('age calculator', () => {
     await Promise.resolve();
     expect($(root, 'h1').textContent).toBe('বয়স ক্যালকুলেটর');
     expect($(root, '#age-dob').value).toBe('1990-06-15');
-    expect(resultText(root)).toContain('৩৬ বছর, ৩ মাস, ১৭ দিন');
+    expect(text(root, '.age-result-body')).toContain('৩৬ বছর, ৩ মাস, ১৭ দিন');
+    expect(text(root, '.age-tiles-totals')).toContain('১৩,২৫৮');
     expect(document.title).toBe('বয়স ক্যালকুলেটর · নেক্সটজেন ইউটিলিটি হাব');
   });
 
@@ -146,7 +235,7 @@ describe('age calculator', () => {
       .find((b) => b.textContent === 'Reset')!
       .click();
     expect($(root, '#age-dob').value).toBe('');
-    expect(root.querySelector('.result-list')).toBeNull();
+    expect(root.querySelector('.age-tiles')).toBeNull();
     expect(document.activeElement?.id).toBe('age-dob');
   });
 

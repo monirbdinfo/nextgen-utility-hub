@@ -62,8 +62,16 @@ test('age calculator works end to end with the keyboard', async ({ page }) => {
   await page.getByLabel('Age on this date').fill('2026-10-02');
   await page.getByRole('button', { name: 'Calculate' }).focus();
   await page.keyboard.press('Enter');
-  await expect(page.locator('.result-row-primary .result-value')).toHaveText(
-    '36 years, 3 months, 17 days',
+  await expect(page.locator('.age-result-body .sr-only')).toHaveText(
+    'Age: 36 years, 3 months, 17 days',
+  );
+  await expect(page.locator('.age-tiles-main .age-tile').first()).toContainText('36');
+  // Quick dates and examples work from the keyboard too.
+  await page.getByRole('button', { name: 'Senior: born 5 May 1960' }).focus();
+  await page.keyboard.press('Enter');
+  await expect(page.getByLabel('Date of birth')).toHaveValue('1960-05-05');
+  await expect(page.locator('.age-result-body .sr-only')).toHaveText(
+    'Age: 66 years, 4 months, 27 days',
   );
   // Error path: future date of birth moves focus to the field and describes the error.
   await page.getByLabel('Date of birth').fill('2030-01-01');
@@ -116,7 +124,8 @@ test('navigation between toolkit and tools supports back and forward', async ({ 
   await page.getByRole('link', { name: 'Taka in Words' }).click();
   await expect(page).toHaveURL(/#\/tool\/taka-in-words$/);
   await expect(page.locator('#tool-title')).toBeFocused();
-  await page.getByRole('link', { name: 'Date Text Formatter' }).click();
+  // The sidebar also lists the toolkit's tools on a tool page; use the related link in main.
+  await page.getByRole('main').getByRole('link', { name: 'Date Text Formatter' }).click();
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('Date Text Formatter');
   await page.goBack();
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('Taka in Words');

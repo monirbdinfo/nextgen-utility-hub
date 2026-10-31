@@ -1,5 +1,5 @@
 import { h } from '../lib/dom';
-import { categories } from '../registry';
+import { categories, getTool, toolsByCategory, type CategoryId } from '../registry';
 import type { Route } from '../router/router';
 import { toHash } from '../router/router';
 import { REPO_URL, type AppContext } from './context';
@@ -31,8 +31,50 @@ export function createSidebar(ctx: AppContext): SidebarHandle {
       h('span', { class: 'side-label' }, cat.name[state.lang]),
       h('span', { class: 'side-chevron', 'aria-hidden': 'true' }, icon('chevron-right', 16)),
     );
-    return { id: cat.id, link };
+    const item = h('li', {}, link);
+    return { id: cat.id, link, item };
   });
+
+  /** Most tools listed under the open toolkit; the rest are reached through "View all tools". */
+  const SUBMENU_MAX = 6;
+  let submenu: HTMLElement | null = null;
+  const openToolkit = (catId: CategoryId | null, toolId: string | null): void => {
+    submenu?.remove();
+    submenu = null;
+    for (const { id, item } of toolkitLinks) item.classList.toggle('is-open', id === catId);
+    const entry = toolkitLinks.find((x) => x.id === catId);
+    if (!entry) return;
+    const available = toolsByCategory(entry.id).filter((x) => x.status === 'available');
+    let shown = available.slice(0, SUBMENU_MAX);
+    const current = available.find((x) => x.id === toolId);
+    if (current && !shown.includes(current)) shown = [...shown.slice(0, SUBMENU_MAX - 1), current];
+    submenu = h(
+      'ul',
+      { class: 'side-sublist', role: 'list' },
+      ...shown.map((x) => {
+        const a = h(
+          'a',
+          { href: toHash({ name: 'tool', id: x.id }), class: 'side-sublink' },
+          x.name[state.lang],
+        );
+        if (x.id === toolId) a.setAttribute('aria-current', 'page');
+        return h('li', {}, a);
+      }),
+      h(
+        'li',
+        {},
+        h(
+          'a',
+          {
+            href: toHash({ name: 'category', id: entry.id }),
+            class: 'side-sublink side-sublink-all',
+          },
+          t('viewAllTools'),
+        ),
+      ),
+    );
+    entry.item.append(submenu);
+  };
 
   const external = (href: string, iconName: 'map' | 'code', label: string): HTMLElement =>
     h(
@@ -49,7 +91,7 @@ export function createSidebar(ctx: AppContext): SidebarHandle {
       'ul',
       { class: 'side-list', role: 'list' },
       h('li', {}, home),
-      ...toolkitLinks.map(({ link }) => h('li', {}, link)),
+      ...toolkitLinks.map(({ item }) => item),
     ),
     h(
       'ul',
@@ -87,6 +129,10 @@ export function createSidebar(ctx: AppContext): SidebarHandle {
       for (const { id, link } of toolkitLinks) {
         current(link, route.name === 'category' && route.id === id);
       }
+      // On a tool page its toolkit opens to list neighbouring tools; a toolkit page already
+      // lists all of them in the main content, so the sidebar stays collapsed there.
+      const toolId = route.name === 'tool' ? route.id : null;
+      openToolkit(toolId ? (getTool(toolId)?.category ?? null) : null, toolId);
     },
   };
 }

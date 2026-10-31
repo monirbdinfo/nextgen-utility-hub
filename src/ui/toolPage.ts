@@ -1,6 +1,8 @@
 import { h } from '../lib/dom';
 import { getCategory, toolsByCategory, type Tool } from '../registry';
+import { fromLocalDate } from '../calc/dates';
 import { toHash } from '../router/router';
+import { ageHeroArt } from './art/ageHero';
 import { statusKey, type AppContext } from './context';
 import { icon } from './icons';
 import { TOOL_ICONS } from './toolkits';
@@ -35,6 +37,11 @@ export function createToolPage(ctx: AppContext, tool: Tool, store: ToolStore): H
   const related = toolsByCategory(tool.category).filter(
     (x) => x.id !== tool.id && x.status === 'available',
   );
+  const body = view ? view({ lang, t: ctx.t, ...store }) : null;
+  // A view that shows its own related tools (data-own-related) replaces the generic list.
+  const ownRelated = body?.dataset.ownRelated === 'true';
+  // Tool-specific header illustration (decorative).
+  const art = tool.id === 'age-calculator' ? ageHeroArt(lang, fromLocalDate(new Date())) : null;
 
   return h(
     'section',
@@ -42,7 +49,7 @@ export function createToolPage(ctx: AppContext, tool: Tool, store: ToolStore): H
     breadcrumb,
     h(
       'header',
-      { class: `tool-header card-${tool.category}` },
+      { class: `tool-header card-${tool.category}${art ? ' tool-header-art' : ''}` },
       cat
         ? h(
             'div',
@@ -59,20 +66,25 @@ export function createToolPage(ctx: AppContext, tool: Tool, store: ToolStore): H
           'p',
           { class: 'tool-badges' },
           h('span', { class: `pill pill-${tool.status}` }, t(statusKey[tool.status])),
-          tool.online
-            ? h('span', { class: 'pill pill-online' }, icon('globe', 14), t('usesInternet'))
-            : h('span', { class: 'pill pill-local' }, icon('shield', 14), t('runsLocally')),
+          ...(tool.online
+            ? [h('span', { class: 'pill pill-online' }, icon('globe', 14), t('usesInternet'))]
+            : [
+                h('span', { class: 'pill pill-local' }, icon('shield', 14), t('runsLocally')),
+                h('span', { class: 'pill pill-private' }, icon('lock', 14), t('badgePrivate')),
+                h('span', { class: 'pill pill-nostore' }, icon('eye-off', 14), t('badgeNoStorage')),
+              ]),
         ),
       ),
+      art ? h('div', { class: 'tool-header-illustration' }, art) : null,
     ),
-    view ? view({ lang, t: ctx.t, ...store }) : null,
+    body,
     h(
       'p',
       { class: 'tool-privacy' },
       icon('shield', 18),
       t(tool.online ? `toolPrivacyOnline_${tool.online}` : 'toolPrivacy'),
     ),
-    related.length
+    related.length && !ownRelated
       ? h(
           'nav',
           { class: 'related', 'aria-labelledby': 'related-title' },
