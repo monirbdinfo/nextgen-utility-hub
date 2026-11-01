@@ -19,7 +19,7 @@ import {
 import { defineStrings } from '../../i18n';
 import { h } from '../../lib/dom';
 import { canEncode, decodeImage, releaseDecoded, type DecodedImage } from '../../lib/imageCanvas';
-import { icon } from '../icons';
+import { icon, type UiIcon } from '../icons';
 import { field, select, type Field, type ToolContext } from './kit';
 
 export const IMG = defineStrings({
@@ -56,6 +56,12 @@ export const IMG = defineStrings({
     'err-canvas': 'Your browser could not create an image this large. Try smaller dimensions.',
     'err-encode': 'Your browser could not save the image in this format. Try another format.',
     keptPrevious: 'Your current image is still open.',
+    dropTitle: 'Drag & drop your image here',
+    dropOr: 'or click to choose a file',
+    loadedSize: 'Image opened: {w} × {h} pixels ({s}).',
+    zoomIn: 'Zoom in',
+    zoomOut: 'Zoom out',
+    fullscreen: 'View full screen',
   },
   bn: {
     choose: 'একটি ছবি বেছে নিন',
@@ -89,6 +95,12 @@ export const IMG = defineStrings({
     'err-canvas': 'আপনার ব্রাউজার এত বড় ছবি তৈরি করতে পারেনি। ছোট মাপ চেষ্টা করুন।',
     'err-encode': 'আপনার ব্রাউজার এই ফরম্যাটে ছবি সংরক্ষণ করতে পারেনি। অন্য ফরম্যাট চেষ্টা করুন।',
     keptPrevious: 'আপনার আগের ছবিটি খোলা আছে।',
+    dropTitle: 'ছবিটি এখানে টেনে এনে ছেড়ে দিন',
+    dropOr: 'অথবা ক্লিক করে একটি ফাইল বেছে নিন',
+    loadedSize: 'ছবি খোলা হয়েছে: {w} × {h} পিক্সেল ({s})।',
+    zoomIn: 'বড় করে দেখুন',
+    zoomOut: 'ছোট করে দেখুন',
+    fullscreen: 'পূর্ণ স্ক্রিনে দেখুন',
   },
 });
 
@@ -131,10 +143,18 @@ export function readBytes(blob: Blob): Promise<ArrayBuffer> {
   });
 }
 
-export function metaRow(label: string, value: string, wrap = false): HTMLElement {
+export function metaRow(
+  label: string,
+  value: string,
+  wrap = false,
+  iconName?: UiIcon,
+): HTMLElement {
   return h(
     'div',
-    { class: 'result-row' },
+    { class: iconName ? 'result-row image-meta-tile' : 'result-row' },
+    iconName
+      ? h('span', { class: 'image-meta-icon', 'aria-hidden': 'true' }, icon(iconName, 20))
+      : null,
     h('dt', {}, label),
     h(
       'dd',
@@ -186,6 +206,11 @@ export interface ImageInputOptions {
   onLoad(image: LoadedImage, restoring: boolean): void;
   /** The image was closed with Reset; the tool clears its own state. */
   onReset(): void;
+  /**
+   * Large illustrated drop zone, a zoomable preview and icon tiles for the details
+   * (Photo & Signature Resizer). Other tools keep the compact layout.
+   */
+  showcase?: boolean;
 }
 
 export interface ImageInput {
@@ -226,21 +251,51 @@ export function imageInput(ctx: ToolContext, opts: ImageInputOptions): ImageInpu
       .join(','),
     'aria-describedby': `${opts.id}-drop-hint`,
   });
-  const dropLabel = h('span', { class: 'drop-text' }, L('drop'));
-  const dropzone = h(
-    'div',
-    { class: 'dropzone', id: `${opts.id}-dropzone` },
-    h('span', { class: 'dropzone-icon', 'aria-hidden': 'true' }, icon('upload', 28)),
-    fileInput,
-    h('label', { for: fileInput.id, class: 'btn btn-primary' }, L('choose')),
-    dropLabel,
-    h('p', { id: `${opts.id}-drop-hint`, class: 'field-hint' }, L('dropHint')),
-  );
+  const show = opts.showcase === true;
+  const idleDrop = show ? L('dropOr') : L('drop');
+  const dropLabel = h('span', { class: 'drop-text' }, idleDrop);
+  const dropzone = show
+    ? h(
+        'div',
+        { class: 'dropzone dropzone-showcase', id: `${opts.id}-dropzone` },
+        dropArt('left'),
+        dropArt('right'),
+        h('span', { class: 'dropzone-icon', 'aria-hidden': 'true' }, icon('image', 28)),
+        h('p', { class: 'dropzone-title' }, L('dropTitle')),
+        dropLabel,
+        fileInput,
+        h(
+          'label',
+          { for: fileInput.id, class: 'btn btn-primary dropzone-btn' },
+          icon('upload', 18),
+          L('choose'),
+        ),
+        h('p', { id: `${opts.id}-drop-hint`, class: 'field-hint' }, L('dropHint')),
+      )
+    : h(
+        'div',
+        { class: 'dropzone', id: `${opts.id}-dropzone` },
+        h('span', { class: 'dropzone-icon', 'aria-hidden': 'true' }, icon('upload', 28)),
+        fileInput,
+        h('label', { for: fileInput.id, class: 'btn btn-primary' }, L('choose')),
+        dropLabel,
+        h('p', { id: `${opts.id}-drop-hint`, class: 'field-hint' }, L('dropHint')),
+      );
+  if (show) {
+    // The whole drop area opens the file picker (the button remains the keyboard route).
+    dropzone.addEventListener('click', (e) => {
+      const target = e.target as HTMLElement;
+      if (target.closest('label, input') || opts.isBusy()) return;
+      fileInput.click();
+    });
+  }
 
   const originalImg = opts.preview
     ? h('img', { class: 'image-preview', alt: L('originalAlt') })
     : null;
-  const originalMeta = h('dl', { class: 'result-list image-meta' });
+  const originalMeta = h('dl', {
+    class: show ? 'result-list image-meta image-meta-tiles' : 'result-list image-meta',
+  });
   const replaceBtn = h(
     'button',
     { type: 'button', class: 'btn' },
@@ -248,11 +303,21 @@ export function imageInput(ctx: ToolContext, opts: ImageInputOptions): ImageInpu
     L('replace'),
   );
   const resetBtn = h('button', { type: 'button', class: 'btn' }, icon('reset', 18), L('reset'));
+  const frame = originalImg ? h('div', { class: 'image-frame' }, originalImg) : null;
+  const zoom = show && frame && originalImg ? zoomControls(L, frame, originalImg) : null;
   const card = h(
     'section',
-    { class: 'image-card', 'aria-labelledby': `${opts.id}-original-title`, hidden: '' },
-    h('h2', { id: `${opts.id}-original-title`, class: 'result-title' }, L('original')),
-    originalImg ? h('div', { class: 'image-frame' }, originalImg) : null,
+    {
+      class: show ? 'image-card image-card-showcase' : 'image-card',
+      'aria-labelledby': `${opts.id}-original-title`,
+      hidden: '',
+    },
+    h(
+      'h2',
+      { id: `${opts.id}-original-title`, class: show ? 'sr-only' : 'result-title' },
+      L('original'),
+    ),
+    zoom ? h('div', { class: 'image-stage' }, frame, zoom.el) : frame,
     originalMeta,
     h('div', { class: 'form-actions' }, replaceBtn, resetBtn),
   );
@@ -293,16 +358,20 @@ export function imageInput(ctx: ToolContext, opts: ImageInputOptions): ImageInpu
     loaded = { file, format: check.value, decoded };
     ctx.session.set('file', file);
     if (originalImg) originalImg.src = decoded.url;
+    zoom?.reset();
     originalMeta.replaceChildren(
-      ...(opts.showName ? [metaRow(L('fileName'), file.name, true)] : []),
-      metaRow(L('dimensions'), fmt.dims(decoded)),
-      metaRow(L('fileSize'), fmt.bytes(file.size)),
-      metaRow(L('format'), FORMATS[check.value].label),
+      ...(opts.showName
+        ? [metaRow(L('fileName'), file.name, true, show ? 'file' : undefined)]
+        : []),
+      metaRow(L('dimensions'), fmt.dims(decoded), false, show ? 'expand' : undefined),
+      metaRow(L('fileSize'), fmt.bytes(file.size), false, show ? 'database' : undefined),
+      metaRow(L('format'), FORMATS[check.value].label, false, show ? 'image' : undefined),
     );
     dropzone.hidden = true;
     card.hidden = false;
     opts.onLoad(loaded, restoring);
-    say(L('loaded', { w: fmt.num(decoded.width), h: fmt.num(decoded.height) }));
+    const dims = { w: fmt.num(decoded.width), h: fmt.num(decoded.height) };
+    say(show ? L('loadedSize', { ...dims, s: fmt.bytes(file.size) }) : L('loaded', dims));
   }
 
   fileInput.addEventListener('change', () => {
@@ -335,7 +404,7 @@ export function imageInput(ctx: ToolContext, opts: ImageInputOptions): ImageInpu
   for (const type of ['dragleave', 'drop'] as const) {
     dropzone.addEventListener(type, () => {
       dropzone.classList.remove('dropzone-active');
-      dropLabel.textContent = L('drop');
+      dropLabel.textContent = idleDrop;
     });
   }
   dropzone.addEventListener('drop', (e) => {
@@ -352,7 +421,14 @@ export function imageInput(ctx: ToolContext, opts: ImageInputOptions): ImageInpu
   });
 
   return {
-    el: h('div', { class: 'tool-form image-input' }, dropzone, status, alertBox, card),
+    el: h(
+      'div',
+      { class: show ? 'image-input image-input-showcase' : 'tool-form image-input' },
+      dropzone,
+      status,
+      alertBox,
+      card,
+    ),
     fileInput,
     current: () => loaded,
     say,
@@ -366,4 +442,90 @@ export function imageInput(ctx: ToolContext, opts: ImageInputOptions): ImageInpu
       if (file instanceof File) void openFile(file, true);
     },
   };
+}
+
+/** Zoom out / zoom in / full screen buttons for the original-image preview. */
+function zoomControls(
+  L: (key: 'zoomIn' | 'zoomOut' | 'fullscreen') => string,
+  frame: HTMLElement,
+  img: HTMLImageElement,
+): { el: HTMLElement; reset(): void } {
+  const STEPS = [1, 1.5, 2, 3, 4];
+  let step = 0;
+  const btn = (name: UiIcon, label: string): HTMLButtonElement =>
+    h(
+      'button',
+      { type: 'button', class: 'image-zoom-btn', 'aria-label': label, title: label },
+      icon(name, 20),
+    );
+  const out = btn('zoom-out', L('zoomOut'));
+  const inn = btn('zoom-in', L('zoomIn'));
+  const full = btn('expand', L('fullscreen'));
+  const apply = (): void => {
+    const z = STEPS[step]!;
+    frame.classList.toggle('image-frame-zoomed', z > 1);
+    img.style.width = z > 1 ? `${z * 100}%` : '';
+    out.disabled = step === 0;
+    inn.disabled = step === STEPS.length - 1;
+  };
+  out.addEventListener('click', () => {
+    step = Math.max(0, step - 1);
+    apply();
+  });
+  inn.addEventListener('click', () => {
+    step = Math.min(STEPS.length - 1, step + 1);
+    apply();
+  });
+  full.addEventListener('click', () => {
+    void frame.requestFullscreen?.().catch(() => undefined);
+  });
+  full.hidden =
+    typeof frame.requestFullscreen !== 'function' || document.fullscreenEnabled === false;
+  apply();
+  return {
+    el: h('div', { class: 'image-zoom' }, out, inn, full),
+    reset() {
+      step = 0;
+      apply();
+    },
+  };
+}
+
+/** Decorative pictures beside the large drop zone: a tilted photo and a dashed selection. */
+function dropArt(side: 'left' | 'right'): SVGElement {
+  const NS = 'http://www.w3.org/2000/svg';
+  const el = (tag: string, attrs: Record<string, string | number>): SVGElement => {
+    const e = document.createElementNS(NS, tag);
+    for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, String(v));
+    return e;
+  };
+  const svg = el('svg', {
+    viewBox: '0 0 120 100',
+    class: `dropzone-art dropzone-art-${side}`,
+    'aria-hidden': 'true',
+    focusable: 'false',
+  });
+  if (side === 'left') {
+    const g = el('g', { transform: 'rotate(-14 60 50)' });
+    g.append(
+      el('rect', { x: 18, y: 18, width: 84, height: 64, rx: 12, class: 'dz-photo' }),
+      el('circle', { cx: 44, cy: 40, r: 7, class: 'dz-sun' }),
+      el('path', { d: 'M24 76l24-22 16 13 12-9 22 18z', class: 'dz-hill' }),
+    );
+    svg.append(g);
+  } else {
+    svg.append(
+      el('rect', {
+        x: 14,
+        y: 14,
+        width: 70,
+        height: 56,
+        rx: 8,
+        class: 'dz-select',
+        transform: 'rotate(10 49 42)',
+      }),
+      el('path', { d: 'M74 50l30 12-13 4-5 13z', class: 'dz-cursor' }),
+    );
+  }
+  return svg;
 }

@@ -4,6 +4,7 @@ import { fromLocalDate } from '../calc/dates';
 import { toHash } from '../router/router';
 import { ageHeroArt } from './art/ageHero';
 import { numberHeroArt } from './art/numberHero';
+import { photoHeroArt } from './art/photoHero';
 import { statusKey, type AppContext } from './context';
 import { icon } from './icons';
 import { TOOL_ICONS } from './toolkits';
@@ -47,7 +48,9 @@ export function createToolPage(ctx: AppContext, tool: Tool, store: ToolStore): H
       ? ageHeroArt(lang, fromLocalDate(new Date()))
       : tool.id === 'number-to-words-bn'
         ? numberHeroArt(lang)
-        : null;
+        : tool.id === 'job-photo-resizer'
+          ? photoHeroArt(lang)
+          : null;
 
   return h(
     'section',

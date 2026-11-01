@@ -21,7 +21,7 @@ photo/signature tool have no code yet, so only their registry entries were revie
 | `image-converter`   | Image Converter           | Available | `#/tool/image-converter`   | Added in this change (new registry entry)         |
 | `image-resizer`     | Image Resizer             | Available | `#/tool/image-resizer`     |                                                   |
 | `image-cropper`     | Image Cropper             | Available | `#/tool/image-cropper`     |                                                   |
-| `job-photo-resizer` | Photo & Signature Resizer | Available | `#/tool/job-photo-resizer` | Custom sizes only; no unverified official presets |
+| `job-photo-resizer` | Photo & Signature Resizer | Available | `#/tool/job-photo-resizer` | Shape-named size presets; no organisation presets |
 | `pdf-create`        | Create PDF                | Available | `#/tool/pdf-create`        | Added later with `pdf-lib`; Latin text only       |
 | `pdf-merge`         | PDF Merge & Split         | Available | `#/tool/pdf-merge`         | Added later with `pdf-lib`                        |
 | `pdf-tools`         | PDF Page Tools            | Available | `#/tool/pdf-tools`         | Added later with `pdf-lib`                        |
@@ -124,3 +124,8 @@ Found while testing, not fixed here (separate small change): the **Image Resizer
 "must be at least 1 pixel" error for a zero _height_ on the _width_ field (the field is chosen
 only for the "side too large" rule). The new tool picks the offending field for each rule and
 tests it.
+
+November 2026: the page redesign added quick presets named only by shape (for example
+"35 × 45 mm photo (300 DPI)", "Square 300 × 300", "Signature 300 × 80"), with a note that they
+are common sizes, not official requirements. Presets naming an organisation are still not
+added; the rule above stands.

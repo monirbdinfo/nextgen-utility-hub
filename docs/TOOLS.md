@@ -446,13 +446,29 @@ No dependencies were added.
 **Purpose.** Make a photo or signature an exact pixel size and, optionally, keep the file
 under a size limit — the two things online application forms usually check.
 
-**No official presets.** The tool has no ready-made sizes for any recruiter, exam board,
-passport or visa. Requirements (pixel size, file-size limit, format, background) differ
-between organisations and change, and they could not be verified from an official source when
-the tool was built (the official job-portal pages could not be reached from the development
-environment). Users enter the size, limit and format from the notice they are applying to;
-the page says so next to the size fields. A preset may be added later only with a cited
-official source and date (see [FILE_TOOLS_AUDIT.md](FILE_TOOLS_AUDIT.md), item 11).
+**Quick presets are shapes, not rules.** The page offers one-click sizes named only by their
+shape: Photo tab — 35 × 45 mm at 300 DPI (413 × 531 px, pure unit conversion), Square
+300 × 300, Portrait 3:4 300 × 400, Square large 600 × 600; Signature tab — 300 × 80,
+300 × 100 and 600 × 200; plus Custom size. A preset only fills width and height; it never
+changes the fit, format or limit. Typing a size marks the matching preset (or Custom size).
+No preset names a recruiter, exam board, passport, ID or visa office, because those
+requirements differ, change, and could not be verified from an official source; the card says
+"Common sizes, not official requirements" and the size hint points to the official notice.
+A preset tied to an organisation may be added only with a cited official source and date (see
+[FILE_TOOLS_AUDIT.md](FILE_TOOLS_AUDIT.md), item 11).
+
+**Layout.** Mockup-based page (November 2026): header illustration (drawn figure, signature
+card, "Resize & Optimize" badge; inline SVG), step 1 Upload & Preview (large drop zone, zoom
+and full-screen preview, file details as tiles), step 2 Output Settings, and a side column
+with Quick presets, Result (after resize), Common use cases and Tips, then four feature
+cards. Columns follow the page's own width (container queries); in one column the cards run
+upload, presets, settings, result, uses, tips. The large drop zone, zoom buttons and tiles
+are an opt-in `showcase` variant of the shared image input; the other image tools are
+unchanged.
+
+**Aspect ratio switch.** "Maintain aspect ratio" (off by default, because forms ask for an
+exact size) makes the other side follow the original image's proportions, rounded to the
+nearest pixel. Width and height also step by 1 px with the arrow keys or the small buttons.
 
 **Input.** The shared image checks (JPEG, PNG and WebP up to 25 MB and 50 megapixels, type
 read from the file's first bytes, upright by EXIF orientation). The file name is shown.
@@ -472,9 +488,9 @@ first with the Image Cropper. Enlarging is allowed but warned about (it cannot a
 Sizes are pixels only: the tool does not set DPI, so print size in cm or inches is not defined
 by it.
 
-**Format and file-size limit.** JPEG (default), PNG or WebP; formats the browser cannot
-encode are disabled. Without a limit, JPEG and WebP are saved at quality 92 %. With a limit
-(KB, 1 KB = 1,024 bytes), JPEG and WebP use the highest quality found that fits, trying
+**Format and file-size limit.** JPEG (default, "smaller files"), PNG ("lossless") or WebP;
+formats the browser cannot encode are disabled. Without a limit, JPEG and WebP are saved at
+quality 92 %. With a limit (KB or MB, 1 KB = 1,024 bytes, 1 MB = 1,024 KB), JPEG and WebP use the highest quality found that fits, trying
 10–100 % with at most 8 encodes; if even 10 % is too large, the smallest result is still
 shown, marked "Over the limit", with an explanation. PNG has no quality setting: a warning
 appears when a limit is entered with PNG, and the result says whether the single PNG encode

@@ -12,7 +12,7 @@ This roadmap follows the real implementation. A tool is only marked **Available*
 | 2         | GitHub Pages deployment workflow                                       | Done (PR #2), site deployed                   |
 | 3         | Date/age, date difference, EMI, digits, number/Taka words, date text   | Done (PR #3, merged `9d0ed68`), site deployed |
 | 4         | Unicode text cleaning and normalization                                | Done (PR #3, merged `9d0ed68`), site deployed |
-| 5         | Image resize, crop, compression, conversion, photo/signature resizer   | Done (presets deferred: no verified source)   |
+| 5         | Image resize, crop, compression, conversion, photo/signature resizer   | Done (shape presets; no organisation presets) |
 | 6         | PDF creation, merge, split, page tools, size reduction                 | Done (pdf-lib, loaded on demand)              |
 | 7         | CV and cover-letter templates with print/PDF export                    | Done (browser print / Save as PDF)            |
 | 8         | Network toolkit: calculators, IP/DNS tools, IPv6, email headers        | 26 of 26 available (some limited, see below)  |
