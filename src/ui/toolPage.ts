@@ -3,6 +3,7 @@ import { getCategory, toolsByCategory, type Tool } from '../registry';
 import { fromLocalDate } from '../calc/dates';
 import { toHash } from '../router/router';
 import { ageHeroArt } from './art/ageHero';
+import { compressHeroArt } from './art/compressHero';
 import { numberHeroArt } from './art/numberHero';
 import { photoHeroArt } from './art/photoHero';
 import { qrHeroArt } from './art/qrHero';
@@ -53,7 +54,9 @@ export function createToolPage(ctx: AppContext, tool: Tool, store: ToolStore): H
           ? photoHeroArt(lang)
           : tool.id === 'qr-code-generator'
             ? qrHeroArt(lang)
-            : null;
+            : tool.id === 'image-compressor'
+              ? compressHeroArt(lang)
+              : null;
 
   return h(
     'section',

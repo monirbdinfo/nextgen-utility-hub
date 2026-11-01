@@ -26,8 +26,10 @@ import {
   openEncoder,
   type EncodedImage,
 } from '../../lib/imageCanvas';
-import { icon } from '../icons';
-import { IMG, formatField, imageFormatters, imageInput, type LoadedImage } from './imageInput';
+import { getTool } from '../../registry';
+import { toHash } from '../../router/router';
+import { icon, type UiIcon } from '../icons';
+import { IMG, imageFormatters, imageInput, type LoadedImage } from './imageInput';
 import { bindMemo, field, notes, resultPanel, textInput, type ToolView } from './kit';
 
 const S = defineStrings({
@@ -35,7 +37,55 @@ const S = defineStrings({
     controls: 'Compression settings',
     mode: 'Compress by',
     modeQuality: 'Quality',
-    modeTarget: 'Target file size',
+    modeTarget: 'Target size',
+    outputFormat: 'Output format',
+    outputFormatInfo: 'Same as original keeps the file type you opened.',
+    sameAsOriginal: 'Same as original',
+    notSupported: '{f} (not supported)',
+    advanced: 'Advanced options',
+    needImage: 'Choose an image first.',
+    originalLabel: 'Original',
+    compressedLabel: 'Compressed',
+    compressedPending: 'The compressed image will appear here.',
+    originalAlt: 'The original image',
+    resultTitle: 'Compression result',
+    resultEmpty: 'Choose an image and select “Compress image” to see the result.',
+    sizeReduced: 'Size reduced',
+    sizeIncreased: 'Size increased',
+    compare: 'Compare',
+    compareOff: 'Side by side',
+    compareSlider: 'Compare: drag to reveal the original',
+    downloadOriginal: 'Download original',
+    resetAll: 'Reset',
+    f1Title: 'Smaller file size',
+    f1Text: 'Large photos often become much smaller, with little visible change.',
+    f2Title: 'High quality',
+    f2Text: 'Keep your images sharp and clear with adjustable quality.',
+    f3Title: 'Multiple formats',
+    f3Text: 'Supports JPEG, PNG and WebP with flexible output options.',
+    f4Title: '100% private',
+    f4Text: 'All processing happens in your browser. Your files never leave your device.',
+    howTitle: 'How it works?',
+    howText:
+      'The tool re-encodes your image in your browser at the quality you choose. You can set the quality yourself, or set a target file size and the tool finds the highest quality that fits.',
+    usesTitle: 'Common use cases',
+    use1: 'Shrink images for websites and blogs',
+    use2: 'Reduce file size for email attachments',
+    use3: 'Optimize images for online forms',
+    use4: 'Save storage space on your device',
+    use5: 'Prepare images for social media (faster upload)',
+    tipsTitle: 'Useful tips',
+    tip1: 'Start with 70–80% quality for a good balance.',
+    tip2: 'Use WebP for smaller files in modern browsers.',
+    tip3: 'For photos of documents, check that the text is still readable.',
+    tip4: 'Use “Target size” if you need a specific file size.',
+    relatedTitle: 'Related Tools',
+    relatedSub: 'You may also find these tools useful.',
+    'rel-image-converter': 'Convert between image formats',
+    'rel-image-resizer': 'Resize images to any dimension',
+    'rel-image-cropper': 'Crop and get the perfect area',
+    'rel-job-photo-resizer': 'Resize photos for forms',
+    'rel-pdf-create': 'Create PDF from images',
     quality: 'Quality',
     qualityValue: '{n}%',
     qualityHint:
@@ -85,7 +135,55 @@ const S = defineStrings({
     controls: 'কম্প্রেশনের সেটিংস',
     mode: 'কীভাবে কম্প্রেস করবেন',
     modeQuality: 'মান (কোয়ালিটি)',
-    modeTarget: 'লক্ষ্য ফাইল সাইজ',
+    modeTarget: 'লক্ষ্য সাইজ',
+    outputFormat: 'ফলাফলের ফরম্যাট',
+    outputFormatInfo: '“মূলের মতো” বেছে নিলে খোলা ফাইলের ধরনই থাকে।',
+    sameAsOriginal: 'মূলের মতো',
+    notSupported: '{f} (সমর্থিত নয়)',
+    advanced: 'আরও অপশন',
+    needImage: 'আগে একটি ছবি বেছে নিন।',
+    originalLabel: 'মূল',
+    compressedLabel: 'কম্প্রেস করা',
+    compressedPending: 'কম্প্রেস করা ছবি এখানে দেখা যাবে।',
+    originalAlt: 'মূল ছবি',
+    resultTitle: 'কম্প্রেশনের ফলাফল',
+    resultEmpty: 'একটি ছবি বেছে “ছবি কম্প্রেস করুন” চাপলে ফলাফল দেখা যাবে।',
+    sizeReduced: 'সাইজ কমেছে',
+    sizeIncreased: 'সাইজ বেড়েছে',
+    compare: 'তুলনা',
+    compareOff: 'পাশাপাশি',
+    compareSlider: 'তুলনা: মূল ছবি দেখতে টানুন',
+    downloadOriginal: 'মূল ছবি ডাউনলোড',
+    resetAll: 'রিসেট',
+    f1Title: 'ছোট ফাইল',
+    f1Text: 'বড় ছবি প্রায়ই অনেক ছোট হয়, চোখে তেমন পার্থক্য বোঝা যায় না।',
+    f2Title: 'উচ্চ মান',
+    f2Text: 'মান ঠিক করে ছবি পরিষ্কার ও ঝকঝকে রাখুন।',
+    f3Title: 'একাধিক ফরম্যাট',
+    f3Text: 'JPEG, PNG ও WebP সমর্থিত, ফলাফলের ফরম্যাট বেছে নেওয়া যায়।',
+    f4Title: '১০০% গোপনীয়',
+    f4Text: 'সব কাজ আপনার ব্রাউজারেই হয়। আপনার ফাইল ডিভাইসের বাইরে যায় না।',
+    howTitle: 'কীভাবে কাজ করে?',
+    howText:
+      'টুলটি আপনার বেছে নেওয়া মানে ব্রাউজারেই ছবিটি নতুন করে এনকোড করে। মান নিজে ঠিক করতে পারেন, অথবা লক্ষ্য ফাইল সাইজ দিলে টুলটি তার মধ্যে থাকা সর্বোচ্চ মান খুঁজে নেয়।',
+    usesTitle: 'সাধারণ ব্যবহার',
+    use1: 'ওয়েবসাইট ও ব্লগের জন্য ছবি ছোট করা',
+    use2: 'ইমেইল সংযুক্তির ফাইল সাইজ কমানো',
+    use3: 'অনলাইন ফর্মের জন্য ছবি উপযোগী করা',
+    use4: 'ডিভাইসে জায়গা বাঁচানো',
+    use5: 'সোশ্যাল মিডিয়ার জন্য ছবি তৈরি (দ্রুত আপলোড)',
+    tipsTitle: 'কাজের টিপস',
+    tip1: 'ভারসাম্যের জন্য ৭০–৮০% মান দিয়ে শুরু করুন।',
+    tip2: 'আধুনিক ব্রাউজারে আরও ছোট ফাইলের জন্য WebP ব্যবহার করুন।',
+    tip3: 'কাগজপত্রের ছবিতে লেখা পড়া যাচ্ছে কি না দেখে নিন।',
+    tip4: 'নির্দিষ্ট ফাইল সাইজ লাগলে “লক্ষ্য সাইজ” ব্যবহার করুন।',
+    relatedTitle: 'সম্পর্কিত টুল',
+    relatedSub: 'এই টুলগুলোও কাজে লাগতে পারে।',
+    'rel-image-converter': 'ছবির ফরম্যাট বদলান',
+    'rel-image-resizer': 'যেকোনো মাপে ছবি রিসাইজ',
+    'rel-image-cropper': 'ছবির দরকারি অংশ কাটুন',
+    'rel-job-photo-resizer': 'ফর্মের জন্য ছবি রিসাইজ',
+    'rel-pdf-create': 'ছবি থেকে PDF তৈরি',
     quality: 'মান (কোয়ালিটি)',
     qualityValue: '{n}%',
     qualityHint:
@@ -132,6 +230,8 @@ const S = defineStrings({
   },
 });
 
+type Key = Parameters<ReturnType<typeof S>>[0];
+
 type Mode = 'quality' | 'target';
 
 interface StoredResult extends EncodedImage {
@@ -141,6 +241,22 @@ interface StoredResult extends EncodedImage {
   filledTransparency: boolean;
   target: { bytes: number; reached: boolean } | null;
 }
+
+const FORMAT_CHOICES = ['same', 'jpeg', 'png', 'webp'] as const;
+const RELATED = [
+  'image-converter',
+  'image-resizer',
+  'image-cropper',
+  'job-photo-resizer',
+  'pdf-create',
+] as const;
+const RELATED_ICON: Record<(typeof RELATED)[number], UiIcon> = {
+  'image-converter': 'convert',
+  'image-resizer': 'expand',
+  'image-cropper': 'crop',
+  'job-photo-resizer': 'portrait',
+  'pdf-create': 'file-plus',
+};
 
 export const imageCompressor: ToolView = (ctx) => {
   const L = S(ctx.lang);
@@ -155,35 +271,32 @@ export const imageCompressor: ToolView = (ctx) => {
   // ---------- Input (drop zone, file details, Replace/Reset) ----------
   const input = imageInput(ctx, {
     id: 'compress',
-    preview: true,
+    preview: false,
     showName: true,
+    showcase: true,
     isBusy: () => busy,
     onLoad(image, restoring) {
       if (!restoring) clearOutput();
-      formatSelect.setSource(image.format);
-      form.hidden = false;
+      setOriginal(image);
       update();
       const stored = ctx.session.get('result') as StoredResult | undefined;
       if (restoring && stored) showResult(image, stored);
     },
     onReset() {
       clearOutput();
+      setOriginal(null);
       for (const k of ['format', 'quality', 'mode', 'target']) delete ctx.memo[k];
-      formatSelect.control.value = 'same';
-      quality.control.value = String(QUALITY.default);
+      for (const r of formatRadios) r.checked = r.value === 'same';
+      range.value = String(QUALITY.default);
       for (const r of modeRadios) r.checked = r.value === 'quality';
       target.control.value = '';
       target.setError(null);
       update();
-      form.hidden = true;
     },
   });
   const loaded = (): LoadedImage | null => input.current();
 
-  // ---------- Controls ----------
-  const formatSelect = formatField(ctx, 'compress-format', ['jpeg', 'webp', 'png']);
-  bindMemo(formatSelect.control, ctx.memo, 'format', 'same');
-
+  // ---------- Mode: Quality | Target size (a radio group drawn as a segmented control) ----------
   const savedMode: Mode = ctx.memo.mode === 'target' ? 'target' : 'quality';
   const modeRadios = (['quality', 'target'] as const).map((value) => {
     const r = h('input', {
@@ -191,7 +304,7 @@ export const imageCompressor: ToolView = (ctx) => {
       name: 'compress-mode',
       id: `compress-mode-${value}`,
       value,
-      class: 'check-input',
+      class: 'ic-seg-input',
     });
     r.checked = savedMode === value;
     r.addEventListener('change', () => {
@@ -202,36 +315,40 @@ export const imageCompressor: ToolView = (ctx) => {
   });
   const modeGroup = h(
     'fieldset',
-    { class: 'radio-group' },
-    h('legend', { class: 'field-label' }, L('mode')),
-    ...modeRadios.map((r) =>
+    { class: 'ic-seg' },
+    h('legend', { class: 'sr-only' }, L('mode')),
+    ...modeRadios.flatMap((r) => [
+      r,
       h(
-        'div',
-        { class: 'check' },
-        r,
-        h('label', { for: r.id }, L(r.value === 'quality' ? 'modeQuality' : 'modeTarget')),
+        'label',
+        { for: r.id, class: 'ic-seg-label' },
+        icon(r.value === 'quality' ? 'image' : 'lock', 18),
+        L(r.value === 'quality' ? 'modeQuality' : 'modeTarget'),
       ),
-    ),
+    ]),
   );
   const mode = (): Mode => (modeRadios[1]?.checked ? 'target' : 'quality');
 
+  // ---------- Quality slider ----------
   const range = h('input', {
     type: 'range',
     id: 'compress-quality',
-    class: 'quality-range',
+    class: 'quality-range ic-range',
     min: String(QUALITY.min),
     max: String(QUALITY.max),
     step: '1',
   });
   range.value = String(clampQuality(Number(ctx.memo.quality ?? QUALITY.default)));
   const quality = field(L('quality'), range, { hint: L('qualityHint') });
+  const labelValue = h('span', { class: 'ic-label-value', 'aria-hidden': 'true' });
+  quality.el.querySelector('label')?.append(labelValue);
   const qualityValue = h('output', {
-    class: 'quality-value',
+    class: 'quality-value ic-quality-box',
     for: range.id,
     'aria-hidden': 'true',
   });
   // Put the live percentage next to the slider, inside the labelled field.
-  const rangeRow = h('div', { class: 'quality-field' });
+  const rangeRow = h('div', { class: 'quality-field ic-range-row' });
   range.parentNode?.replaceChild(rangeRow, range);
   rangeRow.append(range, qualityValue);
 
@@ -239,6 +356,66 @@ export const imageCompressor: ToolView = (ctx) => {
     hint: L('targetHint'),
   });
   bindMemo(target.control, ctx.memo, 'target');
+
+  // ---------- Output format (radio pills) ----------
+  const savedFormat = (FORMAT_CHOICES as readonly string[]).includes(ctx.memo.format ?? '')
+    ? (ctx.memo.format as FormatChoice)
+    : 'same';
+  const formatRadios = FORMAT_CHOICES.map((value) => {
+    const r = h('input', {
+      type: 'radio',
+      name: 'compress-format',
+      id: `compress-format-${value}`,
+      value,
+      class: 'ic-pill-input',
+    });
+    r.checked = value === savedFormat;
+    if (value !== 'same' && !canEncode(value)) r.disabled = true;
+    r.addEventListener('change', () => {
+      ctx.memo.format = value;
+      update();
+    });
+    return r;
+  });
+  if (formatRadios.find((r) => r.checked)?.disabled) formatRadios[0]!.checked = true;
+  const formatGroup = h(
+    'fieldset',
+    { class: 'ic-format', 'aria-describedby': 'compress-format-info' },
+    h(
+      'legend',
+      { class: 'field-label' },
+      L('outputFormat'),
+      h(
+        'span',
+        { class: 'ic-info-dot', 'aria-hidden': 'true', title: L('outputFormatInfo') },
+        icon('info', 14),
+      ),
+    ),
+    h(
+      'div',
+      { class: 'ic-pills' },
+      ...formatRadios.map((r) =>
+        h(
+          'div',
+          { class: 'ic-pill' },
+          r,
+          h(
+            'label',
+            { for: r.id },
+            h('span', { class: 'ic-pill-dot', 'aria-hidden': 'true' }),
+            r.value === 'same'
+              ? L('sameAsOriginal')
+              : r.disabled
+                ? L('notSupported', { f: FORMATS[r.value as ImageFormat].label })
+                : FORMATS[r.value as ImageFormat].label,
+          ),
+        ),
+      ),
+    ),
+    h('p', { class: 'sr-only', id: 'compress-format-info' }, L('outputFormatInfo')),
+  );
+  const formatChoice = (): FormatChoice =>
+    (formatRadios.find((r) => r.checked)?.value ?? 'same') as FormatChoice;
 
   const pngNote = h(
     'p',
@@ -248,55 +425,221 @@ export const imageCompressor: ToolView = (ctx) => {
   const warnings = h('ul', { class: 'image-warnings', role: 'list' });
   const compressBtn = h(
     'button',
-    { type: 'submit', class: 'btn btn-primary', id: 'compress-submit' },
+    { type: 'submit', class: 'btn btn-primary ic-submit', id: 'compress-submit' },
+    icon('compress', 20),
     L('compress'),
+  );
+  const advanced = h(
+    'details',
+    { class: 'ic-advanced' },
+    h('summary', {}, icon('gear', 18), L('advanced')),
+    h(
+      'div',
+      { class: 'ic-advanced-body' },
+      h('p', {}, L('n2')),
+      h('p', {}, L('lossyNote')),
+      h('p', {}, L('n3')),
+    ),
   );
   const form = h(
     'form',
     {
-      class: 'tool-form image-controls compress-controls',
+      class: 'tool-form image-controls compress-controls ic-card ic-settings',
       'aria-labelledby': 'compress-controls-title',
-      hidden: '',
     },
-    h('h2', { id: 'compress-controls-title', class: 'result-title' }, L('controls')),
-    h('div', { class: 'field-grid' }, formatSelect.el),
+    h(
+      'div',
+      { class: 'ic-card-head' },
+      h('span', { class: 'ic-head-icon', 'aria-hidden': 'true' }, icon('gear', 20)),
+      h('h2', { id: 'compress-controls-title', class: 'ic-card-title' }, L('controls')),
+    ),
     modeGroup,
-    h('div', { class: 'field-grid' }, quality.el, target.el),
+    quality.el,
+    target.el,
     pngNote,
+    formatGroup,
+    advanced,
     warnings,
     h('div', { class: 'form-actions' }, compressBtn),
   );
   form.noValidate = true;
 
-  // ---------- Output ----------
-  const outputImg = h('img', { class: 'image-preview', alt: L('compressedAlt') });
+  // ---------- Original → Compressed comparison ----------
+  const origImg = h('img', { class: 'ic-cmp-img', alt: L('originalAlt') });
+  const outputImg = h('img', { class: 'image-preview ic-cmp-img', alt: L('compressedAlt') });
+  const origMeta = h('div', { class: 'ic-cmp-meta' });
+  const outMeta = h('div', { class: 'ic-cmp-meta' });
+  const pending = h('p', { class: 'ic-cmp-pending' }, L('compressedPending'));
+  const origCard = h(
+    'figure',
+    { class: 'ic-cmp-card' },
+    h('span', { class: 'ic-chip ic-chip-dark' }, L('originalLabel')),
+    origImg,
+    origMeta,
+  );
+  const outputHead = h(
+    'figure',
+    { class: 'image-output ic-cmp-card', hidden: '' },
+    h('span', { class: 'ic-chip ic-chip-green' }, L('compressedLabel')),
+    outputImg,
+    outMeta,
+  );
+  const outSlot = h('div', { class: 'ic-cmp-slot' }, pending, outputHead);
+  const sideBySide = h(
+    'div',
+    { class: 'ic-cmp-row' },
+    origCard,
+    h('span', { class: 'ic-cmp-arrow', 'aria-hidden': 'true' }, icon('arrow-right', 22)),
+    outSlot,
+  );
+  // Swipe comparison: the compressed image over the original, clipped by a slider.
+  const swipeOrig = h('img', { class: 'ic-swipe-img', alt: '' });
+  const swipeOut = h('img', { class: 'ic-swipe-img ic-swipe-top', alt: '' });
+  const swipeRange = h('input', {
+    type: 'range',
+    class: 'ic-swipe-range',
+    id: 'compress-compare',
+    min: '0',
+    max: '100',
+    value: '50',
+    'aria-label': L('compareSlider'),
+  });
+  const setSwipe = (): void => {
+    swipeOut.style.clipPath = `inset(0 0 0 ${swipeRange.value}%)`;
+  };
+  swipeRange.addEventListener('input', setSwipe);
+  setSwipe();
+  const swipe = h(
+    'div',
+    { class: 'ic-swipe', hidden: '' },
+    h('div', { class: 'ic-swipe-stage' }, swipeOrig, swipeOut),
+    swipeRange,
+  );
+  const comparison = h(
+    'section',
+    { class: 'ic-card ic-compare', 'aria-label': L('compare'), hidden: '' },
+    sideBySide,
+    swipe,
+  );
+
+  function setOriginal(image: LoadedImage | null): void {
+    if (!image) {
+      origImg.removeAttribute('src');
+      swipeOrig.removeAttribute('src');
+      comparison.hidden = true;
+      return;
+    }
+    origImg.src = swipeOrig.src = image.decoded.url;
+    origMeta.replaceChildren(
+      h('span', {}, icon('file', 16), bytesText(image.file.size)),
+      h('span', {}, dims(image.decoded)),
+    );
+    comparison.hidden = false;
+  }
+
+  // ---------- Result card ----------
+  const tile = (cls: string, ic: UiIcon, label: string, value: string): HTMLElement =>
+    h(
+      'div',
+      { class: `ic-tile ${cls}` },
+      h('span', { class: 'ic-tile-icon', 'aria-hidden': 'true' }, icon(ic, 22)),
+      h('dt', {}, label),
+      h('dd', {}, value),
+    );
+  const tiles = h('dl', { class: 'ic-tiles' });
   const downloadLink = h(
     'a',
-    { class: 'btn btn-primary', id: 'compress-download' },
+    { class: 'btn btn-primary ic-download', id: 'compress-download' },
     icon('download', 18),
     L('download'),
   );
-  const outputHead = h(
-    'div',
-    { class: 'image-output', hidden: '' },
-    h('div', { class: 'image-frame' }, outputImg),
-    h('div', { class: 'form-actions' }, downloadLink),
+  const compareBtn = h(
+    'button',
+    { type: 'button', class: 'btn', 'aria-pressed': 'false', id: 'compress-compare-btn' },
+    icon('layers', 18),
+    L('compare'),
   );
-  const panel = resultPanel(ctx, L('compress'), { prepend: outputHead });
-  panel.el.hidden = true;
+  const originalLink = h(
+    'button',
+    { type: 'button', class: 'btn', id: 'compress-download-original' },
+    icon('download', 18),
+    L('downloadOriginal'),
+  );
+  originalLink.addEventListener('click', () => {
+    const image = loaded();
+    if (!image) return;
+    // A short-lived link to the file already in memory (nothing is uploaded).
+    const url = URL.createObjectURL(image.file);
+    const a = h('a', { href: url, download: image.file.name });
+    document.body.append(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  });
+  const resetBtn = h('button', { type: 'button', class: 'btn' }, icon('reset', 18), L('resetAll'));
+  const resultActions = h(
+    'div',
+    { class: 'form-actions ic-result-actions', hidden: '' },
+    downloadLink,
+    compareBtn,
+    originalLink,
+    resetBtn,
+  );
+  const panel = resultPanel(ctx, L('compress'), {
+    prepend: h('div', {}, tiles, resultActions),
+  });
+  panel.el.classList.add('ic-card', 'ic-result');
+  panel.el
+    .querySelector('.result-title')
+    ?.replaceWith(
+      h(
+        'div',
+        { class: 'ic-result-head' },
+        h('span', { class: 'ic-check', 'aria-hidden': 'true' }, icon('check', 18)),
+        h('h2', { class: 'ic-card-title', id: 'compress-result-title' }, L('resultTitle')),
+      ),
+    );
+  panel.el.removeAttribute('aria-label');
+  panel.el.setAttribute('aria-labelledby', 'compress-result-title');
+  const emptyResult = (): void => {
+    panel.clear();
+    panel.el.querySelector('.result-empty')?.replaceChildren(L('resultEmpty'));
+  };
+
+  function setCompare(on: boolean): void {
+    compareBtn.setAttribute('aria-pressed', String(on));
+    compareBtn.lastChild!.textContent = L(on ? 'compareOff' : 'compare');
+    swipe.hidden = !on;
+    sideBySide.hidden = on;
+  }
+  compareBtn.addEventListener('click', () => {
+    setCompare(compareBtn.getAttribute('aria-pressed') !== 'true');
+    if (!swipe.hidden) swipeRange.focus();
+  });
+  resetBtn.addEventListener('click', () => input.reset());
 
   // ---------- Helpers ----------
   const requestedFormat = (image: LoadedImage): ImageFormat =>
-    resolveOutputFormat(formatSelect.control.value as FormatChoice, image.format);
+    resolveOutputFormat(formatChoice(), image.format);
 
   /** Reflect the current settings: which controls apply, labels and warnings. */
   function update(): void {
     const q = clampQuality(Number(range.value));
     const label = L('qualityValue', { n: num(q) });
     qualityValue.textContent = label;
+    labelValue.textContent = `: ${label}`;
     range.setAttribute('aria-valuetext', label);
+    range.style.setProperty(
+      '--fill',
+      `${((q - QUALITY.min) / (QUALITY.max - QUALITY.min)) * 100}%`,
+    );
     ctx.memo.quality = String(q);
+    const sameLabel = formatRadios[0]?.nextElementSibling;
     const image = loaded();
+    if (sameLabel)
+      sameLabel.lastChild!.textContent = image
+        ? I('sameFormat', { f: FORMATS[image.format].label })
+        : L('sameAsOriginal');
     const out = image ? requestedFormat(image) : null;
     const lossy = out ? usesQuality(out) : true;
     const byTarget = mode() === 'target';
@@ -311,20 +654,32 @@ export const imageCompressor: ToolView = (ctx) => {
   }
 
   function clearOutput(): void {
+    clearOutputView();
+    ctx.session.delete('result');
+  }
+
+  /** Empty the comparison and result card (keeps any stored result for a language switch). */
+  function clearOutputView(): void {
     if (outputUrl) URL.revokeObjectURL(outputUrl);
     outputUrl = null;
     outputImg.removeAttribute('src');
+    swipeOut.removeAttribute('src');
     downloadLink.removeAttribute('href');
     outputHead.hidden = true;
-    panel.el.hidden = true;
-    panel.clear();
-    ctx.session.delete('result');
+    pending.hidden = false;
+    resultActions.hidden = true;
+    compareBtn.disabled = true;
+    setCompare(false);
+    tiles.replaceChildren();
+    emptyResult();
   }
 
   function setBusy(on: boolean): void {
     busy = on;
     compressBtn.disabled = on;
-    for (const el of [formatSelect.control, range, target.control, ...modeRadios]) el.disabled = on;
+    for (const el of [range, target.control, ...modeRadios]) el.disabled = on;
+    for (const r of formatRadios)
+      if (on || r.value === 'same' || canEncode(r.value as ImageFormat)) r.disabled = on;
     input.setBusy(on);
     panel.el.setAttribute('aria-busy', String(on));
   }
@@ -333,13 +688,26 @@ export const imageCompressor: ToolView = (ctx) => {
     if (outputUrl) URL.revokeObjectURL(outputUrl);
     outputUrl = URL.createObjectURL(r.blob);
     const name = compressedFilename(image.file.name, r.format, r.quality);
-    outputImg.src = outputUrl;
+    outputImg.src = swipeOut.src = outputUrl;
     downloadLink.href = outputUrl;
     downloadLink.download = name;
     downloadLink.setAttribute('aria-label', L('downloadAria', { name }));
+    outMeta.replaceChildren(
+      h('span', {}, icon('file', 16), bytesText(r.blob.size)),
+      h('span', {}, dims(r.size)),
+    );
     outputHead.hidden = false;
-    panel.el.hidden = false;
+    pending.hidden = true;
+    resultActions.hidden = false;
+    compareBtn.disabled = false;
     const cmp = compareSizes(image.file.size, r.blob.size);
+    tiles.replaceChildren(
+      tile('ic-tile-blue', 'database', L('originalSize'), bytesText(image.file.size)),
+      tile('ic-tile-violet', 'database', L('compressedSize'), bytesText(r.blob.size)),
+      cmp.change === 'larger'
+        ? tile('ic-tile-red', 'alert', L('sizeIncreased'), `+${pct(cmp.savedPercent)}%`)
+        : tile('ic-tile-green', 'arrow-down', L('sizeReduced'), `${pct(cmp.savedPercent)}%`),
+    );
     const change =
       cmp.change === 'smaller'
         ? L('saved', { b: bytesText(cmp.savedBytes), p: pct(cmp.savedPercent) })
@@ -377,7 +745,6 @@ export const imageCompressor: ToolView = (ctx) => {
 
   // ---------- Events ----------
   range.addEventListener('input', update);
-  formatSelect.control.addEventListener('change', update);
   target.control.addEventListener('input', () => target.setError(null));
   form.addEventListener('submit', (e) => {
     e.preventDefault();
@@ -385,8 +752,13 @@ export const imageCompressor: ToolView = (ctx) => {
   });
 
   async function compress(): Promise<void> {
+    if (busy) return;
     const source = loaded();
-    if (busy || !source) return;
+    if (!source) {
+      input.showError(L('needImage'));
+      input.fileInput.focus();
+      return;
+    }
     input.showError(null);
     target.setError(null);
     const size: Size = { width: source.decoded.width, height: source.decoded.height };
@@ -398,7 +770,7 @@ export const imageCompressor: ToolView = (ctx) => {
     if (byTarget) {
       if (!lossy) {
         input.showError(L('err-target-png'));
-        formatSelect.control.focus();
+        (formatRadios.find((r) => r.checked) ?? formatRadios[0])!.focus();
         return;
       }
       const t = parseTargetKB(target.control.value);
@@ -506,16 +878,108 @@ export const imageCompressor: ToolView = (ctx) => {
     outputUrl = null;
   });
 
+  // ---------- Information sections ----------
+  const features = h(
+    'ul',
+    { class: 'ic-features', role: 'list' },
+    ...(
+      [
+        ['ic-tone-amber', 'bolt', 'f1Title', 'f1Text'],
+        ['ic-tone-blue', 'shield', 'f2Title', 'f2Text'],
+        ['ic-tone-violet', 'layers', 'f3Title', 'f3Text'],
+        ['ic-tone-gold', 'lock', 'f4Title', 'f4Text'],
+      ] as const
+    ).map(([tone, ic, title, body]) =>
+      h(
+        'li',
+        { class: 'ic-feature' },
+        h('span', { class: `ic-feature-icon ${tone}`, 'aria-hidden': 'true' }, icon(ic, 24)),
+        h('div', {}, h('h3', {}, L(title)), h('p', {}, L(body))),
+      ),
+    ),
+  );
+  const checks = (keys: Key[]): HTMLElement =>
+    h(
+      'ul',
+      { class: 'ic-checks', role: 'list' },
+      ...keys.map((k) => h('li', {}, icon('check', 16), h('span', {}, L(k)))),
+    );
+  const infoCard = (cls: string, ic: UiIcon, title: Key, body: HTMLElement): HTMLElement =>
+    h(
+      'section',
+      { class: `ic-info-card ${cls}`, 'aria-labelledby': `compress-${cls}-title` },
+      h('span', { class: 'ic-round-icon', 'aria-hidden': 'true' }, icon(ic, 22)),
+      h('div', {}, h('h2', { id: `compress-${cls}-title` }, L(title)), body),
+    );
+  const info = h(
+    'div',
+    { class: 'ic-info' },
+    infoCard('ic-how', 'info', 'howTitle', h('p', {}, L('howText'))),
+    infoCard('ic-uses', 'check', 'usesTitle', checks(['use1', 'use2', 'use3', 'use4', 'use5'])),
+    infoCard('ic-tips', 'sparkle', 'tipsTitle', checks(['tip1', 'tip2', 'tip3', 'tip4'])),
+  );
+  const relatedTools = RELATED.map((id) => getTool(id)).filter(
+    (t): t is NonNullable<typeof t> => !!t && t.status === 'available',
+  );
+  const related = relatedTools.length
+    ? h(
+        'nav',
+        { class: 'ic-related', 'aria-labelledby': 'compress-related-title' },
+        h(
+          'div',
+          { class: 'ic-related-head' },
+          icon('grid', 20),
+          h('h2', { id: 'compress-related-title' }, L('relatedTitle')),
+          h('p', {}, L('relatedSub')),
+        ),
+        h(
+          'ul',
+          { class: 'ic-related-list', role: 'list' },
+          ...relatedTools.map((t) =>
+            h(
+              'li',
+              {},
+              h(
+                'a',
+                { href: toHash({ name: 'tool', id: t.id }), class: 'ic-related-link' },
+                h(
+                  'span',
+                  { class: `ic-related-icon ic-rel-${t.id}`, 'aria-hidden': 'true' },
+                  icon(RELATED_ICON[t.id as (typeof RELATED)[number]], 20),
+                ),
+                h(
+                  'span',
+                  { class: 'ic-related-text' },
+                  h('strong', {}, t.name[ctx.lang]),
+                  h('span', {}, L(`rel-${t.id}` as Key)),
+                ),
+                icon('arrow-right', 16),
+              ),
+            ),
+          ),
+        ),
+      )
+    : null;
+
+  const upload = h('section', { class: 'ic-card ic-upload', 'aria-label': I('choose') }, input.el);
+
+  clearOutputView();
   update();
   // Restore after a language switch (the File stays in memory, never in storage).
   input.restore();
 
   return h(
     'div',
-    { class: 'tool-layout tool-layout-stacked image-tool' },
-    input.el,
-    form,
-    panel.el,
+    { class: 'ic-page image-tool', 'data-own-related': related ? 'true' : 'false' },
+    h(
+      'div',
+      { class: 'ic-main' },
+      h('div', { class: 'ic-col' }, upload, comparison),
+      h('div', { class: 'ic-col' }, form, panel.el),
+    ),
+    features,
+    info,
+    related,
     notes(ctx, [L('n1'), L('n2'), L('n3'), L('n4')], L('notesTitle')),
   );
 };

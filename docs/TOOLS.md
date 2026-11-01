@@ -340,6 +340,21 @@ Route `#/tool/image-compressor`. Code: `src/calc/compress.ts` (logic), `openEnco
 `src/lib/imageCanvas.ts`, `src/ui/tools/imageInput.ts` (shared file loading) and
 `src/ui/tools/imageCompressor.ts` (view). No dependencies were added.
 
+**Layout.** Mockup-based page (November 2026): header illustration (a large and a small
+landscape picture with example sizes, 5.2 MB → 680 KB, and an "87%" badge; inline SVG), the
+large drop zone (the shared input's `showcase` variant), "Compression settings" with a
+Quality / Target size segmented control (a radio group), the quality slider and an "Output
+format" radio group (Same as original, JPEG, PNG, WebP; formats the browser cannot save are
+disabled and labelled), "Advanced options" (how quality, size and metadata work) and the
+Compress button. Below: an Original → Compressed side-by-side preview with sizes and
+dimensions, and a "Compression result" card with original size, compressed size and the size
+reduced (or increased) as tiles, then Download compressed, Compare (a swipe view: the
+compressed image over the original, revealed with a slider), Download original (the file
+already in memory, saved under its own name) and Reset, followed by the full details. Then
+four feature cards, How it works, Common use cases, Useful tips and Related Tools (Image
+Converter, Image Resizer, Image Cropper, Photo & Signature Resizer, Create PDF). Columns follow
+the page's own width; in one column the cards run upload, settings, comparison, result.
+
 **Privacy.** Same approach as the other image tools: the image is decoded and re-encoded in
 the tab and never uploaded, sent anywhere, written to browser storage or logged. The file name
 is shown on the page only. Object URLs and canvases are released after use, on Replace, on

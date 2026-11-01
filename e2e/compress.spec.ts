@@ -155,7 +155,7 @@ test('reports an unchanged size and explains PNG; transparency is kept', async (
 test('warns about JPEG transparency and fills it with white', async ({ page }) => {
   await page.goto(TOOL);
   await open(page, 'transparent.png');
-  await page.getByLabel('Save as').selectOption('jpeg');
+  await page.getByRole('radio', { name: 'JPEG' }).check();
   await expect(page.locator('.image-warnings')).toContainText('JPEG cannot store transparency');
   await compress(page);
   const out = await output(page, [[190, 50]]);
@@ -174,7 +174,7 @@ test('warns about JPEG transparency and fills it with white', async ({ page }) =
 test('saves WebP with a matching type and extension', async ({ page }) => {
   await page.goto(TOOL);
   await open(page, 'photo.jpg');
-  await page.getByLabel('Save as').selectOption('webp');
+  await page.getByRole('radio', { name: 'WebP' }).check();
   await page.locator('#compress-quality').fill('50');
   await compress(page);
   const out = await output(page);
@@ -189,7 +189,7 @@ test('saves WebP with a matching type and extension', async ({ page }) => {
 test('meets a reachable target size with the highest quality found', async ({ page }) => {
   await page.goto(TOOL);
   await open(page, 'photo.jpg');
-  await page.getByLabel('Target file size').check();
+  await page.getByRole('radio', { name: 'Target size' }).check();
   await page.getByLabel('Target size (KB)').fill('6');
   await compress(page);
   const out = await output(page);
@@ -203,7 +203,7 @@ test('meets a reachable target size with the highest quality found', async ({ pa
 test('reports an unreachable target instead of promising it', async ({ page }) => {
   await page.goto(TOOL);
   await open(page, 'photo.jpg');
-  await page.getByLabel('Target file size').check();
+  await page.getByRole('radio', { name: 'Target size' }).check();
   await page.getByLabel('Target size (KB)').fill('1');
   await compress(page);
   const out = await output(page);
@@ -222,9 +222,7 @@ test('reports an unreachable target instead of promising it', async ({ page }) =
 test('is keyboard operable: slider, mode, format and submit', async ({ page }) => {
   await page.goto(TOOL);
   await open(page, 'photo.jpg');
-  await page.getByLabel('Save as').focus();
-  await page.keyboard.press('Tab');
-  await expect(page.getByRole('radio', { name: 'Quality' })).toBeFocused();
+  await page.getByRole('radio', { name: 'Quality' }).focus();
   await expect(page.getByRole('radio', { name: 'Quality' })).toBeChecked();
   await page.keyboard.press('Tab');
   const slider = page.getByRole('slider', { name: 'Quality' });
@@ -235,6 +233,11 @@ test('is keyboard operable: slider, mode, format and submit', async ({ page }) =
   await expect(slider).toHaveAttribute('aria-valuetext', '75%');
   await page.keyboard.press('Home');
   await expect(page.locator('.quality-value')).toHaveText('10%');
+  // Then the output format group, the advanced options and the button.
+  await page.keyboard.press('Tab');
+  await expect(page.locator('#compress-format-same')).toBeFocused();
+  await page.keyboard.press('Tab');
+  await expect(page.locator('.ic-advanced summary')).toBeFocused();
   await page.keyboard.press('Tab');
   await expect(page.getByRole('button', { name: 'Compress image' })).toBeFocused();
   await page.keyboard.press('Enter');
@@ -260,7 +263,8 @@ test('handles invalid files, replace and reset', async ({ page }) => {
   await expect(page.locator('.image-output')).toBeHidden();
   await page.getByRole('button', { name: 'Reset' }).click();
   await expect(page.locator('#compress-dropzone')).toBeVisible();
-  await expect(page.locator('.compress-controls')).toBeHidden();
+  await expect(page.locator('.image-output')).toBeHidden();
+  await expect(page.locator('.ic-compare')).toBeHidden();
   await expect(page.locator('#compress-file')).toBeFocused();
 });
 
@@ -282,7 +286,7 @@ test('opens a dropped image and wraps a very long file name', async ({ page }) =
   await zone.dispatchEvent('dragenter', { dataTransfer: data });
   await expect(zone).toHaveClass(/dropzone-active/);
   await zone.dispatchEvent('drop', { dataTransfer: data });
-  await expect(page.locator('.image-status')).toHaveText('Image opened: 60 × 40 pixels.');
+  await expect(page.locator('.image-status')).toHaveText(/^Image opened: 60 × 40 pixels \(/);
   await expect(page.locator('.image-meta')).toContainText(longName);
   await noHorizontalScroll(page);
 });
@@ -320,7 +324,7 @@ for (const w of [360, 768, 1280]) {
         await noHorizontalScroll(page);
         await page.locator('#compress-file').setInputFiles(FIX + 'transparent.png');
         await expect(page.locator('.compress-controls')).toBeVisible();
-        await page.locator('#compress-format').selectOption('jpeg');
+        await page.locator('#compress-format-jpeg').check();
         await page.locator('#compress-mode-target').check();
         await page.locator('#compress-target').fill('2');
         await page.locator('#compress-submit').click();
