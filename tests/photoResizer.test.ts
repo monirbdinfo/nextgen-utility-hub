@@ -143,12 +143,13 @@ afterEach(() => {
 });
 
 describe('Photo & Signature Resizer view', () => {
-  it('opens from its route with empty size fields and no recruiter presets', async () => {
+  it('opens from its route with empty size fields and size-based presets only', async () => {
     const root = open();
     expect($(root, 'h1').textContent).toBe('Photo & Signature Resizer');
-    expect($<HTMLElement>(root, '.photo-controls').hidden).toBe(true);
-    await load(root);
     expect($<HTMLElement>(root, '.photo-controls').hidden).toBe(false);
+    expect($(root, '.result').textContent).toContain('Choose an image and select Prepare image');
+    await load(root);
+    expect($(root, '.image-status').textContent).toBe('Image opened: 400 × 300 pixels (48.8 KB).');
     expect($(root, '#photo-width').value).toBe('');
     expect($(root, '#photo-height').value).toBe('');
     expect($<HTMLSelectElement>(root, '#photo-format').value).toBe('jpeg');
@@ -158,11 +159,15 @@ describe('Photo & Signature Resizer view', () => {
       'webp',
     ]);
     expect($(root, '#photo-fit-crop').checked).toBe(true);
-    // No preset buttons and no recruiter names anywhere in the tool.
-    expect(root.querySelector('.preset-group')).toBeNull();
-    expect(root.textContent).not.toMatch(/teletalk|bpsc|passport size|visa/i);
+    // Presets are named by their shape, never by a recruiter, passport or visa office.
+    const presets = $(root, '.pr-presets').textContent ?? '';
+    expect(presets).toContain('35 × 45 mm photo (300 DPI)');
+    expect(presets).toContain('not official requirements');
+    expect(presets).not.toMatch(/teletalk|bpsc|passport|visa|nid|job/i);
+    expect(root.textContent).not.toMatch(/teletalk|bpsc/i);
+    expect($<HTMLInputElement>(root, '#photo-keep-ratio').checked).toBe(false);
     expect($(root, '#photo-size-hint').textContent).toContain('official notice');
-    expect($(root, '.tool-notes').textContent).toContain('no ready-made sizes');
+    expect($(root, '.tool-notes').textContent).toContain('common sizes, not the rules');
   });
 
   it('explains a crop or padding before saving, and warns about enlarging', async () => {
@@ -354,7 +359,8 @@ describe('Photo & Signature Resizer view', () => {
     await done(root);
     [...root.querySelectorAll('button')].find((b) => b.textContent?.trim() === 'Reset')!.click();
     expect(revoked).toContain('blob:out-1');
-    expect($<HTMLElement>(root, '.photo-controls').hidden).toBe(true);
+    expect($<HTMLElement>(root, '.image-output').hidden).toBe(true);
+    expect($<HTMLElement>(root, '#photo-dropzone').hidden).toBe(false);
     await load(root);
     expect($(root, '#photo-width').value).toBe('');
     expect($(root, '#photo-limit').value).toBe('');
@@ -378,5 +384,71 @@ describe('Photo & Signature Resizer view', () => {
     expect(resultText(root)).toContain('উপরে ও নিচে');
     expect(Object.keys(localStorage)).toEqual(['nguh.lang']);
     expect(sessionStorage.length).toBe(0);
+  });
+
+  it('fills the size from a preset and marks the preset that matches typed sizes', async () => {
+    const root = open();
+    await load(root);
+    $<HTMLInputElement>(root, '#photo-preset-photo-35x45').click();
+    expect($(root, '#photo-width').value).toBe('413');
+    expect($(root, '#photo-height').value).toBe('531');
+    expect(plan(root)).toContain('Output: 413 × 531 px JPEG.');
+    // Typing a signature size switches to the Signature tab and marks it.
+    setSize(root, '300', '80');
+    expect($(root, '#photo-tab-signature').getAttribute('aria-selected')).toBe('true');
+    expect($<HTMLElement>(root, '#photo-tabpanel-photo').hidden).toBe(true);
+    expect($(root, '#photo-preset-sig-300x80').checked).toBe(true);
+    setSize(root, '301', '80');
+    expect($(root, '#photo-preset-custom-signature').checked).toBe(true);
+    // Arrow keys move between the tabs.
+    const tab = $<HTMLButtonElement>(root, '#photo-tab-signature');
+    tab.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowRight', bubbles: true }));
+    expect($(root, '#photo-tab-photo').getAttribute('aria-selected')).toBe('true');
+  });
+
+  it('keeps the original proportions when asked, and steps sizes with the arrow keys', async () => {
+    const root = open();
+    await load(root); // 400 × 300
+    const keep = $(root, '#photo-keep-ratio');
+    keep.checked = true;
+    keep.dispatchEvent(new Event('change'));
+    type(root, '#photo-width', '200');
+    expect($(root, '#photo-height').value).toBe('150');
+    type(root, '#photo-height', '90');
+    expect($(root, '#photo-width').value).toBe('120');
+    expect(plan(root)).toContain('The proportions match');
+    keep.checked = false;
+    keep.dispatchEvent(new Event('change'));
+    const w = $(root, '#photo-width');
+    w.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowUp', bubbles: true }));
+    expect(w.value).toBe('121');
+    expect($(root, '#photo-height').value).toBe('90');
+    w.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true }));
+    w.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true }));
+    expect(w.value).toBe('119');
+  });
+
+  it('accepts a limit in MB', async () => {
+    const root = open();
+    await load(root);
+    setSize(root, '300', '300');
+    type(root, '#photo-limit', '0.5');
+    type(root, '#photo-limit-unit', 'mb');
+    mockEncoder(() => 100_000);
+    submit(root);
+    await done(root);
+    expect(resultText(root)).toContain('Within the limit (512.0 KB)');
+    type(root, '#photo-limit', '1.234');
+    submit(root);
+    expect($(root, '#photo-limit-error').textContent).toContain('Enter a size in KB or MB');
+  });
+
+  it('asks for an image before preparing', () => {
+    const root = open();
+    setSize(root, '300', '300');
+    submit(root);
+    expect(alertText(root)).toBe('Choose an image first.');
+    expect(document.activeElement).toBe($(root, '#photo-file'));
+    expect(pipeline.openPlacedEncoder).not.toHaveBeenCalled();
   });
 });

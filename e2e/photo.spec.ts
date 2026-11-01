@@ -151,6 +151,9 @@ test('is keyboard operable', async ({ page }) => {
   await page.keyboard.type('40');
   await page.keyboard.press('Tab');
   await page.keyboard.type('40');
+  // The step buttons are skipped; the aspect-ratio switch comes next.
+  await page.keyboard.press('Tab');
+  await expect(page.locator('#photo-keep-ratio')).toBeFocused();
   await page.keyboard.press('Tab');
   await expect(page.locator('#photo-fit-crop')).toBeFocused();
   await page.keyboard.press('ArrowDown');

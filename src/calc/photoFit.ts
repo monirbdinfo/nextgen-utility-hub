@@ -3,8 +3,9 @@
  * output size without stretching (crop to fill, or fit inside with padding), how much is
  * cut off or padded, and the file-size limit check. No DOM, canvas or network access.
  *
- * No official presets are defined here on purpose: a size or file-size rule for a
- * specific recruiter may only be added with a cited official source (see docs/TOOLS.md).
+ * No organisation rules are defined here on purpose: a size or file-size rule for a specific
+ * recruiter may only be added with a cited official source (see docs/TOOLS.md). The view's
+ * quick presets are plain shapes (e.g. 300 × 300 px), named as such.
  */
 import type { Size } from './image';
 
