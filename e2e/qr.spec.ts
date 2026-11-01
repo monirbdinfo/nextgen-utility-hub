@@ -53,7 +53,7 @@ test.describe('generator → real PNG → scanner', () => {
 
   test('a Wi-Fi code is read back, with the password hidden until asked', async ({ page }) => {
     await page.goto('/#/tool/qr-code-generator');
-    await page.locator('#qr-type').selectOption('wifi');
+    await page.locator('#qr-tab-wifi').click();
     await page.locator('#qr-ssid').fill('Café; WiFi');
     await page.locator('#qr-password').fill('p@ss:word,123');
     await page.getByRole('button', { name: 'Create QR code' }).click();
@@ -71,7 +71,7 @@ test.describe('generator → real PNG → scanner', () => {
 
   test('a contact card is recognised by the scanner', async ({ page }) => {
     await page.goto('/#/tool/qr-code-generator');
-    await page.locator('#qr-type').selectOption('contact');
+    await page.locator('#qr-tab-contact').click();
     await page.locator('#qr-cname').fill('Md. Maniruzzaman');
     await page.locator('#qr-cemail').fill('hello@example.com');
     await page.getByRole('button', { name: 'Create QR code' }).click();

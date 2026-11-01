@@ -1,7 +1,10 @@
 import { describe, expect, it } from 'vitest';
 import {
   classifyPayload,
+  emailPayload,
   parseWifi,
+  phonePayload,
+  smsPayload,
   vcardPayload,
   wifiPayload,
   type Contact,
@@ -197,5 +200,45 @@ describe('classifyPayload', () => {
     ['https://example.com with spaces', 'text'],
   ])('%s is %s', (text, kind) => {
     expect(classifyPayload(text)).toBe(kind);
+  });
+});
+
+describe('email, phone and SMS payloads', () => {
+  it('builds mailto links with optional, encoded subject and body', () => {
+    expect(emailPayload({ to: 'info@example.com', subject: '', body: '' })).toEqual({
+      ok: true,
+      value: 'mailto:info@example.com',
+    });
+    expect(emailPayload({ to: ' a@b.co ', subject: 'Hi & bye', body: 'আমি ভালো' })).toEqual({
+      ok: true,
+      value:
+        'mailto:a@b.co?subject=Hi%20%26%20bye&body=%E0%A6%86%E0%A6%AE%E0%A6%BF%20%E0%A6%AD%E0%A6%BE%E0%A6%B2%E0%A7%8B',
+    });
+    expect(emailPayload({ to: 'nope', subject: '', body: '' })).toEqual({
+      ok: false,
+      error: 'email-invalid',
+    });
+    expect(classifyPayload('mailto:a@b.co')).toBe('email');
+  });
+
+  it('builds tel links from Bangla or English digits', () => {
+    expect(phonePayload('+880 1700-000000')).toEqual({ ok: true, value: 'tel:+8801700000000' });
+    expect(phonePayload('০১৭০০ ০০০০০০')).toEqual({ ok: true, value: 'tel:01700000000' });
+    expect(phonePayload(' ')).toEqual({ ok: false, error: 'phone-empty' });
+    expect(phonePayload('call me')).toEqual({ ok: false, error: 'phone-invalid' });
+    expect(classifyPayload('tel:+8801700000000')).toBe('phone');
+  });
+
+  it('builds SMSTO payloads', () => {
+    expect(smsPayload({ number: '01700-000000', message: ' Hello ' })).toEqual({
+      ok: true,
+      value: 'SMSTO:01700000000:Hello',
+    });
+    expect(smsPayload({ number: '', message: 'x' })).toEqual({ ok: false, error: 'phone-empty' });
+    expect(smsPayload({ number: '12', message: '' })).toEqual({
+      ok: false,
+      error: 'phone-invalid',
+    });
+    expect(classifyPayload('SMSTO:01700000000:Hello')).toBe('sms');
   });
 });

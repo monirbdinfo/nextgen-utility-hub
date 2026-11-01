@@ -68,13 +68,29 @@ afterEach(() => {
 });
 
 describe('QR Code Generator', () => {
+  const tab = (root: ParentNode, type: string): void =>
+    $<HTMLButtonElement>(root, `#qr-tab-${type}`).click();
+  /** Whether a field is on screen: its tab panel is shown and the field itself is not hidden. */
+  const shown = (root: ParentNode, id: string): boolean => {
+    const el = $(root, `#${id}`);
+    return (
+      !el.closest<HTMLElement>('[role="tabpanel"]')!.hidden &&
+      !el.closest<HTMLElement>('.field, .check')!.hidden
+    );
+  };
+
   it('draws a code that decodes to exactly what was typed', () => {
     const root = open('#/tool/qr-code-generator');
+    expect(root.querySelector('.qg-result')?.textContent).toContain('Enter your content');
     set(root, '#qr-text', 'https://example.com/path?x=1');
     submit(root);
     expect(decodeShown(root)).toBe('https://example.com/path?x=1');
-    expect(row(root, 'Type')).toBe('Text or link');
-    expect(row(root, 'Size')).toMatch(/^Version \d+, \d+ × \d+ squares$/);
+    expect(row(root, 'Type')).toBe('Text / Link');
+    expect(row(root, 'Size')).toBe('250 × 250 pixels');
+    expect(row(root, 'Data')).toBe('28 characters (28 bytes)');
+    expect(row(root, 'Error correction')).toBe('Medium (M)');
+    expect(row(root, 'Margin')).toBe('4 modules');
+    expect(row(root, 'Code version')).toMatch(/^Version \d+ \(\d+ × \d+ squares\)$/);
     expect($(root, '.qr-svg').getAttribute('role')).toBe('img');
     expect($(root, '.qr-svg').getAttribute('aria-label')).toBe('QR code');
     // The label never repeats the content, which could be a secret.
@@ -88,37 +104,50 @@ describe('QR Code Generator', () => {
     expect(decodeShown(root)).toBe('আমার সোনার বাংলা');
   });
 
-  it('shows only the fields for the chosen type', () => {
+  it('shows only the fields for the chosen tab', () => {
     const root = open('#/tool/qr-code-generator');
-    const hidden = (id: string): boolean =>
-      $(root, `#${id}`).closest<HTMLElement>('.field, .check')!.hidden;
-    expect([hidden('qr-text'), hidden('qr-ssid'), hidden('qr-cname')]).toEqual([false, true, true]);
-    set(root, '#qr-type', 'wifi');
+    expect([shown(root, 'qr-text'), shown(root, 'qr-ssid'), shown(root, 'qr-cname')]).toEqual([
+      true,
+      false,
+      false,
+    ]);
+    expect($(root, '#qr-tab-text').getAttribute('aria-selected')).toBe('true');
+    tab(root, 'wifi');
     expect([
-      hidden('qr-text'),
-      hidden('qr-ssid'),
-      hidden('qr-password'),
-      hidden('qr-cname'),
-    ]).toEqual([true, false, false, true]);
+      shown(root, 'qr-text'),
+      shown(root, 'qr-ssid'),
+      shown(root, 'qr-password'),
+      shown(root, 'qr-cname'),
+    ]).toEqual([false, true, true, false]);
     set(root, '#qr-security', 'nopass');
-    expect(hidden('qr-password')).toBe(true);
-    set(root, '#qr-type', 'contact');
-    expect([hidden('qr-text'), hidden('qr-ssid'), hidden('qr-cname')]).toEqual([true, true, false]);
+    expect(shown(root, 'qr-password')).toBe(false);
+    tab(root, 'contact');
+    expect([shown(root, 'qr-text'), shown(root, 'qr-ssid'), shown(root, 'qr-cname')]).toEqual([
+      false,
+      false,
+      true,
+    ]);
+    // Arrow keys move between tabs.
+    $(root, '#qr-tab-contact').dispatchEvent(
+      new KeyboardEvent('keydown', { key: 'ArrowRight', bubbles: true }),
+    );
+    expect($(root, '#qr-tab-email').getAttribute('aria-selected')).toBe('true');
+    expect(document.activeElement?.id).toBe('qr-tab-email');
   });
 
   it('makes a Wi-Fi code that decodes to the standard payload', () => {
     const root = open('#/tool/qr-code-generator');
-    set(root, '#qr-type', 'wifi');
+    tab(root, 'wifi');
     set(root, '#qr-ssid', 'HomeNet');
     set(root, '#qr-password', 'password123');
     submit(root);
     expect(decodeShown(root)).toBe('WIFI:T:WPA;S:HomeNet;P:password123;;');
-    expect(row(root, 'Type')).toBe('Wi-Fi network');
+    expect(row(root, 'Type')).toBe('Wi-Fi');
   });
 
   it('checks Wi-Fi fields and focuses the first problem', () => {
     const root = open('#/tool/qr-code-generator');
-    set(root, '#qr-type', 'wifi');
+    tab(root, 'wifi');
     submit(root);
     expect(err(root, 'qr-ssid')).toBe('Enter the network name.');
     expect(document.activeElement?.id).toBe('qr-ssid');
@@ -130,7 +159,7 @@ describe('QR Code Generator', () => {
 
   it('makes a contact-card code and names the field that is wrong', () => {
     const root = open('#/tool/qr-code-generator');
-    set(root, '#qr-type', 'contact');
+    tab(root, 'contact');
     set(root, '#qr-cname', 'Md. Maniruzzaman');
     set(root, '#qr-cemail', 'not-an-email');
     submit(root);
@@ -141,6 +170,31 @@ describe('QR Code Generator', () => {
     expect(decoded).toContain('BEGIN:VCARD');
     expect(decoded).toContain('FN:Md. Maniruzzaman');
     expect(decoded).toContain('EMAIL:hello@example.com');
+  });
+
+  it('makes email, phone and SMS codes', () => {
+    const root = open('#/tool/qr-code-generator');
+    tab(root, 'email');
+    set(root, '#qr-emailto', 'bad');
+    submit(root);
+    expect(err(root, 'qr-emailto')).toBe('Enter a valid email address.');
+    set(root, '#qr-emailto', 'info@example.com');
+    set(root, '#qr-emailsubject', 'Hi there');
+    submit(root);
+    expect(decodeShown(root)).toBe('mailto:info@example.com?subject=Hi%20there');
+    expect(row(root, 'Type')).toBe('Email');
+    tab(root, 'phone');
+    submit(root);
+    expect(err(root, 'qr-phone')).toBe('Enter a phone number.');
+    set(root, '#qr-phone', '+৮৮০ ১৭০০-০০০০০০');
+    submit(root);
+    expect(decodeShown(root)).toBe('tel:+8801700000000');
+    tab(root, 'sms');
+    set(root, '#qr-smsnumber', '01700000000');
+    set(root, '#qr-smsmessage', 'Hello');
+    submit(root);
+    expect(decodeShown(root)).toBe('SMSTO:01700000000:Hello');
+    expect(row(root, 'Type')).toBe('SMS');
   });
 
   it('refuses empty text and text that is too long', () => {
@@ -154,19 +208,67 @@ describe('QR Code Generator', () => {
     expect(root.querySelector('.qr-svg')).toBeNull();
   });
 
-  it('honours the error-correction level', () => {
+  it('honours the error-correction level, margin and size, and redraws at once', () => {
     const root = open('#/tool/qr-code-generator');
     set(root, '#qr-text', 'a'.repeat(100));
     set(root, '#qr-ecc', 'L');
     submit(root);
-    const low = row(root, 'Size');
+    const low = row(root, 'Code version');
     set(root, '#qr-ecc', 'H');
-    submit(root);
-    expect(row(root, 'Size')).not.toBe(low);
+    expect(row(root, 'Code version')).not.toBe(low);
+    expect(row(root, 'Error correction')).toBe('High (H)');
     expect(decodeShown(root)).toBe('a'.repeat(100));
+    const modules = (): number => Number($(root, '.qr-svg').getAttribute('viewBox')!.split(' ')[2]);
+    const before = modules();
+    set(root, '#qr-margin', '8');
+    expect(modules()).toBe(before + 8);
+    expect(row(root, 'Margin')).toBe('8 modules');
+    set(root, '#qr-margin', '2');
+    expect(root.querySelector('.qg-warnings')?.textContent).toContain('below the QR standard');
+    set(root, '#qr-size', '600');
+    expect(row(root, 'Size')).toBe('600 × 600 pixels');
   });
 
-  it('offers SVG and PNG downloads and saves a real SVG file', async () => {
+  it('uses custom colours and refuses a code lighter than its background', () => {
+    const root = open('#/tool/qr-code-generator');
+    set(root, '#qr-text', 'colours');
+    set(root, '#qr-fg', '#1e3a8a');
+    submit(root);
+    expect($(root, '.qr-svg path').getAttribute('fill')).toBe('#1e3a8a');
+    set(root, '#qr-fg', '#ffffff');
+    set(root, '#qr-bg', '#000000');
+    submit(root);
+    expect(err(root, 'qr-fg')).toBe('The code colour must be darker than the background colour.');
+    expect($<HTMLDetailsElement>(root, '.qg-advanced').open).toBe(true);
+    expect(root.querySelector('.qr-svg')).toBeNull();
+  });
+
+  it('fills the form from an example and resets everything', () => {
+    const root = open('#/tool/qr-code-generator');
+    $<HTMLButtonElement>(root, '#qr-example-wifi').click();
+    expect($(root, '#qr-tab-wifi').getAttribute('aria-selected')).toBe('true');
+    expect($(root, '#qr-ssid').value).toBe('Office WiFi');
+    expect(decodeShown(root)).toBe('WIFI:T:WPA;S:Office WiFi;P:ChangeThisPassword;;');
+    $<HTMLButtonElement>(root, '#qr-example-contact').click();
+    expect(decodeShown(root)).toContain('FN:Md. Maniruzzaman');
+    [...root.querySelectorAll<HTMLButtonElement>('.qg-form button')]
+      .find((b) => b.textContent?.trim() === 'Reset')!
+      .click();
+    expect($(root, '#qr-tab-text').getAttribute('aria-selected')).toBe('true');
+    expect($(root, '#qr-cname').value).toBe('');
+    expect(root.querySelector('.qr-svg')).toBeNull();
+  });
+
+  it('links only to related tools that exist', () => {
+    const root = open('#/tool/qr-code-generator');
+    const links = [...root.querySelectorAll<HTMLAnchorElement>('.qg-related a')].map((a) =>
+      a.getAttribute('href'),
+    );
+    expect(links).toEqual(['#/tool/qr-scanner', '#/tool/wifi-qr-scanner']);
+    expect(root.querySelector('.related')).toBeNull();
+  });
+
+  it('offers PNG, SVG and image-copy and saves a real SVG file', async () => {
     let saved: Blob | null = null;
     URL.createObjectURL = vi.fn((b: Blob) => {
       saved = b;
@@ -181,16 +283,17 @@ describe('QR Code Generator', () => {
     });
     const root = open('#/tool/qr-code-generator');
     set(root, '#qr-text', 'download me');
+    set(root, '#qr-size', '400');
     submit(root);
     const buttons = [...root.querySelectorAll<HTMLButtonElement>('.qr-preview button')].map(
       (b) => b.textContent,
     );
-    expect(buttons).toEqual(['Download PNG', 'Download SVG']);
+    expect(buttons).toEqual(['Download PNG', 'Download SVG', 'Copy Image']);
     [...root.querySelectorAll<HTMLButtonElement>('.qr-preview button')]
       .find((b) => b.textContent === 'Download SVG')!
       .click();
     expect(name).toBe('qr-code.svg');
-    expect($(root, '.copy-status').textContent).toBe('Download started.');
+    expect($(root, '.qr-preview .copy-status').textContent).toBe('Download started.');
     const text = await new Promise<string>((resolve) => {
       const reader = new FileReader();
       reader.onload = () => resolve(String(reader.result));
@@ -198,6 +301,16 @@ describe('QR Code Generator', () => {
     });
     expect(text).toContain('<svg');
     expect(text).toContain('xmlns="http://www.w3.org/2000/svg"');
+    expect(text).toContain('width="400"');
+    // jsdom has no image clipboard: the page says so instead of failing silently.
+    [...root.querySelectorAll<HTMLButtonElement>('.qr-preview button')]
+      .find((b) => b.textContent === 'Copy Image')!
+      .click();
+    await vi.waitFor(() =>
+      expect($(root, '.qr-preview .copy-status').textContent).toBe(
+        'This browser cannot copy images. Download the PNG instead.',
+      ),
+    );
   });
 
   it('keeps the form and code across a language switch', async () => {
@@ -209,6 +322,7 @@ describe('QR Code Generator', () => {
     expect($(root, 'h1').textContent).toBe('QR কোড জেনারেটর');
     expect($<HTMLTextAreaElement>(root, '#qr-text').value).toBe('keep me');
     await vi.waitFor(() => expect(decodeShown(root)).toBe('keep me'));
+    expect(row(root, 'আকার')).toBe('২৫০ × ২৫০ পিক্সেল');
   });
 });
 

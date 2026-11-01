@@ -137,6 +137,51 @@ export function vcardPayload(c: Contact): Result<string, ContactError> {
   return ok(lines.join('\n'));
 }
 
+// ---------- Email, phone and SMS ----------
+
+export type MessageError = 'email-invalid' | 'phone-empty' | 'phone-invalid';
+
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+/** A phone number reduced to an optional leading + and digits, or null if it is not one. */
+export function cleanPhone(text: string): string | null {
+  const t = toEnglishDigits(text).trim();
+  if (!/^\+?[\d\s\-().]{3,24}$/.test(t)) return null;
+  const digits = t.replace(/[^\d]/g, '');
+  if (digits.length < 3 || digits.length > 20) return null;
+  return (t.startsWith('+') ? '+' : '') + digits;
+}
+
+/** `mailto:` link; the subject and body are optional and percent-encoded. */
+export function emailPayload(m: {
+  to: string;
+  subject: string;
+  body: string;
+}): Result<string, MessageError> {
+  const to = m.to.trim();
+  if (!EMAIL_RE.test(to)) return fail('email-invalid');
+  const query = [
+    ...(m.subject.trim() ? [`subject=${encodeURIComponent(m.subject.trim())}`] : []),
+    ...(m.body.trim() ? [`body=${encodeURIComponent(m.body.trim())}`] : []),
+  ];
+  return ok(`mailto:${to}${query.length ? `?${query.join('&')}` : ''}`);
+}
+
+/** `tel:` link (digits and an optional leading +). */
+export function phonePayload(number: string): Result<string, MessageError> {
+  if (!number.trim()) return fail('phone-empty');
+  const n = cleanPhone(number);
+  return n ? ok(`tel:${n}`) : fail('phone-invalid');
+}
+
+/** `SMSTO:number:message`, the form phone cameras open in the messages app. */
+export function smsPayload(m: { number: string; message: string }): Result<string, MessageError> {
+  if (!m.number.trim()) return fail('phone-empty');
+  const n = cleanPhone(m.number);
+  if (!n) return fail('phone-invalid');
+  return ok(`SMSTO:${n}:${m.message.trim()}`);
+}
+
 // ---------- What a scanned code contains ----------
 
 export type PayloadKind = 'url' | 'wifi' | 'contact' | 'email' | 'phone' | 'sms' | 'geo' | 'text';

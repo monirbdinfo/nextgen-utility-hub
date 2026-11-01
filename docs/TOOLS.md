@@ -897,13 +897,29 @@ service. It encodes text as UTF-8 in byte mode (so Bangla and emoji work), in ve
 all four error-correction levels (L ≈ 7 %, M ≈ 15 %, Q ≈ 25 %, H ≈ 30 % of the symbol can be
 damaged). It picks the smallest version that fits and the mask with the lowest standard penalty
 score. Capacity in bytes: version 1 holds 17 / 14 / 11 / 7 (L / M / Q / H) and version 40 holds
-2,953 / 2,331 / 1,663 / 1,273. Longer text is refused with a message. The code is always black on
-white with a 4-module quiet zone, in dark mode too, because scanners need that contrast.
-Downloads: PNG (at least 600 px, drawn on a canvas) and SVG (a single path, no scripts).
+2,953 / 2,331 / 1,663 / 1,273. Longer text is refused with a message.
+
+**Look.** Size 150, 250 (default), 400, 600 or 1,000 px; margin (quiet zone) 2, 4 (default,
+the standard), 6 or 8 modules; and, under "Advanced options", the code and background colours
+(default black on white). The page refuses a code colour that is lighter than the background
+(light-on-dark codes fail in many scanners) and warns when the colours have a contrast ratio
+under 4:1, when the margin is under 4 modules, and when a PNG square would be under 3 px. The
+preview frame stays white in dark mode. Changing the size, level, margin or colours redraws an
+existing code at once. Downloads: PNG of exactly the chosen size (module edges rounded to whole
+pixels, so squares stay sharp) and SVG (a single path, no scripts, with the chosen width and
+height). "Copy Image" puts the PNG on the clipboard where the browser allows it, and says so
+when it does not.
+
+**Layout.** Mockup-based page (November 2026): header illustration (a "Scan me" card and a
+phone showing a real, scannable code for this site, made by the page's own encoder, plus
+content-type badges; inline SVG), "1. Enter Content" with one tab per content type, "2. Preview &
+Download" with a QR Code Information list (type, size, data, error correction, margin, version),
+four feature cards, "How is this calculated?", common uses, examples that fill in the form, and
+related tools (only QR Scanner and WiFi QR Scanner, the related tools that exist).
 
 Content types:
 
-- **Text or link:** the text as typed.
+- **Text / Link:** the text as typed.
 - **Wi-Fi network:** `WIFI:T:<WPA|WEP|nopass>;S:<name>;P:<password>;H:true;;`. The characters
   `\ ; , : "` are escaped with a backslash. The name is at most 32 **bytes** (a Bangla letter
   is 3). WPA passwords are 8–63 characters; WEP passwords are 5 or 13 characters, or 10 or 26
@@ -912,6 +928,11 @@ Content types:
   least one other). Commas, semicolons, backslashes and line breaks are escaped. The phone
   number allows digits, spaces, hyphens, brackets and a leading `+`; the website must start
   with `http://` or `https://`. Long lines are not folded, which scanners accept.
+- **Email:** `mailto:<address>?subject=…&body=…`, subject and body optional and
+  percent-encoded.
+- **Phone:** `tel:<number>`, Bangla or English digits, reduced to digits and an optional
+  leading `+` (3–20 digits).
+- **SMS:** `SMSTO:<number>:<message>`, the form phone cameras open in the messages app.
 
 The picture's accessible name is only “QR code”. It never repeats the content, which could be a
 password. The page warns that anyone who scans a code can read it.
