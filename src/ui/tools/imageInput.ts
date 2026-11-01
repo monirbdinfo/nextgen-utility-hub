@@ -225,6 +225,8 @@ export interface ImageInput {
   disposed(): boolean;
   /** Reopen the in-memory file after a language switch. Call once the view is built. */
   restore(): void;
+  /** Close the image, as the Reset button does. */
+  reset(): void;
 }
 
 export function imageInput(ctx: ToolContext, opts: ImageInputOptions): ImageInput {
@@ -441,6 +443,7 @@ export function imageInput(ctx: ToolContext, opts: ImageInputOptions): ImageInpu
       const file = ctx.session.get('file');
       if (file instanceof File) void openFile(file, true);
     },
+    reset: () => resetBtn.click(),
   };
 }
 

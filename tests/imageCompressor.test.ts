@@ -104,6 +104,13 @@ async function load(
 }
 
 function choose(root: ParentNode, sel: string, value: string): void {
+  if (sel === '#compress-format') {
+    // The output format is a group of radio buttons.
+    const r = $(root, `#compress-format-${value}`);
+    r.checked = true;
+    r.dispatchEvent(new Event('change'));
+    return;
+  }
   const el = $<HTMLSelectElement | HTMLInputElement>(root, sel);
   el.value = value;
   el.dispatchEvent(new Event(el instanceof HTMLSelectElement ? 'change' : 'input'));
@@ -154,11 +161,30 @@ afterEach(() => {
 });
 
 describe('Image Compressor view', () => {
-  it('renders the drop zone and hides the settings until an image is opened', () => {
+  it('renders the drop zone and settings, and asks for an image before compressing', () => {
     const root = open();
     expect($(root, 'h1').textContent).toBe('Image Compressor');
     expect($(root, '#compress-file').accept).toBe('image/jpeg,image/png,image/webp');
-    expect($<HTMLElement>(root, '.compress-controls').hidden).toBe(true);
+    expect($<HTMLElement>(root, '.compress-controls').hidden).toBe(false);
+    expect($(root, '.ic-result').textContent).toContain('Choose an image and select');
+    expect($(root, '#compress-format-same').checked).toBe(true);
+    submit(root);
+    expect(alertText(root)).toBe('Choose an image first.');
+    expect(document.activeElement).toBe($(root, '#compress-file'));
+    expect(pipeline.openEncoder).not.toHaveBeenCalled();
+    // Related tools are real routes only.
+    expect(
+      [...root.querySelectorAll<HTMLAnchorElement>('.ic-related a')].map((a) =>
+        a.getAttribute('href'),
+      ),
+    ).toEqual([
+      '#/tool/image-converter',
+      '#/tool/image-resizer',
+      '#/tool/image-cropper',
+      '#/tool/job-photo-resizer',
+      '#/tool/pdf-create',
+    ]);
+    expect(root.querySelector('.related')).toBeNull();
   });
 
   it('shows the file name, format, dimensions and size, and a labelled quality slider', async () => {
@@ -175,7 +201,9 @@ describe('Image Compressor view', () => {
       '1',
       '80',
     ]);
-    expect(range.labels?.[0]?.textContent).toBe('Quality');
+    // The live value is shown next to the label but is not part of its name.
+    expect(range.labels?.[0]?.textContent).toBe('Quality: 80%');
+    expect(range.labels?.[0]?.querySelector('[aria-hidden="true"]')?.textContent).toBe(': 80%');
     expect(range.getAttribute('aria-valuetext')).toBe('80%');
     choose(root, '#compress-quality', '55');
     expect(range.getAttribute('aria-valuetext')).toBe('55%');
@@ -344,10 +372,9 @@ describe('Image Compressor view', () => {
   it('refuses formats the browser cannot encode and never mislabels the output', async () => {
     pipeline.canEncode.mockImplementation((f: string) => f !== 'webp');
     const root = open();
-    const webp = $<HTMLSelectElement>(root, '#compress-format').querySelector(
-      'option[value="webp"]',
-    ) as HTMLOptionElement;
+    const webp = $(root, '#compress-format-webp');
     expect(webp.disabled).toBe(true);
+    expect(webp.nextElementSibling?.textContent).toBe('WebP (not supported)');
     await load(root, file('p.webp', WEBP_HEADER, 'image/webp', 5_000));
     submit(root);
     await vi.waitFor(() =>
@@ -437,7 +464,8 @@ describe('Image Compressor view', () => {
     [...root.querySelectorAll('button')].find((b) => b.textContent?.trim() === 'Reset')!.click();
     expect(released()).toEqual(['blob:decoded-400x300', 'blob:decoded-200x100']);
     expect($<HTMLElement>(root, '#compress-dropzone').hidden).toBe(false);
-    expect($<HTMLElement>(root, '.compress-controls').hidden).toBe(true);
+    expect($<HTMLElement>(root, '.image-output').hidden).toBe(true);
+    expect($<HTMLElement>(root, '.ic-compare').hidden).toBe(true);
     expect($(root, '#compress-quality').value).toBe('80');
     expect(document.activeElement).toBe($(root, '#compress-file'));
   });
@@ -474,5 +502,40 @@ describe('Image Compressor view', () => {
     expect(resultText(root)).toContain('২.৫০ : ১');
     expect(Object.keys(localStorage)).toEqual(['nguh.lang']);
     expect(sessionStorage.length).toBe(0);
+  });
+
+  it('shows the original and compressed side by side, the saving tiles, compare and download original', async () => {
+    const root = open();
+    await load(root, file('a.jpg', JPEG_HEADER, 'image/jpeg', 10_000));
+    expect($<HTMLElement>(root, '.ic-compare').hidden).toBe(false);
+    expect($<HTMLImageElement>(root, '.ic-cmp-card img').src).toBe('blob:decoded-400x300');
+    expect($(root, '.ic-cmp-pending').hidden).toBe(false);
+    mockEncoder(() => 4_000);
+    submit(root);
+    await done(root);
+    expect($(root, '.ic-cmp-pending').hidden).toBe(true);
+    const tiles = $(root, '.ic-tiles').textContent ?? '';
+    for (const t of ['Original size9.8 KB', 'Compressed size3.9 KB', 'Size reduced60.0%'])
+      expect(tiles).toContain(t);
+    // Compare switches to the swipe view and back.
+    const compare = $<HTMLButtonElement>(root, '#compress-compare-btn');
+    compare.click();
+    expect(compare.getAttribute('aria-pressed')).toBe('true');
+    expect($<HTMLElement>(root, '.ic-swipe').hidden).toBe(false);
+    const range = $(root, '#compress-compare');
+    range.value = '20';
+    range.dispatchEvent(new Event('input'));
+    expect($<HTMLImageElement>(root, '.ic-swipe-top').style.clipPath).toBe('inset(0 0 0 20%)');
+    compare.click();
+    expect($<HTMLElement>(root, '.ic-swipe').hidden).toBe(true);
+    // Download original saves the file that is already in memory under its own name.
+    let name = '';
+    vi.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(function (
+      this: HTMLAnchorElement,
+    ) {
+      name = this.download;
+    });
+    $<HTMLButtonElement>(root, '#compress-download-original').click();
+    expect(name).toBe('a.jpg');
   });
 });
