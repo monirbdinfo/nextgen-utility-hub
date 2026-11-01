@@ -5,6 +5,7 @@ import { toHash } from '../router/router';
 import { ageHeroArt } from './art/ageHero';
 import { numberHeroArt } from './art/numberHero';
 import { photoHeroArt } from './art/photoHero';
+import { qrHeroArt } from './art/qrHero';
 import { statusKey, type AppContext } from './context';
 import { icon } from './icons';
 import { TOOL_ICONS } from './toolkits';
@@ -50,7 +51,9 @@ export function createToolPage(ctx: AppContext, tool: Tool, store: ToolStore): H
         ? numberHeroArt(lang)
         : tool.id === 'job-photo-resizer'
           ? photoHeroArt(lang)
-          : null;
+          : tool.id === 'qr-code-generator'
+            ? qrHeroArt(lang)
+            : null;
 
   return h(
     'section',
